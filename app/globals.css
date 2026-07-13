@@ -1,0 +1,102 @@
+@font-face {
+    font-family: 'Anton';
+    src: url('/fonts/Anton-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Roboto Flex';
+    src: url('/fonts/RobotoFlex-Variable.ttf') format('truetype');
+    font-weight: 100 1000;
+    font-style: normal;
+    font-display: swap;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    :root {
+        --background: 0 0% 13%;
+        --background-light: 0 0% 19%;
+        --foreground: 0 0% 87%;
+
+        --card: 0 0% 3.9%;
+        --card-foreground: 0 0% 98%;
+        --popover: 0 0% 3.9%;
+        --popover-foreground: 0 0% 98%;
+
+        --primary: 140 100% 47%;
+        --primary-foreground: 0 0% 13%;
+        --secondary: 193 100% 47%;
+        --secondary-foreground: 0 0% 13%;
+        --muted: 0 0% 14.9%;
+        --muted-foreground: 0 0% 71%;
+        --accent: 0 0% 14.9%;
+        --accent-foreground: 0 0% 98%;
+        --destructive: 0 62.8% 30.6%;
+        --destructive-foreground: 0 0% 98%;
+        --border: 0 0% 24%;
+        --input: 0 0% 14.9%;
+        --ring: 0 0% 83.1%;
+        --chart-1: 220 70% 50%;
+        --chart-2: 160 60% 45%;
+        --chart-3: 30 80% 55%;
+        --chart-4: 280 65% 60%;
+        --chart-5: 340 75% 55%;
+
+        --font-anton: 'Anton', 'Arial Black', 'Avenir Next', 'Segoe UI',
+            sans-serif;
+        --font-roboto-flex: 'Roboto Flex', 'Segoe UI', Arial, sans-serif;
+    }
+
+    html[data-theme='light'] {
+        --background: 0 0% 100%;
+        --background-light: 0 0% 97%;
+        --foreground: 220 15% 15%;
+
+        --card: 0 0% 100%;
+        --card-foreground: 220 15% 15%;
+        --popover: 0 0% 100%;
+        --popover-foreground: 220 15% 15%;
+
+        --primary: 140 100% 47%;
+        --primary-foreground: 0 0% 13%;
+        --secondary: 193 100% 47%;
+        --secondary-foreground: 0 0% 13%;
+        --muted: 0 0% 95%;
+        --muted-foreground: 220 8% 45%;
+        --accent: 220 10% 95%;
+        --accent-foreground: 220 15% 15%;
+        --destructive: 0 62.8% 30.6%;
+        --destructive-foreground: 0 0% 98%;
+        --border: 220 10% 88%;
+        --input: 220 10% 90%;
+        --ring: 140 100% 47%;
+    }
+}
+
+@layer base {
+    ::-webkit-scrollbar {
+        display: none;
+    }
+    * {
+        @apply border-border !cursor-none;
+    }
+    body {
+        @apply bg-background text-foreground font-roboto-flex transition-colors duration-300;
+    }
+}
+
+@layer components {
+    .grid {
+        @apply gap-[25px];
+    }
+
+    .markdown-text ul {
+        @apply pl-5 mt-2 list-disc;
+    }
+}
