@@ -3,16 +3,16 @@ import { ReactLenis } from 'lenis/react';
 import { Fraunces } from 'next/font/google';
 import 'lenis/dist/lenis.css';
 import './globals.css';
-import Footer from '@/components/Footer';
-import ScrollProgressIndicator from '@/components/ScrollProgressIndicator';
 import ParticleBackground from '@/components/ParticleBackground';
-import Navbar from '@/components/Navbar';
+// import Navbar from '@/components/Navbar';
 import CustomCursor from '@/components/CustomCursor';
 import Preloader from '../components/Preloader';
 import StickyEmail from './_components/StickyEmail';
 import { GoogleAnalytics } from '@next/third-parties/google';
 import Script from 'next/script';
 import { ThemeProvider } from '@/components/ThemeProvider';
+import Footer from '@/components/Footer';
+import SectionPills from '@/components/SectionPills';
 
 export const metadata: Metadata = {
     title: 'Portfolio - Husnain Maroof',
@@ -60,15 +60,15 @@ export default function RootLayout({
                             Frontend dev? I&apos;ll help you polish your resume —
                             completely free.
                         </a> */}
-                        <Navbar />
+                        {/* <Navbar /> */}
                         <main>{children}</main>
                         <Footer />
 
                         <CustomCursor />
                         <Preloader />
-                        <ScrollProgressIndicator />
                         <ParticleBackground />
                         <StickyEmail />
+                        <SectionPills />
                     </ReactLenis>
                 </ThemeProvider>
             </body>

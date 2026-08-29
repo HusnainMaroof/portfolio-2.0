@@ -13,7 +13,7 @@ export interface BoldHoverTextProps {
     text: string;
     /** resting letter color */
     color?: string;
-    /** color a letter tweens to once toggled on — defaults to `color` if omitted */
+    /** color a letter tweens to while hovered — defaults to `color` if omitted */
     hoverColor?: string;
     /** extra classes, e.g. "hero-word inline-block" to match sibling words */
     className?: string;
@@ -59,7 +59,6 @@ export default function BoldHoverText({
 
         split.chars.forEach((charEl) => {
             const c = charEl as HTMLElement;
-            let written = false;
             let tween: gsap.core.Tween | null = null;
 
             c.style.display = 'inline-block';
@@ -69,23 +68,36 @@ export default function BoldHoverText({
             c.style.color = color;
             if (fontFamily) c.style.fontFamily = fontFamily;
 
-            // toggles on hover-in only: a letter stays bold/colored until it's
-            // hovered again, it never reverts on mouseleave
+            // Standard hover in/out: bold+colored while hovered, reverts the
+            // instant the pointer leaves — no persistent per-letter state.
             const onEnter = () => {
                 tween?.kill();
-                written = !written;
-
                 tween = gsap.to(c, {
-                    '--wght': written ? hoverWeight : baseWeight,
-                    letterSpacing: written ? hoverTracking : baseTracking,
-                    color: written ? targetHoverColor : color,
+                    '--wght': hoverWeight,
+                    letterSpacing: hoverTracking,
+                    color: targetHoverColor,
+                    duration,
+                    ease: 'power3.out',
+                } as gsap.TweenVars);
+            };
+
+            const onLeave = () => {
+                tween?.kill();
+                tween = gsap.to(c, {
+                    '--wght': baseWeight,
+                    letterSpacing: baseTracking,
+                    color,
                     duration,
                     ease: 'power3.out',
                 } as gsap.TweenVars);
             };
 
             c.addEventListener('mouseenter', onEnter);
-            cleanupFns.push(() => c.removeEventListener('mouseenter', onEnter));
+            c.addEventListener('mouseleave', onLeave);
+            cleanupFns.push(() => {
+                c.removeEventListener('mouseenter', onEnter);
+                c.removeEventListener('mouseleave', onLeave);
+            });
         });
 
         return () => {

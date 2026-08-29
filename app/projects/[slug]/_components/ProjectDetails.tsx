@@ -86,7 +86,7 @@ const ProjectDetails = ({ project }: Props) => {
 
     return (
         <section className="pt-5 pb-14">
-            <div className="container" ref={containerRef}>
+            <div className="max-w-[80%] mx-auto" ref={containerRef}>
                 <TransitionLink
                     back
                     href="/"

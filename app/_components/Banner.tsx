@@ -1,127 +1,131 @@
 'use client';
-import ArrowAnimation from '@/components/ArrowAnimation';
-import Button from '@/components/Button';
 import BoldHoverText from '@/components/HoverText';
 import { GENERAL_INFO } from '@/lib/data';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/all';
 import { useRef } from 'react';
 import { useTheme } from '@/components/ThemeProvider';
 
-gsap.registerPlugin(ScrollTrigger, useGSAP);
+gsap.registerPlugin(useGSAP);
+
+// TODO: move to GENERAL_INFO / lib/data once real content is finalized.
+const HERO_STATS = [
+    { label: 'Years', value: '6+' },
+    { label: 'Apps Shipped', value: '72+' },
+];
+
+const HERO_CREDIBILITY = {
+    text: 'Top 5% of developers, recognized by Toptal',
+    href: GENERAL_INFO.upworkProfile,
+};
+
+const HERO_BULLETS = [
+    {
+        lead: 'Beyond the build',
+        text: 'I plan for scalability so your stack holds up as usage grows.',
+    },
+    {
+        lead: 'Built to grow',
+        text: 'Products shaped to attract users and keep them coming back.',
+    },
+];
 
 const Banner = () => {
     const containerRef = useRef<HTMLDivElement>(null);
     const { theme } = useTheme();
-    const heroTextColor = theme === 'light' ? '#111111' : '#DEDEDE';
     const heroAccentColor = theme === 'light' ? '#111111' : '#00F050';
+    const heroTextColor = theme === 'light' ? '#111111' : '#DEDEDE';
 
     useGSAP(
         () => {
-            // entrance: word-by-word reveal on mount, plays once
-            gsap.from('.hero-word', {
-                yPercent: 210,
-                stagger: 0.08,
-                duration: 6,
-                ease: 'power4.out',
-                delay: 0.15,
-            });
-
-            // existing scroll-out fade, untouched logic
-            const tl = gsap.timeline({
-                scrollTrigger: {
-                    trigger: containerRef.current,
-                    start: 'bottom 70%',
-                    end: 'bottom 10%',
-                    scrub: 1,
-                },
-            });
-
-            tl.fromTo(
-                '.slide-up-and-fade',
-                { y: 0 },
-                { y: -150, opacity: 0, stagger: 0.02 },
+            const mediaQuery = window.matchMedia(
+                '(prefers-reduced-motion: reduce)',
             );
+            if (mediaQuery.matches) return;
+
+            gsap.from('.hero-reveal', {
+                opacity: 0,
+                y: 12,
+                duration: 0.5,
+                stagger: 0.05,
+                ease: 'power2.out',
+            });
         },
         { scope: containerRef },
     );
 
     return (
         <section className="relative overflow-hidden" id="banner">
-            <ArrowAnimation />
             <div
-                className="container relative h-[100svh] min-h-[600px] flex flex-col justify-center items-center text-center"
+                className=" max-w-[80%] mx-auto relative min-h-[600px] grid grid-cols-1 md:grid-cols-[1fr_240px] gap-12 items-center py-24"
                 ref={containerRef}
             >
-                {/* nameplate pill */}
-                <div className="slide-up-and-fade text-start   mb-10">
-                    <span className="text-sm font-medium text-foreground">
-                        Hey there, I&apos;m{' '}
-                        <span className="text-primary">Husnain</span>
+                {/* left: name-led headline block */}
+                <div className="flex flex-col gap-6">
+                    <span className="hero-reveal text-sm uppercase tracking-wide text-muted-foreground">
+                        Full-Stack Developer · Based in Pakistan
                     </span>
+
+                    <h1
+                        className="hero-reveal leading-[.95] text-[clamp(2.5rem,9vw,48px)] uppercase"
+                        style={{
+                            fontFamily: "'Fraunces', serif",
+                            fontWeight: 600,
+                        }}
+                    >
+                        <BoldHoverText
+                            text="Husnain Maroof"
+                            className="inline-block"
+                            fontFamily="'Fraunces', serif"
+                            baseWeight={600}
+                            hoverWeight={900}
+                            color={heroTextColor}
+                            hoverColor={heroAccentColor}
+                        />
+                        <span className="text-foreground">.</span>
+                    </h1>
+
+                    <p className="hero-reveal max-w-xl text-base md:text-lg text-muted-foreground leading-relaxed">
+                        I build fast, reliable web products — from first line of
+                        code to something real users depend on.
+                    </p>
+
+                    <div className="hero-reveal flex flex-col gap-2 max-w-xl text-sm md:text-base text-muted-foreground">
+                        {HERO_BULLETS.map((bullet) => (
+                            <p key={bullet.lead}>
+                                <span className="text-foreground font-semibold">
+                                    {bullet.lead}
+                                </span>{' '}
+                                — {bullet.text}
+                            </p>
+                        ))}
+                    </div>
                 </div>
 
-                {/* headline — each word masked + revealed independently */}
-                <h1 className="slide-up-and-fade leading-[.9] text-[clamp(2.5rem,12vw,120px)] font-anton">
-                    <span className="flex flex-wrap justify-center gap-x-4 md:gap-x-6 pb-10">
-                        <span className="overflow-hidden inline-block  -mb-2">
-                            <BoldHoverText
-                                text="Full"
-                                className="hero-word inline-block uppercase"
-                                fontFamily="'Fraunces', serif"
-                                baseWeight={300}
-                                hoverWeight={900}
-                                color={heroTextColor}
-                                hoverColor={heroAccentColor}
-                            />
-                        </span>
-                        <span className="overflow-hidden inline-block pb-2 -mb-2">
-                            <BoldHoverText
-                                text="Stack"
-                                className="hero-word inline-block uppercase"
-                                fontFamily="'Fraunces', serif"
-                                baseWeight={300}
-                                hoverWeight={900}
-                                color={heroTextColor}
-                                hoverColor={heroTextColor}
-                            />
-                        </span>
-                    </span>
-                    <span className="flex flex-wrap justify-center">
-                        <span className="overflow-hidden inline-block pb-2 -mb-2">
-                            <BoldHoverText
-                                text="Developer"
-                                className="hero-word inline-block uppercase"
-                                fontFamily="'Fraunces', serif"
-                                baseWeight={300}
-                                hoverWeight={900}
-                                color={heroTextColor}
-                                hoverColor={heroTextColor}
-                            />
-                        </span>
-                    </span>
-                </h1>
-
-                {/* bottom-left: availability */}
-                <div className="slide-up-and-fade absolute bottom-8 left-6 md:left-10  items-center gap-2 hidden md:flex">
-                    <span className="size-3 rounded-full bg-primary" />
-                    <span className="text-sm text-muted-foreground">
-                        Available for full-time opportunities
-                    </span>
-                </div>
-
-                {/* bottom-right: CTA in the corner */}
-                <div className="slide-up-and-fade absolute bottom-8 right-6 md:right-10 rounded-sm bg-background/80 backdrop-blur-md px-4 py-2 flex items-center gap-3">
-                    <Button
-                        as="link"
+                {/* right: credibility + stats sidebar */}
+                <div className="hero-reveal flex md:flex-col gap-6 md:gap-8 md:border-l md:border-border md:pl-8">
+                    <a
+                        href={HERO_CREDIBILITY.href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        href={GENERAL_INFO.upworkProfile}
-                        variant="primary"
+                        className="inline-flex items-center gap-2 text-sm text-foreground hover:text-primary transition-colors w-fit"
                     >
-                        Let&apos;s Talk
-                    </Button>
+                        {HERO_CREDIBILITY.text}
+                        <span aria-hidden>↗</span>
+                    </a>
+
+                    <div className="flex md:flex-col gap-6">
+                        {HERO_STATS.map((stat) => (
+                            <div key={stat.label}>
+                                <div className="text-3xl font-semibold text-foreground">
+                                    {stat.value}
+                                </div>
+                                <div className="text-xs uppercase tracking-wide text-muted-foreground">
+                                    {stat.label}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </div>
         </section>

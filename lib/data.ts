@@ -2,24 +2,32 @@ import { IProject } from '@/types';
 
 export const GENERAL_INFO = {
     Name: 'Husnain Maroof',
-    email: 'tasmirolislam@gmail.com',
+    email: 'husnainmaroof95@gmail.com',
 
     emailSubject: "Let's collaborate on a project",
-    emailBody: 'Hi Tajmirul, I am reaching out to you because...',
+    emailBody: 'Hi Husnain, I am reaching out to you because...',
 
-    oldPortfolio: 'https://www.legacy.me.toinfinite.dev',
-    upworkProfile: 'https://www.upwork.com/freelancers/tajmirul',
+    oldPortfolio: 'https://husnain-maroof-portfolio.vercel.app',
+    upworkProfile: 'https://www.upwork.com/freelancers/~01e3f0c7b1d8a5e2f9',
 };
 
 export const SOCIAL_LINKS = [
     { name: 'github', url: 'https://github.com/Tajmirul' },
     { name: 'linkedin', url: 'https://www.linkedin.com/in/tajmirul' },
-    { name: 'facebook', url: 'https://www.facebook.com/tajmirul.2000' },
+    { name: 'facebook', url: 'https://www.facebook.com' },
     { name: 'Old Version', url: GENERAL_INFO.oldPortfolio },
 ];
 
 export const MY_STACK = {
     frontend: [
+        {
+            name: 'HTML',
+            icon: '/logo/html5.svg',
+        },
+        {
+            name: 'CSS',
+            icon: '/logo/css3.svg',
+        },
         {
             name: 'JavaScript',
             icon: '/logo/js.png',
@@ -91,6 +99,10 @@ export const MY_STACK = {
         {
             name: 'Prisma',
             icon: '/logo/prisma.png',
+        },
+        {
+            name: 'Supabase',
+            icon: '/logo/supabase.svg',
         },
     ],
     tools: [
@@ -287,23 +299,18 @@ export const PROJECTS: IProject[] = [
 
 export const MY_EXPERIENCE = [
     {
-        title: 'Software Engineer (Frontend)',
-        company: 'Strativ AB',
-        duration: 'Dec 2024 - Present',
+        title: 'Full Stack (Frontend)',
+        company: 'Freelance',
+        duration: ' 2025 - Present',
     },
     {
         title: 'Frontend Developer',
-        company: 'Epikcoders',
-        duration: 'Oct 2023 - Nov 2024',
+        company: 'Paymits',
+        duration: 'jan 2024 - Nov 2024',
     },
     {
         title: 'Frontend Engineer',
-        company: 'Anchorblock Technology',
-        duration: 'Oct 2022 - Sep 2023',
-    },
-    {
-        title: 'Frontend Developer (Part-time)',
-        company: 'Branex IT',
-        duration: 'Jan 2022 - Oct 2022',
+        company: 'TangoPay',
+        duration: 'Oct 2024 - jan 2025',
     },
 ];
