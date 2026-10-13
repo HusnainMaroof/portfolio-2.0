@@ -59,19 +59,19 @@ const Skills = () => {
 
     return (
         <section id="my-stack" ref={containerRef} className="pt-section">
-            <div className="max-w-[80%] mx-auto">
+            <div className="page-container">
                 <SectionTitle title="My Stack" />
 
                 <div className="space-y-20">
                     {Object.entries(MY_STACK).map(([key, value]) => (
                         <div className="grid sm:grid-cols-12" key={key}>
                             <div className="sm:col-span-5">
-                                <p className="slide-up text-5xl font-anton leading-none text-muted-foreground uppercase">
+                                <p className="slide-up text-3xl font-anton leading-none text-muted-foreground uppercase sm:text-4xl md:text-5xl">
                                     {key}
                                 </p>
                             </div>
 
-                            <div className="sm:col-span-7 flex gap-x-11 gap-y-9 flex-wrap">
+                            <div className="sm:col-span-7 flex gap-x-8 gap-y-7 flex-wrap md:gap-x-11 md:gap-y-9">
                                 {value.map((item) => (
                                     <div
                                         className="slide-up flex gap-3.5 items-center leading-none"
@@ -89,7 +89,7 @@ const Skills = () => {
                                                 className="max-h-10"
                                             />
                                         </div>
-                                        <span className="text-2xl capitalize">
+                                        <span className="text-lg capitalize sm:text-xl md:text-2xl">
                                             {item.name}
                                         </span>
                                     </div>

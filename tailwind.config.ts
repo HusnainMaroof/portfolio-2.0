@@ -66,7 +66,9 @@ export default {
                 'roboto-flex': ['var(--font-roboto-flex)'],
             },
             padding: {
-                section: '250px',
+                // Responsive via --section-pad in globals.css: phones cannot
+                // afford 250px of dead space between sections.
+                section: 'var(--section-pad)',
             },
             container: {
                 center: true,

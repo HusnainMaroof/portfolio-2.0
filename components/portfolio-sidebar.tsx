@@ -254,7 +254,7 @@ export default function PortfolioSidebar() {
                 data-avatar-keepout=""
                 className={cn(
                     'fixed z-[4] bg-sidebar text-foreground',
-                    'inset-x-0 bottom-0 flex h-[68px] w-full items-stretch',
+                    'inset-x-0 bottom-0 flex h-[60px] w-full items-stretch',
                     'border-t border-white/[0.18] px-1.5 lg:hidden',
                 )}
             >

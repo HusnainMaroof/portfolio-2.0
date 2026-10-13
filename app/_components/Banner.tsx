@@ -77,7 +77,7 @@ const Banner = () => {
     return (
         <section className="relative overflow-hidden" id="banner">
             <div
-                className=" max-w-[80%] mx-auto relative min-h-[600px] grid grid-cols-1 md:grid-cols-[1fr_240px] gap-12 items-center py-24"
+                className=" page-container relative grid grid-cols-1 md:grid-cols-[1fr_240px] gap-10 md:gap-12 items-center py-20 sm:py-24 md:min-h-[600px]"
                 ref={containerRef}
             >
                 {/* left: name-led headline block */}
@@ -98,7 +98,7 @@ const Banner = () => {
                     </span>
 
                     <h1
-                        className="hero-reveal leading-[.95] text-[clamp(2.5rem,9vw,48px)] uppercase"
+                        className="hero-reveal leading-[.95] text-[clamp(2rem,8.5vw,48px)] uppercase"
                         style={{
                             fontFamily: "'Fraunces', serif",
                             fontWeight: 600,
@@ -170,7 +170,7 @@ const Banner = () => {
                                 data-avatar-label={stat.label}
                                 data-avatar-context={stat.context}
                             >
-                                <div className="text-3xl font-semibold text-foreground">
+                                <div className="text-2xl md:text-3xl font-semibold text-foreground">
                                     {stat.value}
                                 </div>
                                 <div className="text-xs uppercase tracking-wide text-muted-foreground">

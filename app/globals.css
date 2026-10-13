@@ -20,6 +20,11 @@
 
 @layer base {
     :root {
+        /* Section rhythm. The original design used a flat 250px, which eats a
+           whole phone screen between every section, so each step down shrinks
+           the vertical gap. `py-section` / `pt-section` read this variable. */
+        --section-pad: 72px;
+
         --background: 0 0% 13%;
         --background-light: 0 0% 19%;
         --foreground: 0 0% 87%;
@@ -84,25 +89,61 @@
     ::-webkit-scrollbar {
         display: none;
     }
-    * {
-        @apply border-border cursor-none;
+
+    /* The custom cursor only renders on fine pointers (see CustomCursor, which
+       is `hidden md:block`). Hiding the native cursor everywhere would leave
+       touch and coarse-pointer devices with no feedback at all, so both rules
+       are scoped to `@media (pointer: fine)`. */
+    @media (pointer: fine) {
+        * {
+            @apply border-border cursor-none;
+        }
+
+        /* Tailwind preflight sets `cursor: pointer` on button/[role=button] and
+           `cursor: default` on :disabled. Those selectors outrank the universal
+           `cursor: none` above, so the native cursor flashed over the custom
+           one whenever a button (or a disabled carousel arrow) was hovered.
+           Re-assert `none` here, same layer, later in source, so these win the
+           tie. */
+        button,
+        [role='button'],
+        :disabled {
+            @apply cursor-none;
+        }
     }
-    /* Tailwind preflight sets `cursor: pointer` on button/[role=button] and
-       `cursor: default` on :disabled. Those selectors outrank the universal
-       `cursor: none` above, so the native cursor flashed over the custom one
-       whenever a button (or a disabled carousel arrow) was hovered. Re-assert
-       `none` here, same layer, later in source, so these win the tie. */
-    button,
-    [role='button'],
-    :disabled {
-        @apply cursor-none;
-    }
+
     body {
         @apply bg-background text-foreground font-roboto-flex transition-colors duration-300;
+    }
+
+    @media (min-width: 640px) {
+        :root {
+            --section-pad: 120px;
+        }
+    }
+
+    @media (min-width: 768px) {
+        :root {
+            --section-pad: 180px;
+        }
+    }
+
+    @media (min-width: 1280px) {
+        :root {
+            --section-pad: 250px;
+        }
     }
 }
 
 @layer components {
+    /* The centred page container every section uses. At 80% a 375px phone
+       only has ~37px of gutter, which crowds long headings and buttons, so
+       phones get a wider relative container and it steps back to the original
+       80% once there is room for it. */
+    .page-container {
+        @apply mx-auto w-full max-w-[88%] md:max-w-[80%];
+    }
+
     .no-scrollbar {
         -ms-overflow-style: none;
         scrollbar-width: none;
@@ -112,8 +153,14 @@
         display: none;
     }
 
-    .grid {
-        @apply gap-[25px];
+    /* A blanket gap on every `.grid` was inherited from the desktop design.
+       On a phone a 25px gutter on single-column grids eats horizontal space it
+       does not need, so it only applies from the md breakpoint up. Individual
+       components still override it with their own `gap-*` utilities. */
+    @media (min-width: 768px) {
+        .grid {
+            @apply gap-[25px];
+        }
     }
 
     .markdown-text ul {

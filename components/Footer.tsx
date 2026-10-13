@@ -66,7 +66,7 @@ const Footer = () => {
     return (
         <footer className="relative overflow-hidden" id="contact">
             <div
-                className="max-w-[80%] mx-auto pb-section flex flex-col justify-center items-center text-center"
+                className="page-container pb-section flex flex-col justify-center items-center text-center"
                 ref={containerRef}
             >
                 {/* nameplate pill, matches Banner's availability tag */}
@@ -83,7 +83,7 @@ const Footer = () => {
                     className="group block"
                     data-avatar="contact"
                 >
-                    <h2 className="leading-[.9] text-[clamp(2.5rem,12vw,120px)] font-anton pb-10">
+                    <h2 className="leading-[.9] text-[clamp(2rem,10vw,120px)] font-anton pb-6 md:pb-10">
                         <span className="flex flex-wrap justify-center gap-x-4 md:gap-x-6">
                             <span className="overflow-hidden inline-block -mb-2">
                                 <BoldHoverText
@@ -112,7 +112,7 @@ const Footer = () => {
                 </a>
 
                 {/* scroll-scrubbed description, same pattern as AboutMe */}
-                <div className="max-w-[600px] text-lg text-muted-foreground tracking-widest mb-10">
+                <div className="max-w-[600px] text-base leading-relaxed text-muted-foreground tracking-wide mb-8 md:text-lg md:tracking-widest md:mb-10">
                     <ScrollReveal
                         id="footer-reveal"
                         baseOpacity={0}

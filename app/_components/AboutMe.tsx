@@ -67,7 +67,7 @@ const AboutMe = ({ scrollerRef }: AboutMeProps) => {
 
     return (
         <section className="pb-20 md:pb-28" id="about-me">
-            <div className="max-w-[80%] mx-auto" ref={container}>
+            <div className="page-container" ref={container}>
                 <p className="pb-3 border-b text-muted-foreground slide-up-and-fade">
                     This is me.
                 </p>

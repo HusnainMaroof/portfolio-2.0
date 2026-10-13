@@ -147,7 +147,7 @@ export default function RootLayout({
                 a.appendChild(r);
             })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');`}
             </Script>
-            <body className="antialiased pb-[68px] lg:pb-0">
+            <body className="antialiased pb-[60px] lg:pb-0">
                 <ThemeProvider>
                     <ReactLenis
                         root

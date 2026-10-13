@@ -39,7 +39,7 @@ export const ViewSwitcher = ({ value, onChange }: ViewSwitcherProps) => (
                     aria-pressed={isActive}
                     onClick={() => onChange(option.value)}
                     className={cn(
-                        'rounded border px-3.5 py-3 text-[11px] uppercase tracking-[0.14em] transition-colors duration-200 lg:py-1.5',
+                        'rounded border px-3.5 py-2.5 text-[11px] uppercase tracking-[0.14em] transition-colors duration-200 lg:py-1.5',
                         'focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background',
                         isActive
                             ? 'border-primary/70 text-foreground'
@@ -58,10 +58,10 @@ const SelectedWork = () => {
 
     return (
         <section id="my-projects" className="pt-20 md:pt-28">
-            <div className="mx-auto max-w-[80%]">
+            <div className="page-container">
                 <header className="mb-12 flex flex-col gap-7 md:mb-16 md:flex-row md:items-start md:justify-between md:gap-10">
                     <div>
-                        <h2 className="font-anton text-4xl leading-none text-foreground sm:text-5xl md:text-6xl">
+                        <h2 className="font-anton text-3xl leading-none text-foreground sm:text-4xl md:text-6xl">
                             Projects
                         </h2>
 

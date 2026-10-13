@@ -53,10 +53,10 @@ const Experiences = () => {
 
     return (
         <section className="py-section" id="my-experience">
-            <div className="max-w-[80%] mx-auto" ref={containerRef}>
+            <div className="page-container" ref={containerRef}>
                 <SectionTitle title="My Experience" />
 
-                <div className="grid gap-14">
+                <div className="grid gap-10 md:gap-14">
                     {MY_EXPERIENCE.map((item) => (
                         <div
                             key={item.title}
@@ -68,7 +68,7 @@ const Experiences = () => {
                             <p className="text-xl text-muted-foreground">
                                 {item.company}
                             </p>
-                            <p className="text-5xl font-anton leading-none mt-3.5 mb-2.5">
+                            <p className="text-3xl font-anton leading-none mt-3.5 mb-2.5 sm:text-4xl md:text-5xl">
                                 {item.title}
                             </p>
                             <p className="text-lg text-muted-foreground">

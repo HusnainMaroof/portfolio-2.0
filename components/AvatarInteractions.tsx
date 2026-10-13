@@ -50,11 +50,27 @@ gsap.registerPlugin(SplitText);
 
 const MESSAGE_W = 200;
 const PANEL_W = 240;
+/**
+ * Overlays are pinned to a fixed pixel width, which can outgrow a 320px
+ * viewport. This cap is applied to both the measured style and the planning
+ * estimate so the reserved space matches what is actually rendered.
+ */
+const overlayWidth = (preferred: number) =>
+    Math.min(preferred, Math.max(200, window.innerWidth - 32));
 /** Planning estimate for the first line; the real box is measured after render. */
-const MESSAGE_ESTIMATE: Size = { width: MESSAGE_W, height: 72 };
+const messageEstimate = (): Size => ({
+    width: overlayWidth(MESSAGE_W),
+    height: 72,
+});
+
 const PANEL_ID = 'avatar-assistant-panel';
 const AVATAR_DESKTOP = 112;
-const AVATAR_MOBILE = 84;
+/**
+ * Phones get a smaller Onee: 84px covered a large share of a short viewport
+ * and crowded the fixed bottom nav, so the mobile avatar steps down to 64px.
+ * Overlay widths below follow the same reasoning.
+ */
+const AVATAR_MOBILE = 64;
 const MOBILE_BREAKPOINT = 768;
 const REACH_PX = 260;
 /** Hover intent: the line appears only after the pointer has settled on a target. */
@@ -119,7 +135,8 @@ const viewportSize = (): Size => ({
     height: window.innerHeight,
 });
 
-const NAV_BAR_HEIGHT = 68;
+/** Must match the mobile nav height in portfolio-sidebar and the body padding in layout. */
+const NAV_BAR_HEIGHT = 60;
 const NAV_BAR_BREAKPOINT = 1024;
 
 /** Home is the bottom-right corner of the viewport, clear of the centred navbar. */
@@ -238,8 +255,8 @@ const AvatarInteractions = () => {
             box.style.top = `${placed.top}px`;
         };
 
-        place(messageRef.current, MESSAGE_W);
-        place(panelRef.current, PANEL_W);
+        place(messageRef.current, overlayWidth(MESSAGE_W));
+        place(panelRef.current, overlayWidth(PANEL_W));
     }, []);
 
     /**
@@ -581,7 +598,7 @@ const AvatarInteractions = () => {
                 element,
                 root,
                 trigger,
-                MESSAGE_ESTIMATE,
+                messageEstimate(),
                 layoutRef.current.choice,
             );
 
@@ -645,7 +662,7 @@ const AvatarInteractions = () => {
             active.element,
             root,
             active.trigger,
-            MESSAGE_ESTIMATE,
+            messageEstimate(),
             layoutRef.current.choice,
         );
 
@@ -936,7 +953,7 @@ const AvatarInteractions = () => {
                 ref={messageRef}
                 data-avatar-message=""
                 className="pointer-events-none absolute left-0 top-0 rounded-lg border border-border/60 bg-background-light px-3 py-2 text-sm leading-snug text-foreground opacity-0"
-                style={{ width: MESSAGE_W, maxWidth: 'calc(100vw - 2rem)' }}
+                style={{ maxWidth: 'calc(100vw - 2rem)' }}
             >
                 {view.label && (
                     <p className="mb-1 text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
@@ -962,7 +979,7 @@ const AvatarInteractions = () => {
                 role="dialog"
                 aria-label="Portfolio assistant"
                 className="pointer-events-auto invisible absolute left-0 top-0 rounded-2xl border border-border/60 bg-background-light p-4 text-foreground opacity-0"
-                style={{ width: PANEL_W }}
+                style={{ maxWidth: 'calc(100vw - 2rem)' }}
             >
                 <div className="mb-3 flex items-start justify-between gap-3">
                     <p className="text-sm leading-snug">

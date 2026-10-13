@@ -202,7 +202,7 @@ const ClientProof = () => {
     return (
         // Same centred page container as every other section, so the panel
         // no longer spills outside the page grid on wide screens.
-        <section aria-label="Client proof" className="mx-auto max-w-[80%] pb-24 md:pb-32">
+        <section aria-label="Client proof" className="page-container pb-24 md:pb-32">
             <div className="overflow-hidden rounded-2xl border border-border/50 bg-background-light">
                 {/* Header: eyebrow + stars left, action right */}
                 <header className="flex flex-col gap-6 px-6 pb-7 pt-7 md:flex-row md:items-center md:justify-between md:gap-6 md:px-9 md:py-8">
