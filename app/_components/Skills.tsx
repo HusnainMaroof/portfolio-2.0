@@ -75,6 +75,9 @@ const Skills = () => {
                                 {value.map((item) => (
                                     <div
                                         className="slide-up flex gap-3.5 items-center leading-none"
+                                        data-avatar="skill"
+                                        data-avatar-label={item.name}
+                                        data-avatar-group={key}
                                         key={item.name}
                                     >
                                         <div>

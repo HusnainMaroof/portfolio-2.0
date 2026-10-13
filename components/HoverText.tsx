@@ -13,15 +13,15 @@ export interface BoldHoverTextProps {
     text: string;
     /** resting letter color */
     color?: string;
-    /** color a letter tweens to while hovered — defaults to `color` if omitted */
+    /** color a letter tweens to while hovered, defaults to `color` if omitted */
     hoverColor?: string;
     /** extra classes, e.g. "hero-word inline-block" to match sibling words */
     className?: string;
-    /** never a heading tag — this sits inside your own <h1> */
+    /** never a heading tag. This sits inside your own <h1> */
     as?: 'span' | 'div' | 'p';
     /**
      * needs a variable font with a wght axis (e.g. Fraunces, Inter).
-     * Omit only if the inherited parent font already has one — a fixed-weight
+     * Omit only if the inherited parent font already has one, a fixed-weight
      * font like Anton has nothing for this to animate.
      */
     fontFamily?: string;
@@ -69,7 +69,7 @@ export default function BoldHoverText({
             if (fontFamily) c.style.fontFamily = fontFamily;
 
             // Standard hover in/out: bold+colored while hovered, reverts the
-            // instant the pointer leaves — no persistent per-letter state.
+            // instant the pointer leaves; no persistent per-letter state.
             const onEnter = () => {
                 tween?.kill();
                 tween = gsap.to(c, {
@@ -126,7 +126,8 @@ export default function BoldHoverText({
                 fontSize: 'inherit',
                 letterSpacing: 'inherit',
                 color,
-                cursor: 'default',
+                // no `cursor: 'default'`; an inline cursor beats the global
+                // `cursor: none` and flashes the native cursor over the custom one.
             }}
         >
             {text}

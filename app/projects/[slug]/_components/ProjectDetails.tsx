@@ -7,6 +7,7 @@ import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/all';
 import { ArrowLeft, ExternalLink, Github } from 'lucide-react';
+import Image from 'next/image';
 import { useRef } from 'react';
 
 interface Props {
@@ -62,14 +63,20 @@ const ProjectDetails = ({ project }: Props) => {
         { scope: containerRef },
     );
 
-    // parallax effect on images
-    useGSAP(
-        () => {
-            gsap.utils
-                .toArray<HTMLDivElement>('#images > div')
-                .forEach((imageDiv, i) => {
-                    gsap.to(imageDiv, {
-                        backgroundPosition: `center 0%`,
+    // parallax effect on images (real <img> elements so crawlers can index
+    // them; the scroll shift moves object-position instead of background-position)
+    useGSAP(() => {
+        gsap.utils
+            .toArray<HTMLDivElement>('#images > div')
+            .forEach((imageDiv, i) => {
+                const img = imageDiv.querySelector('img');
+                if (!img) return;
+
+                gsap.fromTo(
+                    img,
+                    { objectPosition: 'center 50%' },
+                    {
+                        objectPosition: 'center 0%',
                         ease: 'none',
                         scrollTrigger: {
                             trigger: imageDiv,
@@ -78,19 +85,18 @@ const ProjectDetails = ({ project }: Props) => {
                             scrub: true,
                             // invalidateOnRefresh: true, // to make it responsive
                         },
-                    });
-                });
-        },
-        { scope: containerRef },
-    );
+                    },
+                );
+            });
+    }, { scope: containerRef });
 
     return (
-        <section className="pt-5 pb-14">
+        <section className="pt-24 pb-14">
             <div className="max-w-[80%] mx-auto" ref={containerRef}>
                 <TransitionLink
                     back
                     href="/"
-                    className="mb-16 inline-flex gap-2 items-center group h-12"
+                    className="fixed top-6 left-6 z-[4] lg:left-[172px] inline-flex gap-2 items-center group h-12 px-3 rounded-[12px] bg-background/80 backdrop-blur-sm"
                 >
                     <ArrowLeft className="group-hover:-translate-x-1 group-hover:text-primary transition-all duration-300" />
                     Back
@@ -179,21 +185,24 @@ const ProjectDetails = ({ project }: Props) => {
                     className="fade-in-later relative flex flex-col gap-2 max-w-[800px] mx-auto"
                     id="images"
                 >
-                    {project.images.map((image) => (
+                    {project.images.map((image, index) => (
                         <div
                             key={image}
-                            className="group relative w-full aspect-[750/400] bg-background-light"
-                            style={{
-                                backgroundImage: `url(${image})`,
-                                backgroundSize: 'cover',
-                                backgroundPosition: 'center 50%',
-                                backgroundRepeat: 'no-repeat',
-                            }}
+                            className="group relative w-full aspect-[750/400] overflow-hidden bg-background-light"
                         >
+                            <Image
+                                src={image}
+                                alt={`${project.title} project screenshot ${index + 1}`}
+                                fill
+                                sizes="(min-width: 1024px) 800px, 90vw"
+                                className="object-cover"
+                                style={{ objectPosition: 'center 50%' }}
+                            />
                             <a
                                 href={image}
                                 target="_blank"
-                                className="absolute top-4 right-4 bg-background/70 text-foreground size-12 inline-flex justify-center items-center transition-all opacity-0 hover:bg-primary hover:text-primary-foreground group-hover:opacity-100"
+                                aria-label={`Open ${project.title} screenshot ${index + 1} full size`}
+                                className="absolute top-4 right-4 z-[1] bg-background/70 text-foreground size-12 inline-flex justify-center items-center transition-all opacity-0 hover:bg-primary hover:text-primary-foreground group-hover:opacity-100"
                             >
                                 <ExternalLink />
                             </a>

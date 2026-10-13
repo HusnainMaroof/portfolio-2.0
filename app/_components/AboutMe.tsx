@@ -66,7 +66,7 @@ const AboutMe = ({ scrollerRef }: AboutMeProps) => {
     );
 
     return (
-        <section className="pb-section" id="about-me">
+        <section className="pb-20 md:pb-28" id="about-me">
             <div className="max-w-[80%] mx-auto" ref={container}>
                 <p className="pb-3 border-b text-muted-foreground slide-up-and-fade">
                     This is me.
@@ -74,15 +74,15 @@ const AboutMe = ({ scrollerRef }: AboutMeProps) => {
 
                 <div className="grid md:grid-cols-12 mt-9">
                     <div className="md:col-span-5">
-                        <p className="text-5xl slide-up-and-fade">
+                        <h2 className="text-5xl slide-up-and-fade">
                             Hi, I&apos;m Husnain.
-                        </p>
+                        </h2>
                     </div>
 
                     <div className="md:col-span-7 text-2xl text-muted-foreground max-w-[450px] md:max-w-none">
                         <div className="mb-10 leading-35 tracking-widest">
                             I&apos;m a full-stack developer focused on
-                            building fast, polished web experiences — from
+                            building fast, polished web experiences, from
                             pixel-level scroll animation to
                             production-grade data-driven apps.
                         </div>

@@ -8,7 +8,7 @@ gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 interface ScrollRevealProps {
     // Unique id for this instance. Required whenever more than one
-    // ScrollReveal is mounted at once — GSAP ScrollTrigger ids must be
+    // ScrollReveal is mounted at once. GSAP ScrollTrigger ids must be
     // unique or cleanup/getById calls collide between instances.
     id: string;
     children: string;

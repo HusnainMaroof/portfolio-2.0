@@ -58,7 +58,13 @@ const Experiences = () => {
 
                 <div className="grid gap-14">
                     {MY_EXPERIENCE.map((item) => (
-                        <div key={item.title} className="experience-item">
+                        <div
+                            key={item.title}
+                            className="experience-item"
+                            data-avatar="experience"
+                            data-avatar-label={item.title}
+                            data-avatar-detail={item.company}
+                        >
                             <p className="text-xl text-muted-foreground">
                                 {item.company}
                             </p>

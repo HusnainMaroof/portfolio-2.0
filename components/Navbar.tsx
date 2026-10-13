@@ -77,7 +77,7 @@ const Navbar = () => {
     };
 
     return (
-        // Root sits at z-[4] — the same top-most layer your old sticky nav
+        // Root sits at z-[4], the same top-most layer your old sticky nav
         // wrapper used, so it stacks above any z-[2]/z-[3] overlays elsewhere
         // on the site without needing its own separate overlay/backdrop layers.
         <div className="absolute top-8 left-1/2 -translate-x-1/2 z-[4]">

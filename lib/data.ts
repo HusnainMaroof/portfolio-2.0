@@ -121,179 +121,325 @@ export const MY_STACK = {
     ],
 };
 
+/**
+ * Add your own projects here. Shape (all fields reused by the carousel, list,
+ * case-study page, and the avatar's project lines):
+ *
+ * {
+ *     title: 'My Project',
+ *     slug: 'my-project',
+ *     liveUrl: 'https://…',          // optional
+ *     sourceCode: 'https://…',       // optional
+ *     year: 2026,
+ *     description: 'HTML allowed',   // shown on the case-study page
+ *     role: 'HTML allowed',          // shown on the case-study page
+ *     techStack: ['Next.js', '…'],
+ *     thumbnail: '/projects/thumbnail/…',
+ *     longThumbnail: '/projects/long/…',
+ *     images: ['/projects/images/…'], // carousel screenshots
+ * }
+ */
 export const PROJECTS: IProject[] = [
     {
-        title: 'Electro EV',
-        slug: 'electro-ev',
-        liveUrl: 'https://electroev.co.uk/',
-        year: 2025,
+        title: 'Crispies',
+        slug: 'crispies',
+        liveUrl: 'https://crispiesuk.com/',
+        year: 2026,
         description: `
-      A complete agency portfolio platform built for Electro EV to showcase their services, blog content, and product offerings. <br/> <br/>
-      
+      Crispies is the official website for Crispies, a 100% halal burger & crispy chicken brand serving London from 10+ takeaway locations. The site pairs a bold, food-first landing experience with the tools customers actually need: flavour discovery, a store locator with live opening hours, and a takeaway-only click & collect ordering flow. <br/> <br/>
+
       Key Features:<br/>
       <ul>
-        <li>🛠️ Service Display System: Interactive service showcase with synchronized sliders</li>
-        <li>✍️ Blog Management: SEO-friendly blog with categorization and search</li>
-        <li>🛒 Product Catalog: Organized product display with filtering capabilities</li>
-        <li>📱 Fully Responsive: Optimized for all device sizes</li>
-        <li>⚡ Fast Performance: Optimized Next.js frontend with ISR (Incremental Static Regeneration)</li>
+        <li>Flavour Explorer: interactive "Discover Your Crispy Flavor" section showcasing all Crispies original flavours with heat levels</li>
+        <li>Store Locator: 10+ London locations with opening hours, live open/closed status, postcode search and an interactive map</li>
+        <li>Click & Collect: cart and takeaway-only pickup ordering backed by a custom REST API</li>
+        <li>Social Proof: embedded Instagram & TikTok feed straight from the brand's account</li>
+        <li>Partner CTA: "Become A Partner" franchise section for brand expansion</li>
+        <li>Fully Responsive: optimized for all device sizes</li>
       </ul><br/>
-      
+
       Technical Highlights:
       <ul>
-        <li>Implemented complex slider synchronization logic using Swiper.js</li>
-        <li>Customized Payload CMS admin panel for intuitive content management</li>
-        <li>Developed reusable UI components with shadcn for design consistency</li>
-        <li>Configured efficient data fetching strategies in Next.js</li>
+        <li>Built with Next.js and Tailwind CSS, animated with GSAP for a bold, scroll-driven landing experience</li>
+        <li>Redux slices for cart, locations, ordering and UI state</li>
+        <li>Custom REST API powering locations, menu and click & collect orders</li>
+        <li>Cloudinary for media delivery; CARTO map tiles with Nominatim geocoding and postcode lookup</li>
+        <li>SEO metadata, strict Content-Security-Policy and optimized assets for performance</li>
       </ul>
       `,
         role: `
       Full-Stack Developer <br/>
-      Owned the entire development lifecycle:
+      Owned the entire project from concept to deployment:
       <ul>
-        <li>✅ Backend: Configured Payload CMS with custom collections for services, blogs, and products</li>
-        <li>🎨 Frontend: Built all UI components using Tailwind CSS and shadcn</li>
-        <li>🔄 State Management: Implemented client-side data fetching and caching</li>
-        <li>🖥️ CMS Customization: Created admin interfaces for content editors</li>
-        <li>🚀 Deployment: Set up CI/CD pipeline for Vercel hosting</li>
-        <li>🧩 Third-Party Integration: Added Swiper.js for interactive sliders</li>
+        <li>Design: translated the brand's bold diner identity into a responsive, conversion-focused UI</li>
+        <li>Frontend: built every page and component with Next.js, TypeScript and Tailwind CSS</li>
+        <li>State: managed cart, locations and ordering flows with Redux</li>
+        <li>Backend: implemented the REST API behind locations, menu and orders</li>
+        <li>Integrations: store locator map, postcode search, Cloudinary media and Instagram/TikTok feeds</li>
+        <li>Deployment: shipped to production behind nginx with CSP hardening and optimized caching</li>
       </ul>
       `,
         techStack: [
             'Next.js',
-            'Payload CMS',
-            'Tailwind CSS',
-            'shadcn',
-            'Swiper.js',
-            'React Hook Form',
-            'Vercel',
-        ],
-        thumbnail: '/projects/thumbnail/mti-electronics.webp',
-        longThumbnail: '/projects/long/mti-electronics.webp',
-        images: [
-            '/projects/images/mti-electronics-1.webp',
-            '/projects/images/mti-electronics-2.webp',
-        ],
-    },
-    {
-        title: 'Epikcart',
-        slug: 'epikcart',
-        techStack: [
             'React',
+            'TypeScript',
+            'Tailwind CSS',
+            'GSAP',
             'Redux',
-            'React i18n',
-            'Tailwind CSS',
-            'Framer Motion',
-            'debouncing',
-            'Api Integration',
+            'Cloudinary',
+            'Leaflet / Map',
+            'REST API',
         ],
-        thumbnail: '/projects/thumbnail/epikcart.jpg',
-        longThumbnail: '/projects/long/epikcart.jpg',
+        thumbnail: '/projects/images/crispies-1.avif',
+        longThumbnail: '/projects/images/crispies-6.avif',
         images: [
-            '/projects/images/epikcart-1.png',
-            '/projects/images/epikcart-2.png',
-            '/projects/images/epikcart-3.png',
-            '/projects/images/epikcart-4.png',
-            '/projects/images/epikcart-5.png',
+            '/projects/images/crispies-1.avif',
+            '/projects/images/crispies-2.avif',
+            '/projects/images/crispies-3.avif',
+            '/projects/images/crispies-4.avif',
+            '/projects/images/crispies-5.avif',
+            '/projects/images/crispies-6.avif',
         ],
-        liveUrl: 'https://demo.epikcart.siphertech.com/',
-        year: 2023,
-        description: `Epikcart is a feature-rich, scalable e-commerce platform tailored for large businesses. It features dynamic product filtering, multi-language support with RTL, advanced inventory management, order tracking, and refund systems, offering a comprehensive solution for multi-vendor operations.`,
-        role: `As the frontend developer in a team of five, I: <br/>
-        - Built the frontend from scratch using React, Redux, RTK Query, and Tailwind CSS.<br/>
-        - Developed dynamic filtering logic for the product search page with admin-configurable parameters.<br/>
-        - Integrated multi-language support with React i18n, including RTL handling.<br/>
-        - Delivered a responsive, user-friendly interface in collaboration with the UI/UX designer.`,
     },
     {
-        title: 'Resume Roaster',
-        slug: 'resume-roaster',
-        techStack: [
-            'GPT-4',
-            'Next.js',
-            'Postgressql',
-            'Prisma',
-            'Tailwind CSS',
-        ],
-        thumbnail: '/projects/thumbnail/resume-roaster.jpg',
-        longThumbnail: '/projects/long/resume-roaster.jpg',
-        images: [
-            '/projects/images/resume-roaster-1.png',
-            '/projects/images/resume-roaster-2.png',
-            '/projects/images/resume-roaster-3.png',
-        ],
-        liveUrl: 'https://resume-roaster.vercel.app/',
-        year: 2023,
-        description:
-            'Resume Roaster is a web application designed to provide tailored resume feedback and professional writing services. Built with Next.js, PostgreSQL, Prisma, and Tailwind CSS, it integrates GPT-4 for AI-powered recommendations. The platform also includes peer-to-peer reviews with a points-based system, fostering a collaborative and engaging experience. Targeting freshers, experienced professionals, and programmers, it helps optimize resumes for job-specific success.',
-        role: `As the sole developer and business owner, I:<br/>
-        - Designed and developed the platform end-to-end using Next.js, PostgreSQL, Prisma, and Tailwind CSS.<br/>
-        - Integrated GPT-4 for AI-driven feedback and insights.<br/>
-        - Implemented complex SQL queries, including one to identify the top two resumes based on user points.`,
-    },
-    {
-        title: 'Real Estate',
-        slug: 'property-pro',
-        techStack: [
-            'React.js',
-            'Redux',
-            'Tailwind CSS',
-            'React i18n',
-            'Framer Motion',
-        ],
-        thumbnail: '/projects/thumbnail/property-pro.jpg',
-        longThumbnail: '/projects/long/property-pro.jpg',
-        images: [
-            '/projects/images/property-pro-1.png',
-            '/projects/images/property-pro-2.png',
-            '/projects/images/property-pro-3.png',
-        ],
-        liveUrl: 'https://demo.propertypro.siphertech.com/',
-        year: 2023,
-        description:
-            'PropertyPro is a real estate management platform offering users a seamless experience to explore, manage, and view property listings. The application emphasizes accessibility and responsive design, ensuring a smooth interface across devices.',
-        role: `As the frontend developer, I:<br/>
-        - Built the frontend using React, Redux, RTK Query, Framer Motion, and Tailwind CSS.<br/>
-        - Integrated dynamic state management for efficient handling of property data.<br/>
-        - Implemented multi-language support with React i18n to cater to diverse audiences.<br/>
-        - Enhanced user interaction with animations and transitions using Framer Motion.`,
-    },
-    {
-        title: 'Consulting Finance',
-        slug: 'crenotive',
-        techStack: ['HTML', 'CSS & SCSS', 'Javascript', 'Bootstrap'],
-        thumbnail: '/projects/thumbnail/consulting-finance.jpg',
-        longThumbnail: '/projects/long/consulting-finance.jpg',
-        images: [
-            '/projects/images/consulting-finance-1.png',
-            '/projects/images/consulting-finance-2.png',
-            '/projects/images/consulting-finance-3.png',
-        ],
-        sourceCode: 'https://github.com/Tajmirul/crenotive',
-        liveUrl: 'https://crenotive.netlify.app/',
-        year: 2023,
-        description:
-            'I developed Crenotive, a portfolio website using Html, SASS, and jQuery to showcase services and expertise. The design focuses on responsive user experience and effective presentation of professional achievements.',
-        role: ``,
-    },
-    {
-        title: 'devLinks',
-        slug: 'devLinks',
-        techStack: ['Next.js', 'Formik', 'Drag & Drop', 'Tailwind CSS'],
-        thumbnail: '/projects/thumbnail/devLinks.jpg',
-        longThumbnail: '/projects/long/devLinks.jpg',
-        images: [
-            '/projects/images/devLinks-1.png',
-            '/projects/images/devLinks-2.png',
-            '/projects/images/devLinks-3.png',
-        ],
-        sourceCode: 'https://github.com/Tajmirul/devsLink',
-        liveUrl: 'https://devlinks-demo.vercel.app/auth/signin',
-        year: 2023,
-        description: `One of the most challenging projects in Frontend Mentor.<br/><br/>
+        title: 'Tijartt',
+        slug: 'tijartt',
+        liveUrl: 'https://www.tijartt.com/',
+        year: 2026,
+        description: `
+      Tijartt is a business record-keeping app for stock-based businesses, built to answer three questions at a glance: what you have, what you owe, and what you earn. Stock, purchases, sales, payments and profit live in one record instead of scattered spreadsheets. <br/> <br/>
 
-            I developed a LinkSharing App as part of the Frontend Mentor challenge, utilizing React, Redux, and Tailwind CSS to create a responsive and feature-rich platform. The app allows users to share, save, and explore links, with a focus on intuitive design and smooth navigation. Advanced state management ensures efficient data handling for user interactions.`,
-        role: ``,
+      Key Features:<br/>
+      <ul>
+        <li>Dashboard: revenue overview with charts breaking income down by source</li>
+        <li>Stock: inventory levels kept in sync with every purchase and sale</li>
+        <li>Purchases & Sales: record transactions against customers and suppliers in a few clicks</li>
+        <li>Payments: see what is paid, what is due, and who it is owed to</li>
+        <li>Reports: profit and performance reporting across the whole business</li>
+        <li>Pricing & Auth: public marketing site with sign up, login and subscription tiers</li>
+      </ul><br/>
+
+      Technical Highlights:
+      <ul>
+        <li>Next.js App Router with server rendering and route caching for fast first loads</li>
+        <li>Custom SVG charts built by hand instead of a heavy charting library</li>
+        <li>Tailwind CSS utility workflow for a consistent design system</li>
+        <li>Cloudinary for media storage and delivery</li>
+        <li>Strict security headers (CSP, HSTS, frame denial) served behind nginx on Ubuntu</li>
+      </ul>
+      `,
+        role: `
+      Full-Stack Developer <br/>
+      Owned the entire project from concept to deployment:
+      <ul>
+        <li>Design: modelled the data and UI around the have, owe and earn mental model</li>
+        <li>Frontend: built the dashboard, charts and every screen with Next.js, TypeScript and Tailwind CSS</li>
+        <li>Backend: implemented the records API behind stock, purchases, sales and payments</li>
+        <li>Media: integrated Cloudinary for uploads and asset delivery</li>
+        <li>Security: configured CSP and security headers, plus SSR and caching strategies</li>
+        <li>Deployment: self-hosted behind nginx on Ubuntu with automated builds</li>
+      </ul>
+      `,
+        techStack: [
+            'Next.js',
+            'React',
+            'TypeScript',
+            'Tailwind CSS',
+            'Framer Motion',
+            'Cloudinary',
+            'REST API',
+        ],
+        thumbnail: '/projects/images/tijartt-1.avif',
+        longThumbnail: '/projects/images/tijartt-7.avif',
+        images: [
+            '/projects/images/tijartt-1.avif',
+            '/projects/images/tijartt-2.avif',
+            '/projects/images/tijartt-3.avif',
+            '/projects/images/tijartt-4.avif',
+            '/projects/images/tijartt-5.avif',
+            '/projects/images/tijartt-6.avif',
+            '/projects/images/tijartt-7.avif',
+        ],
+    },
+    {
+        title: 'Warden',
+        slug: 'warden',
+        liveUrl: 'https://warden.blog/',
+        year: 2026,
+        description: `
+      Warden is an open-source security tool that runs MCP servers inside a restricted sandbox instead of giving them access to your filesystem. Servers only get the files, hosts and environment variables you explicitly grant, so a misbehaving or compromised tool can never touch anything else. <br/> <br/>
+
+      Key Features:<br/>
+      <ul>
+        <li>Sandboxed Execution: MCP servers run under a fail-closed sandbox with an explicit allowlist of files, hosts and env vars</li>
+        <li>Web Fetch: uses web fetch to safely gather information from remote URLs inside the sandbox boundary</li>
+        <li>Fail-Closed by Default: anything not explicitly granted is denied</li>
+        <li>Docker Fallback: sandbox-exec on macOS with Docker as a portable fallback</li>
+        <li>Audited & Open Source: CI-verified policy checks with the source available to review</li>
+        <li>Drop-In Setup: wraps existing MCP server commands without changing them</li>
+      </ul><br/>
+
+      Technical Highlights:
+      <ul>
+        <li>OS-level sandboxing with macOS sandbox-exec and a Docker fallback for other platforms</li>
+        <li>Policy generation from an explicit allowlist of filesystem paths, network hosts and environment variables</li>
+        <li>Web fetch for information gathering, restricted to the hosts granted in the policy</li>
+        <li>Fail-closed error handling: if a policy cannot be applied, the server does not start</li>
+        <li>CI pipeline verifying sandbox policies on every change</li>
+      </ul>
+      `,
+        role: `
+      Full-Stack Developer <br/>
+      Owned the entire project from concept to deployment:
+      <ul>
+        <li>Design: defined the threat model and the least-privilege allowlist approach</li>
+        <li>Core: built the sandbox wrapper around MCP server processes</li>
+        <li>Networking: implemented sandboxed web fetch limited to approved hosts</li>
+        <li>Portability: added the Docker fallback alongside macOS sandbox-exec</li>
+        <li>Quality: set up CI verification and audited the default policies</li>
+        <li>Launch: shipped the marketing site and documentation at warden.blog</li>
+      </ul>
+      `,
+        techStack: ['Sandboxing', 'Web Fetch', 'MCP', 'Docker', 'TypeScript', 'CI/CD'],
+        thumbnail: '/projects/images/warden-1.avif',
+        longThumbnail: '/projects/images/warden-6.avif',
+        images: [
+            '/projects/images/warden-1.avif',
+            '/projects/images/warden-2.avif',
+            '/projects/images/warden-3.avif',
+            '/projects/images/warden-4.avif',
+            '/projects/images/warden-5.avif',
+            '/projects/images/warden-6.avif',
+        ],
+    },
+    {
+        title: 'Paymit',
+        slug: 'paymit',
+        liveUrl: 'https://paymit-iota.vercel.app/',
+        year: 2024,
+        description: `
+      Paymit is a payment product project built as a clean, easy to use web experience. <br/> <br/>
+
+      Key Features:<br/>
+      <ul>
+        <li>Clear, simple layouts for everyday payment flows</li>
+        <li>Fully responsive design for all device sizes</li>
+      </ul>
+      `,
+        role: `
+      Frontend Developer <br/>
+      <ul>
+        <li>Built the user interface with reusable components</li>
+        <li>Made the layouts responsive and consistent across pages</li>
+      </ul>
+      `,
+        techStack: ['Next.js', 'React', 'TypeScript', 'Tailwind CSS'],
+        thumbnail: '/projects/images/paymit-1.avif',
+        longThumbnail: '/projects/images/paymit-7.avif',
+        images: [
+            '/projects/images/paymit-1.avif',
+            '/projects/images/paymit-2.avif',
+            '/projects/images/paymit-3.avif',
+            '/projects/images/paymit-4.avif',
+            '/projects/images/paymit-5.avif',
+            '/projects/images/paymit-6.avif',
+            '/projects/images/paymit-7.avif',
+        ],
+    },
+    {
+        title: 'Pulse',
+        slug: 'pulse',
+        liveUrl: 'https://pulse-iota-one-11.vercel.app/',
+        year: 2026,
+        description: `
+      Pulse is a web project with a clean, modern interface and a focus on a smooth user experience. <br/> <br/>
+
+      Key Features:<br/>
+      <ul>
+        <li>Clear, simple layouts across all pages</li>
+        <li>Fully responsive design for all device sizes</li>
+      </ul>
+      `,
+        role: `
+      Frontend Developer <br/>
+      <ul>
+        <li>Built the user interface with reusable components</li>
+        <li>Made the layouts responsive and consistent across pages</li>
+      </ul>
+      `,
+        techStack: ['Next.js', 'React', 'TypeScript', 'Tailwind CSS'],
+        thumbnail: '/projects/images/pulse-1.avif',
+        longThumbnail: '/projects/images/pulse-5.avif',
+        images: [
+            '/projects/images/pulse-1.avif',
+            '/projects/images/pulse-2.avif',
+            '/projects/images/pulse-3.avif',
+            '/projects/images/pulse-4.avif',
+            '/projects/images/pulse-5.avif',
+        ],
+    },
+    {
+        title: 'Rafin Solutions',
+        slug: 'rafin-solutions',
+        liveUrl: 'https://rafinsolutions.com/',
+        year: 2026,
+        description: `
+      Rafin Solutions is the official website for Rafin Solutions, a company offering digital solutions for its clients. <br/> <br/>
+
+      Key Features:<br/>
+      <ul>
+        <li>Clear presentation of the company's services</li>
+        <li>Fully responsive design for all device sizes</li>
+      </ul>
+      `,
+        role: `
+      Frontend Developer <br/>
+      <ul>
+        <li>Built the user interface with reusable components</li>
+        <li>Made the layouts responsive and consistent across pages</li>
+      </ul>
+      `,
+        techStack: ['Next.js', 'React', 'TypeScript', 'Tailwind CSS'],
+        thumbnail: '/projects/images/rafin-solutions-1.avif',
+        longThumbnail: '/projects/images/rafin-solutions-5.avif',
+        images: [
+            '/projects/images/rafin-solutions-1.avif',
+            '/projects/images/rafin-solutions-2.avif',
+            '/projects/images/rafin-solutions-3.avif',
+            '/projects/images/rafin-solutions-4.avif',
+            '/projects/images/rafin-solutions-5.avif',
+        ],
+    },
+    {
+        title: 'Exam System',
+        slug: 'exam-system',
+        year: 2026,
+        description: `
+      Exam System is a web application for taking and managing exams online. <br/> <br/>
+
+      Key Features:<br/>
+      <ul>
+        <li>Clear, simple screens for taking and reviewing exams</li>
+        <li>Fully responsive design for all device sizes</li>
+      </ul>
+      `,
+        role: `
+      Frontend Developer <br/>
+      <ul>
+        <li>Built the user interface with reusable components</li>
+        <li>Made the layouts responsive and consistent across pages</li>
+      </ul>
+      `,
+        techStack: ['Next.js', 'React', 'TypeScript', 'Tailwind CSS'],
+        thumbnail: '/projects/images/exam-system-1.avif',
+        longThumbnail: '/projects/images/exam-system-5.avif',
+        images: [
+            '/projects/images/exam-system-1.avif',
+            '/projects/images/exam-system-2.avif',
+            '/projects/images/exam-system-3.avif',
+            '/projects/images/exam-system-4.avif',
+            '/projects/images/exam-system-5.avif',
+        ],
     },
 ];
 

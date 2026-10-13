@@ -1,16 +1,24 @@
-import AboutMe from './_components/AboutMe';
 import Banner from './_components/Banner';
+import ClientProof from './_components/ClientProof';
+import HowIWork from './_components/HowIWork';
 import Experiences from './_components/Experiences';
 import Skills from './_components/Skills';
-import ProjectsSection from './_components/Project';
+import SelectedWork from './_components/SelectedWork';
+import { PROJECTS } from '@/lib/data';
+import { TESTIMONIAL_SHOTS } from '@/lib/testimonials';
 
 export default function Home() {
+    const hasProjects = PROJECTS.length > 0;
+    const hasTestimonials = TESTIMONIAL_SHOTS.length > 0;
+
     return (
         <div className="page-">
             <Banner />
-            <ProjectsSection />
+            <HowIWork />
+            {hasProjects && <SelectedWork />}
             <Skills />
             <Experiences />
+            {hasTestimonials && hasProjects && <ClientProof />}
         </div>
     );
 }

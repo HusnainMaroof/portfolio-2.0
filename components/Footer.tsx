@@ -33,7 +33,7 @@ const Footer = () => {
                 if (!cancelled) setStats(data);
             })
             .catch(() => {
-                // Stats are decorative — fail silently
+                // Stats are decorative, fail silently
             });
         return () => {
             cancelled = true;
@@ -69,7 +69,7 @@ const Footer = () => {
                 className="max-w-[80%] mx-auto pb-section flex flex-col justify-center items-center text-center"
                 ref={containerRef}
             >
-                {/* nameplate pill — matches Banner's availability tag */}
+                {/* nameplate pill, matches Banner's availability tag */}
                 <div className="slide-up-and-fade mb-10 flex items-center gap-2">
                     <span className="size-2.5 rounded-full bg-primary" />
                     <span className="text-sm font-medium text-muted-foreground">
@@ -77,10 +77,11 @@ const Footer = () => {
                     </span>
                 </div>
 
-                {/* headline — word-by-word reveal, same treatment as Banner's h1 */}
+                {/* headline, word-by-word reveal, same treatment as Banner's h1 */}
                 <a
                     href={`mailto:${GENERAL_INFO.email}`}
                     className="group block"
+                    data-avatar="contact"
                 >
                     <h2 className="leading-[.9] text-[clamp(2.5rem,12vw,120px)] font-anton pb-10">
                         <span className="flex flex-wrap justify-center gap-x-4 md:gap-x-6">
@@ -115,39 +116,41 @@ const Footer = () => {
                     <ScrollReveal
                         id="footer-reveal"
                         baseOpacity={0}
-                        enableBlur
-                        baseRotation={5}
+                        enableBlur={false}
+                        baseRotation={0}
                         blurStrength={10}
                         rotationEnd="top 70%"
                         wordAnimationEnd="top 55%"
                     >
                         Have a project in mind? Let&apos;s turn your vision into
-                        reality — reach out and let&apos;s build something great
-                        together.
+                        reality. Reach out and let&apos;s build something great
+                        together. Available for freelance and remote
+                        projects worldwide, based in Islamabad, Pakistan.
                     </ScrollReveal>
                 </div>
 
-                {/* CTA button — same Button component as Banner */}
+                {/* CTA button, same Button component as Banner */}
                 <div className="slide-up-and-fade mb-16">
                     <Button
                         as="link"
                         target="_blank"
                         rel="noopener noreferrer"
                         href={GENERAL_INFO.upworkProfile}
+                        data-avatar="contact"
                         variant="primary"
                     >
                         Let&apos;s Talk
                     </Button>
                 </div>
 
-                {/* bottom row — credit + live GitHub stats */}
+                {/* bottom row, credit + live GitHub stats */}
                 <div className="w-full flex flex-col md:flex-row items-center justify-between gap-4 pt-6 border-t border-muted-foreground/20">
                     <span className="text-xs uppercase tracking-[0.25em] text-muted-foreground">
                         Husnain Maroof © {new Date().getFullYear()}
                     </span>
 
                     <a
-                        href="https://github.com/husnainmaroof/portfolio"
+                        href="https://github.com/husnainmaroof/portfolio" data-avatar="social"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="group flex flex-col items-center md:items-end gap-1"

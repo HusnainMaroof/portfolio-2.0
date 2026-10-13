@@ -13,7 +13,7 @@ import SectionTitle from '@/components/SectionTitle';
 gsap.registerPlugin(useGSAP);
 
 // Width: applies only to the specific card's own role (active / compressed / idle).
-// These are flex-grow ratios, not px — flex-grow is unitless, it's a share of
+// These are flex-grow ratios, not px. flex-grow is unitless, it's a share of
 // the row's remaining space relative to its siblings' flex-grow values.
 const ACTIVE_WIDTH_GROW = 1.5;
 const DEFAULT_WIDTH_GROW = 1;
@@ -23,7 +23,7 @@ interface CardProps {
     index: number;
     project: IProject;
     selectedProject: string | null;
-    onMouseEnter: (slug: string) => void;
+    onMouseEnter: (_slug: string) => void;
     onMouseLeave: () => void;
 }
 
@@ -95,7 +95,7 @@ const ProjectCard = ({
                     : 'border-border/40 bg-background-light/20 ',
             )}
         >
-            {/* Idle affordance — only visible when nothing on the row is hovered yet */}
+            {/* Idle affordance: only visible when nothing on the row is hovered yet */}
             <div
                 className={cn(
                     'absolute top-3 right-3 z-10 flex items-center gap-1.5 transition-opacity duration-300',

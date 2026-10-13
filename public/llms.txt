@@ -1,0 +1,25 @@
+# Husnain Maroof
+
+> Freelance full-stack developer based in Islamabad, Pakistan, building fast, polished, high-performing web applications with Next.js, React, TypeScript, Tailwind CSS, and Node.js. Available for remote projects worldwide.
+
+Husnain Maroof's portfolio showcases production web applications: e-commerce and click & collect ordering (Crispies), business record-keeping dashboards (Tijartt), marketing sites (Rafin Solutions), and open-source security tooling (Warden).
+
+## Projects
+
+- [Crispies](https://husnain.cc/projects/crispies): Official site for a London burger and crispy chicken brand with flavour explorer, store locator and click & collect ordering. Stack: Next.js, Redux, GSAP, REST API.
+- [Tijartt](https://husnain.cc/projects/tijartt): Business record-keeping app covering stock, purchases, sales, payments and profit reporting. Stack: Next.js, Tailwind CSS, REST API.
+- [Warden](https://husnain.cc/projects/warden): Open-source tool that runs MCP servers in a restricted sandbox with web fetch for information gathering. Stack: Sandboxing, MCP, Docker, TypeScript.
+- [Paymit](https://husnain.cc/projects/paymit): Payment product web experience. Stack: Next.js, React, TypeScript, Tailwind CSS.
+- [Pulse](https://husnain.cc/projects/pulse): Clean, modern web project focused on smooth user experience. Stack: Next.js, React, TypeScript, Tailwind CSS.
+- [Rafin Solutions](https://husnain.cc/projects/rafin-solutions): Official marketing website for a digital solutions company. Stack: Next.js, React, TypeScript, Tailwind CSS.
+- [Exam System](https://husnain.cc/projects/exam-system): Web application for taking and managing exams online. Stack: Next.js, React, TypeScript, Tailwind CSS.
+
+## Expertise
+
+Frontend: Next.js, React, TypeScript, Redux, Tailwind CSS, GSAP, Framer Motion. Backend: Node.js, NestJS, Express. Databases: PostgreSQL, MySQL, MongoDB, Prisma, Supabase. Tools: Git, Docker, AWS.
+
+## Contact
+
+- Email: husnainmaroof95@gmail.com
+- Upwork: https://www.upwork.com/freelancers/~01e3f0c7b1d8a5e2f9
+- Website: https://husnain.cc
