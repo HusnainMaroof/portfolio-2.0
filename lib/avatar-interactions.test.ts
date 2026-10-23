@@ -66,7 +66,7 @@ describe('project and experience messages', () => {
             {
                 kind: 'experience',
                 label: 'Frontend Developer',
-                detail: 'Paymits',
+                detail: 'Paymit',
             },
             0,
             bags,

@@ -60,10 +60,11 @@ export const metadata: Metadata = {
         follow: true,
     },
 };
-export const fraunces = Fraunces({
+const fraunces = Fraunces({
     subsets: ['latin'],
-    weight: ['100', '400', '700'],
+    style: ['normal', 'italic'],
     variable: '--font-fraunces',
+    display: 'swap',
 });
 
 /*
@@ -135,7 +136,7 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en">
+        <html lang="en" className={fraunces.variable}>
             <GoogleAnalytics gaId="G-MHLY1LNGY5" />
             <Script id="hotjar" strategy="afterInteractive">
                 {`(function(h,o,t,j,a,r){

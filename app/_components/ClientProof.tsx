@@ -16,6 +16,7 @@ import {
     type TestimonialShot,
 } from '@/lib/testimonials';
 import { cn } from '@/lib/utils';
+import { pill } from '@/lib/pill';
 
 /*
  * Client Proof section. Card and control treatment mirrors the project
@@ -101,7 +102,7 @@ const Lightbox = ({
                 type="button"
                 aria-label="Close screenshot"
                 onClick={onClose}
-                className="absolute right-5 top-5 inline-flex size-9 items-center justify-center rounded-full border border-border/60 bg-background-light text-muted-foreground transition-colors duration-200 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className={pill(false, 'absolute right-5 top-5 size-9')}
             >
                 <X size={16} aria-hidden="true" />
             </button>
@@ -253,8 +254,8 @@ const ClientProof = () => {
                 />
 
                 {/* Carousel: same pattern as the project screenshots row,
-                    snap cards, edge-to-edge inside the panel */}
-                <div className="mt-8 pb-9">
+                    one rounded container around all the cards */}
+                <div className="mx-4 mb-9 mt-8 rounded-2xl border border-border/50 bg-background-light/40 p-2.5 sm:p-3 md:mx-6">
                     <div
                         ref={scrollerRef}
                         role="region"
@@ -262,7 +263,7 @@ const ClientProof = () => {
                         aria-label="Client testimonials"
                         tabIndex={0}
                         onKeyDown={handleKeyDown}
-                        className="flex snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain px-4 pb-1 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring md:px-6"
+                        className="flex snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain rounded-xl focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                     >
                         {TESTIMONIAL_SHOTS.map((shot, index) => (
                             <button
@@ -273,16 +274,14 @@ const ClientProof = () => {
                                 aria-label={`${shot.alt}, open full screenshot`}
                                 className="group w-[60%] shrink-0 snap-start text-left focus-visible:outline-none sm:w-[28%] lg:w-[20%]"
                             >
-                                <span className="block rounded-md border border-border/50 bg-background-light/40 p-1.5 transition-colors duration-300 group-hover:border-border">
-                                    <span className="relative block aspect-[2/3] w-full overflow-hidden rounded-sm bg-background/60">
-                                        <Image
-                                            src={shot.src}
-                                            alt=""
-                                            fill
-                                            sizes={CARD_SIZES}
-                                            className="object-cover"
-                                        />
-                                    </span>
+                                <span className="relative block aspect-[2/3] w-full overflow-hidden rounded-xl">
+                                    <Image
+                                        src={shot.src}
+                                        alt=""
+                                        fill
+                                        sizes={CARD_SIZES}
+                                        className="object-cover transition-opacity duration-300 group-hover:opacity-90"
+                                    />
                                 </span>
 
                                 <span className="mt-2 flex items-center justify-between px-1.5">
@@ -304,7 +303,7 @@ const ClientProof = () => {
                         same as the project carousel. */}
                     <div
                         className={cn(
-                            'mt-4 flex justify-end gap-2 md:pr-6',
+                            'mt-3 flex justify-end gap-2',
                             !canScroll && 'invisible',
                         )}
                     >
@@ -313,7 +312,7 @@ const ClientProof = () => {
                             onClick={() => scrollByCard(-1)}
                             disabled={atStart}
                             aria-label="Scroll testimonials backwards"
-                            className="inline-flex size-11 items-center justify-center rounded border border-border/60 bg-background-light/50 text-muted-foreground transition-colors duration-200 hover:border-primary/50 hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-40 lg:size-8"
+                            className={pill(false, 'size-11 lg:size-9')}
                         >
                             <ChevronLeft size={16} aria-hidden="true" />
                         </button>
@@ -323,7 +322,7 @@ const ClientProof = () => {
                             onClick={() => scrollByCard(1)}
                             disabled={atEnd}
                             aria-label="Scroll testimonials forwards"
-                            className="inline-flex size-11 items-center justify-center rounded border border-border/60 bg-background-light/50 text-muted-foreground transition-colors duration-200 hover:border-primary/50 hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-40 lg:size-8"
+                            className={pill(false, 'size-11 lg:size-9')}
                         >
                             <ChevronRight size={16} aria-hidden="true" />
                         </button>

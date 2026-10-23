@@ -1,8 +1,18 @@
 'use client';
 
-import { useState, type Dispatch, type SetStateAction } from 'react';
+import {
+    useEffect,
+    useRef,
+    useState,
+    type Dispatch,
+    type SetStateAction,
+} from 'react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useLenis } from 'lenis/react';
 import { PROJECTS } from '@/lib/data';
 import { cn } from '@/lib/utils';
+import { PILL_ACTIVE, PILL_BASE } from '@/lib/pill';
 import SelectedWorkCarousel from './SelectedWorkCarousel';
 import SelectedWorkList from './SelectedWorkList';
 
@@ -27,7 +37,7 @@ export const ViewSwitcher = ({ value, onChange }: ViewSwitcherProps) => (
     <div
         role="group"
         aria-label="Project view"
-        className="inline-flex shrink-0 items-center gap-1 self-start rounded-md border border-border/60 bg-background-light/50 p-1"
+        className="inline-flex shrink-0 items-center gap-1 self-start rounded-[14px] bg-white/[0.04] p-1"
     >
         {VIEW_OPTIONS.map((option) => {
             const isActive = option.value === value;
@@ -39,11 +49,12 @@ export const ViewSwitcher = ({ value, onChange }: ViewSwitcherProps) => (
                     aria-pressed={isActive}
                     onClick={() => onChange(option.value)}
                     className={cn(
-                        'rounded border px-3.5 py-2.5 text-[11px] uppercase tracking-[0.14em] transition-colors duration-200 lg:py-1.5',
-                        'focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background',
+                        PILL_BASE,
+                        'h-10 px-4 text-[11px] uppercase tracking-[0.14em] lg:h-9',
+                        // Same states as the sidebar rail: no wash until hovered.
                         isActive
-                            ? 'border-primary/70 text-foreground'
-                            : 'border-transparent text-muted-foreground hover:text-foreground',
+                            ? PILL_ACTIVE
+                            : 'text-muted-foreground hover:bg-white/[0.05] hover:text-foreground',
                     )}
                 >
                     {option.label}
@@ -53,8 +64,29 @@ export const ViewSwitcher = ({ value, onChange }: ViewSwitcherProps) => (
     </div>
 );
 
+gsap.registerPlugin(ScrollTrigger);
+
 const SelectedWork = () => {
     const [view, setView] = useState<ProjectView>('carousel');
+    const lenis = useLenis();
+    const firstRender = useRef(true);
+
+    // Switching views changes the page height by thousands of pixels. The
+    // scroll-triggered reveals further down keep their old start points and
+    // stay hidden, which shows up as an empty gap, so re-measure after layout.
+    useEffect(() => {
+        if (firstRender.current) {
+            firstRender.current = false;
+            return;
+        }
+
+        const frame = requestAnimationFrame(() => {
+            lenis?.resize();
+            ScrollTrigger.refresh();
+        });
+
+        return () => cancelAnimationFrame(frame);
+    }, [view, lenis]);
 
     return (
         <section id="my-projects" className="pt-20 md:pt-28">

@@ -12,6 +12,7 @@ import {
     padIndex,
 } from '@/lib/projects';
 import { cn } from '@/lib/utils';
+import { pill } from '@/lib/pill';
 
 // Card widths resolve to ~31vw / ~48vw / ~66vw of the section container.
 const CARD_SIZES = '(min-width: 1024px) 25vw, (min-width: 640px) 38vw, 66vw';
@@ -89,7 +90,7 @@ const ScreenshotCarousel = ({ images, title }: ScreenshotCarouselProps) => {
     };
 
     return (
-        <div>
+        <div className="rounded-2xl border border-border/50 bg-background-light/40 p-2.5 sm:p-3">
             <div
                 ref={scrollerRef}
                 role="region"
@@ -97,7 +98,7 @@ const ScreenshotCarousel = ({ images, title }: ScreenshotCarouselProps) => {
                 aria-label={`${title} screenshots`}
                 tabIndex={0}
                 onKeyDown={handleKeyDown}
-                className="flex snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain pb-1 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                className="flex snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain rounded-xl focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
             >
                 {images.map((image, index) => (
                     <div
@@ -105,8 +106,7 @@ const ScreenshotCarousel = ({ images, title }: ScreenshotCarouselProps) => {
                         data-slide
                         className="group w-[82%] shrink-0 snap-start sm:w-[48%] lg:w-[31%]"
                     >
-                        <div className="rounded-md border border-border/50 bg-background-light/40 p-1.5 transition-colors duration-300 group-hover:border-border">
-                            <div className="relative aspect-[1000/873] w-full overflow-hidden rounded-sm bg-background/60">
+                        <div className="relative aspect-[1000/873] w-full overflow-hidden rounded-xl">
                                 <Image
                                     src={image}
                                     alt={`${title} screenshot ${index + 1}`}
@@ -120,7 +120,6 @@ const ScreenshotCarousel = ({ images, title }: ScreenshotCarouselProps) => {
                                         images.length,
                                     )}
                                 </span>
-                            </div>
                         </div>
                     </div>
                 ))}
@@ -129,7 +128,7 @@ const ScreenshotCarousel = ({ images, title }: ScreenshotCarouselProps) => {
             {/* Reserved space keeps the layout stable once measurements land. */}
             <div
                 className={cn(
-                    'mt-4 flex justify-end gap-2',
+                    'mt-3 flex justify-end gap-2',
                     !canScroll && 'invisible',
                 )}
             >
@@ -138,7 +137,7 @@ const ScreenshotCarousel = ({ images, title }: ScreenshotCarouselProps) => {
                     onClick={() => scrollByCard(-1)}
                     disabled={atStart}
                     aria-label={`Scroll ${title} screenshots backwards`}
-                    className="inline-flex size-11 items-center justify-center rounded border border-border/60 bg-background-light/50 text-muted-foreground transition-colors duration-200 hover:border-primary/50 hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-40 lg:size-8"
+                    className={pill(false, 'size-11 lg:size-9')}
                 >
                     <ChevronLeft size={16} aria-hidden="true" />
                 </button>
@@ -148,7 +147,7 @@ const ScreenshotCarousel = ({ images, title }: ScreenshotCarouselProps) => {
                     onClick={() => scrollByCard(1)}
                     disabled={atEnd}
                     aria-label={`Scroll ${title} screenshots forwards`}
-                    className="inline-flex size-11 items-center justify-center rounded border border-border/60 bg-background-light/50 text-muted-foreground transition-colors duration-200 hover:border-primary/50 hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-40 lg:size-8"
+                    className={pill(false, 'size-11 lg:size-9')}
                 >
                     <ChevronRight size={16} aria-hidden="true" />
                 </button>
@@ -201,7 +200,7 @@ export const ProjectShowcase = ({ project, index }: ProjectShowcaseProps) => {
                     <div className="flex flex-wrap items-center gap-2 md:shrink-0">
                         {actions.map((action) => {
                             const className =
-                                'rounded border border-border/60 bg-background-light/50 px-3.5 py-2 text-xs text-muted-foreground transition-colors duration-200 hover:border-primary/50 hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring';
+                                pill(false, 'h-10 px-4 text-xs');
 
                             return action.external ? (
                                 <a

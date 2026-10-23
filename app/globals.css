@@ -25,10 +25,10 @@
            the vertical gap. `py-section` / `pt-section` read this variable. */
         --section-pad: 72px;
 
-        --background: 0 0% 13%;
-        --background-light: 0 0% 19%;
+        --background: 0 0% 6%;
+        --background-light: 0 0% 12%;
         --foreground: 0 0% 87%;
-        --sidebar: 0 0% 11%;
+        --sidebar: 0 0% 8%;
 
         --card: 0 0% 3.9%;
         --card-foreground: 0 0% 98%;
@@ -165,5 +165,51 @@
 
     .markdown-text ul {
         @apply pl-5 mt-2 list-disc;
+    }
+}
+
+/* Hero: near-black surface, faint 8-column grid, theme-aware portrait. */
+.hero-surface {
+    background-color: hsl(var(--background));
+}
+.hero-grid {
+    background-image: linear-gradient(
+        to right,
+        rgba(255, 255, 255, 0.025) 1px,
+        transparent 1px
+    );
+    background-size: calc(100% / 8) 100%;
+    /* Lines hold through the middle, then fade out toward the bottom. */
+    mask-image: linear-gradient(to bottom, black 0%, black 50%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, black 0%, black 50%, transparent 100%);
+}
+html[data-theme='light'] .hero-surface {
+    background-color: hsl(var(--background));
+}
+html[data-theme='light'] .hero-grid {
+    background-image: linear-gradient(
+        to right,
+        rgba(0, 0, 0, 0.035) 1px,
+        transparent 1px
+    );
+}
+/* Light dots vanish on white, so the halftone flips to dark dots. */
+html[data-theme='light'] .hero-portrait {
+    filter: invert(1);
+}
+
+/* Portrait hover: a faint green glow through the dots, no movement. */
+.hero-portrait {
+    transition: filter 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.group:hover .hero-portrait {
+    filter: brightness(1.12) drop-shadow(0 0 18px rgba(0, 240, 80, 0.22));
+}
+html[data-theme='light'] .group:hover .hero-portrait {
+    filter: invert(1) drop-shadow(0 0 18px rgba(0, 160, 60, 0.25));
+}
+@media (prefers-reduced-motion: reduce) {
+    .hero-portrait {
+        transition: none;
     }
 }

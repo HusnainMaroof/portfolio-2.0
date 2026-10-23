@@ -22,9 +22,9 @@ I build fast, reliable web products, from the first line of code to something re
 
 | Role | Company | Duration |
 | --- | --- | --- |
-| Full Stack (Frontend) | Freelance | 2025 - Present |
-| Frontend Developer | Paymits | Jan 2024 - Nov 2024 |
-| Frontend Engineer | TangoPay | Oct 2024 - Jan 2025 |
+| Full Stack (Frontend) | Freelance | Nov 2025 - Present |
+| Frontend Developer | Paymit | Jan 2025 - Nov 2025 |
+| Frontend Engineer | TangoPay | Jul 2024 - Jan 2025 |
 
 ---
 

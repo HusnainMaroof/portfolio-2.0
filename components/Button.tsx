@@ -2,6 +2,7 @@ import Link from 'next/link';
 import React, { ButtonHTMLAttributes, ComponentProps, ReactNode } from 'react';
 import { Variant } from '@/types';
 import { cn } from '@/lib/utils';
+import { PILL_ACTIVE, PILL_BASE } from '@/lib/pill';
 
 const Child = ({ icon }: any) => (
     <span className="flex items-center justify-center gap-3">
@@ -50,7 +51,7 @@ const Button = ({
     ...rest
 }: Props) => {
     const variantClasses = {
-        primary: `bg-primary text-primary-foreground  hover:bg-primary-hover`,
+        primary: PILL_ACTIVE,
         secondary: `bg-secondary text-secondary-foreground hover:bg-secondary-hover`,
         success: `bg-green-500 text-white hover:bg-green-600`,
         warning: `bg-orange-500 text-white hover:bg-orange-600`,
@@ -68,7 +69,9 @@ const Button = ({
     );
 
     const buttonClasses = cn(
-        `group h-12 px-8 inline-flex justify-center items-center gap-2 text-lg uppercase font-anton tracking-widest outline-none transition-colors relative overflow-hidden`,
+        // Same shape and states as the sidebar nav pills.
+        PILL_BASE,
+        'h-12 px-7 text-sm font-medium',
         variantClasses,
         { [iconClasses]: icon },
         className,
@@ -84,10 +87,7 @@ const Button = ({
                     {...props}
                     href={props.href.toString() || '#'}
                 >
-                    {variant !== 'link' && (
-                        <span className="absolute top-[200%] left-0 right-0 h-full bg-white rounded-[50%] group-hover:top-0 transition-all duration-500 scale-150"></span>
-                    )}
-                    <span className="z-[1]">
+                    <span>
                         {loading ? <Child icon={icon} /> : children}
                     </span>
                 </a>
@@ -96,10 +96,7 @@ const Button = ({
 
         return (
             <Link className={buttonClasses} {...props} href={props.href || '#'}>
-                {variant !== 'link' && (
-                    <span className="absolute top-[200%] left-0 right-0 h-full bg-white rounded-[50%] group-hover:top-0 transition-all duration-500 scale-150"></span>
-                )}
-                <span className="z-[1]">
+                <span>
                     {loading ? <Child icon={icon} /> : children}
                 </span>
             </Link>
@@ -109,10 +106,7 @@ const Button = ({
 
         return (
             <button className={buttonClasses} {...props}>
-                {variant !== 'link' && (
-                    <span className="absolute top-[200%] left-0 right-0 h-full bg-white rounded-[50%] group-hover:top-0 transition-all duration-500 scale-150"></span>
-                )}
-                <span className="z-[1]">
+                <span>
                     {loading ? <Child icon={icon} /> : children}
                 </span>
             </button>

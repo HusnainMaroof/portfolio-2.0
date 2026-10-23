@@ -7,6 +7,7 @@ import type { Side } from '@/lib/avatar-placement';
  */
 export type AvatarTriggerKind =
     | 'name'
+    | 'portrait'
     | 'bio'
     | 'project'
     | 'skill'
@@ -26,6 +27,7 @@ export const AVATAR_HOME_ANIMATION: AnimationName = 'idle';
 
 export const AVATAR_REACTIONS: Record<AvatarTriggerKind, AvatarReaction> = {
     name: { animations: ['curious', 'playful'] },
+    portrait: { animations: ['excited', 'curious'] },
     bio: { animations: ['curious'] },
     project: { animations: ['thinking', 'excited'] },
     skill: { animations: ['working'] },
@@ -43,6 +45,7 @@ export const AVATAR_REACTIONS: Record<AvatarTriggerKind, AvatarReaction> = {
  */
 export const PREFERRED_SIDES: Record<AvatarTriggerKind, readonly Side[]> = {
     name: ['left', 'right', 'above', 'below'],
+    portrait: ['right', 'left', 'above', 'below'],
     bio: ['right', 'left', 'above', 'below'],
     project: ['left', 'right', 'above', 'below'],
     skill: ['right', 'left', 'above', 'below'],
@@ -70,6 +73,14 @@ export const AVATAR_MESSAGES: Record<AvatarTriggerKind, readonly string[]> = {
         'Welcome to my corner of the internet. Mind the bugs.',
         'This is where the story starts. Dramatic enough?',
         'You could read the bio. I hear it is quite informative.',
+    ],
+    portrait: [
+        'Yes, that is him. Made of tiny dots, like a newspaper legend.',
+        'Halftone mode: one part portrait, one part printer nostalgia.',
+        'He insisted on the side profile. Very mysterious.',
+        'Every dot placed with care. Okay, a script placed them.',
+        'Same face that reviews every pull request. Be nice.',
+        'Looking thoughtful. Probably thinking about edge cases.',
     ],
     bio: [
         'A short version of the story. The projects are the long version.',

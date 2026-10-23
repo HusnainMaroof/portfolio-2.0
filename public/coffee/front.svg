@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1440" viewBox="0 0 1024 1440">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#00F050"/>
+      <stop offset="1" stop-color="#00C241"/>
+    </linearGradient>
+  </defs>
+  <rect width="1024" height="1440" fill="url(#bg)"/>
+  <rect x="48" y="48" width="928" height="1344" rx="40" fill="none" stroke="#0f0f0f" stroke-opacity="0.35" stroke-width="4"/>
+  <g transform="translate(512 640)" fill="none" stroke="#0f0f0f" stroke-width="22" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M-150 -60 h260 v170 a110 110 0 0 1 -110 110 h-40 a110 110 0 0 1 -110 -110 z"/>
+    <path d="M110 -20 h40 a60 60 0 0 1 0 120 h-40"/>
+    <path d="M-80 -150 q-20 -35 0 -70 M-20 -150 q-20 -35 0 -70 M40 -150 q-20 -35 0 -70" stroke-width="16"/>
+  </g>
+  <text x="512" y="1010" text-anchor="middle" font-family="Georgia, serif" font-size="112" fill="#0f0f0f">Buy me</text>
+  <text x="512" y="1130" text-anchor="middle" font-family="Georgia, serif" font-size="112" font-style="italic" fill="#0f0f0f">a coffee</text>
+  <text x="512" y="1290" text-anchor="middle" font-family="Arial, sans-serif" font-size="40" letter-spacing="8" fill="#0f0f0f" fill-opacity="0.55">TAP TO SUPPORT</text>
+</svg>

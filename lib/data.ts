@@ -12,8 +12,11 @@ export const GENERAL_INFO = {
 };
 
 export const SOCIAL_LINKS = [
-    { name: 'github', url: 'https://github.com/Tajmirul' },
-    { name: 'linkedin', url: 'https://www.linkedin.com/in/tajmirul' },
+    { name: 'github', url: 'https://github.com/HusnainMaroof' },
+    {
+        name: 'linkedin',
+        url: 'https://www.linkedin.com/in/husnain-maroof-aa80212b5/',
+    },
     { name: 'facebook', url: 'https://www.facebook.com' },
     { name: 'Old Version', url: GENERAL_INFO.oldPortfolio },
 ];
@@ -191,7 +194,7 @@ export const PROJECTS: IProject[] = [
             'REST API',
         ],
         thumbnail: '/projects/images/crispies-1.avif',
-        longThumbnail: '/projects/images/crispies-6.avif',
+        longThumbnail: '/projects/images/crispies-7.avif',
         images: [
             '/projects/images/crispies-1.avif',
             '/projects/images/crispies-2.avif',
@@ -199,6 +202,7 @@ export const PROJECTS: IProject[] = [
             '/projects/images/crispies-4.avif',
             '/projects/images/crispies-5.avif',
             '/projects/images/crispies-6.avif',
+            '/projects/images/crispies-7.avif',
         ],
     },
     {
@@ -302,7 +306,7 @@ export const PROJECTS: IProject[] = [
       `,
         techStack: ['Sandboxing', 'Web Fetch', 'MCP', 'Docker', 'TypeScript', 'CI/CD'],
         thumbnail: '/projects/images/warden-1.avif',
-        longThumbnail: '/projects/images/warden-6.avif',
+        longThumbnail: '/projects/images/warden-7.avif',
         images: [
             '/projects/images/warden-1.avif',
             '/projects/images/warden-2.avif',
@@ -310,6 +314,7 @@ export const PROJECTS: IProject[] = [
             '/projects/images/warden-4.avif',
             '/projects/images/warden-5.avif',
             '/projects/images/warden-6.avif',
+            '/projects/images/warden-7.avif',
         ],
     },
     {
@@ -335,7 +340,7 @@ export const PROJECTS: IProject[] = [
       `,
         techStack: ['Next.js', 'React', 'TypeScript', 'Tailwind CSS'],
         thumbnail: '/projects/images/paymit-1.avif',
-        longThumbnail: '/projects/images/paymit-7.avif',
+        longThumbnail: '/projects/images/paymit-8.avif',
         images: [
             '/projects/images/paymit-1.avif',
             '/projects/images/paymit-2.avif',
@@ -344,6 +349,7 @@ export const PROJECTS: IProject[] = [
             '/projects/images/paymit-5.avif',
             '/projects/images/paymit-6.avif',
             '/projects/images/paymit-7.avif',
+            '/projects/images/paymit-8.avif',
         ],
     },
     {
@@ -369,13 +375,14 @@ export const PROJECTS: IProject[] = [
       `,
         techStack: ['Next.js', 'React', 'TypeScript', 'Tailwind CSS'],
         thumbnail: '/projects/images/pulse-1.avif',
-        longThumbnail: '/projects/images/pulse-5.avif',
+        longThumbnail: '/projects/images/pulse-6.avif',
         images: [
             '/projects/images/pulse-1.avif',
             '/projects/images/pulse-2.avif',
             '/projects/images/pulse-3.avif',
             '/projects/images/pulse-4.avif',
             '/projects/images/pulse-5.avif',
+            '/projects/images/pulse-6.avif',
         ],
     },
     {
@@ -401,13 +408,14 @@ export const PROJECTS: IProject[] = [
       `,
         techStack: ['Next.js', 'React', 'TypeScript', 'Tailwind CSS'],
         thumbnail: '/projects/images/rafin-solutions-1.avif',
-        longThumbnail: '/projects/images/rafin-solutions-5.avif',
+        longThumbnail: '/projects/images/rafin-solutions-6.avif',
         images: [
             '/projects/images/rafin-solutions-1.avif',
             '/projects/images/rafin-solutions-2.avif',
             '/projects/images/rafin-solutions-3.avif',
             '/projects/images/rafin-solutions-4.avif',
             '/projects/images/rafin-solutions-5.avif',
+            '/projects/images/rafin-solutions-6.avif',
         ],
     },
     {
@@ -432,13 +440,14 @@ export const PROJECTS: IProject[] = [
       `,
         techStack: ['Next.js', 'React', 'TypeScript', 'Tailwind CSS'],
         thumbnail: '/projects/images/exam-system-1.avif',
-        longThumbnail: '/projects/images/exam-system-5.avif',
+        longThumbnail: '/projects/images/exam-system-6.avif',
         images: [
             '/projects/images/exam-system-1.avif',
             '/projects/images/exam-system-2.avif',
             '/projects/images/exam-system-3.avif',
             '/projects/images/exam-system-4.avif',
             '/projects/images/exam-system-5.avif',
+            '/projects/images/exam-system-6.avif',
         ],
     },
 ];
@@ -447,16 +456,16 @@ export const MY_EXPERIENCE = [
     {
         title: 'Full Stack (Frontend)',
         company: 'Freelance',
-        duration: ' 2025 - Present',
+        duration: 'Nov 2025 - Present',
     },
     {
         title: 'Frontend Developer',
-        company: 'Paymits',
-        duration: 'jan 2024 - Nov 2024',
+        company: 'Paymit',
+        duration: 'Jan 2025 - Nov 2025',
     },
     {
         title: 'Frontend Engineer',
         company: 'TangoPay',
-        duration: 'Oct 2024 - jan 2025',
+        duration: 'Jul 2024 - Jan 2025',
     },
 ];

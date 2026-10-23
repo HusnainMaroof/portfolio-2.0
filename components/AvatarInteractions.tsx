@@ -12,6 +12,8 @@ import { SplitText } from 'gsap/SplitText';
 import { useLenis } from 'lenis/react';
 import { useRouter } from 'next/navigation';
 import { X } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { PILL_BASE, PILL_IDLE } from '@/lib/pill';
 import {
     Onee,
     type AnimationName,
@@ -34,7 +36,6 @@ import {
 import {
     AVATAR_EDGE as EDGE,
     boxFromRect,
-    clampPoint,
     clipToViewport,
     collectObstacles,
     placeAvatar,
@@ -48,7 +49,7 @@ import {
 
 gsap.registerPlugin(SplitText);
 
-const MESSAGE_W = 200;
+const MESSAGE_W = 230;
 const PANEL_W = 240;
 /**
  * Overlays are pinned to a fixed pixel width, which can outgrow a 320px
@@ -74,23 +75,34 @@ const AVATAR_MOBILE = 64;
 const MOBILE_BREAKPOINT = 768;
 const REACH_PX = 260;
 /** Hover intent: the line appears only after the pointer has settled on a target. */
-const DWELL_MS = 160;
-const TYPING_MS = 450;
-const CHAR_STAGGER = 0.018;
+const DWELL_MS = 120;
+/** How long the pointer must rest on a target before Onee travels to it. */
+const HOVER_INTENT_MS = 220;
+/** Minimum rest after a hop lands before Onee may leave for another target. */
+const HOP_REST_MS = 700;
+/** Scrolling must pause this long before Onee re-aligns with its target. */
+const SCROLL_SETTLE_MS = 180;
+const TYPING_MS = 220;
+const CHAR_STAGGER = 0.01;
 /** Minimum gap before the same target can speak again. */
 const MESSAGE_COOLDOWN_MS = 1500;
-/** Slow, eased travel: the avatar glides instead of snapping between targets. */
-const TRAVEL_S = 1.15;
-const FOLLOW_S = 0.35;
 /**
- * A hop never starts until the previous one has landed and this beat has
- * passed, so retargeting mid-flight queues instead of fighting the tween.
+ * Movement is a critically damped spring stepped every frame. Retargeting
+ * mid-flight keeps the current velocity, so the avatar never snaps, stalls,
+ * or restarts. Higher stiffness tracks tighter (used while following scroll).
  */
-const ARRIVE_GAP_MS = 260;
+type Motion = 'travel' | 'follow' | 'instant';
+const TRAVEL_STIFFNESS = 4;
+const FOLLOW_STIFFNESS = 6;
+/** Close enough to the destination to count as landed (px and px/s). */
+const SETTLE_PX = 0.15;
+const SETTLE_SPEED = 2;
+/** Beat of stillness after landing before a message appears. */
+const ARRIVE_GAP_MS = 60;
 const GREETING_DELAY_MS = 4000;
 const GREETING_HOLD_MS = 7000;
 /** Destinations closer than this are treated as unchanged: no new tween. */
-const RETARGET_PX = 4;
+const RETARGET_PX = 24;
 const FADE_S = 0.28;
 const PANEL_S = 0.2;
 const OPEN_ANIMATION: AnimationName = 'happy';
@@ -140,14 +152,32 @@ const NAV_BAR_HEIGHT = 60;
 const NAV_BAR_BREAKPOINT = 1024;
 
 /** Home is the bottom-right corner of the viewport, clear of the centred navbar. */
+/** Space reserved on the right edge, e.g. the vertical sticky email. */
+const rightGutter = () => {
+    const el = document.querySelector('[data-avatar-dock-gutter]');
+    const rect = el?.getBoundingClientRect();
+
+    return rect && rect.width > 0
+        ? Math.max(EDGE, window.innerWidth - rect.left + 8)
+        : EDGE;
+};
+
 const homeFor = (size: number): Point => ({
-    x: window.innerWidth - size - EDGE,
+    x: window.innerWidth - size - rightGutter(),
     y:
         window.innerHeight -
         size -
         EDGE -
         (window.innerWidth < NAV_BAR_BREAKPOINT ? NAV_BAR_HEIGHT : 0),
 });
+
+/** Highest the docked avatar may go: below the hanging coffee card when it is on screen. */
+const dockTop = () => {
+    const card = document.querySelector('[data-avatar-dock-keepout]');
+    const bottom = card ? card.getBoundingClientRect().bottom : 0;
+
+    return Math.max(EDGE, bottom + EDGE);
+};
 
 /**
  * Plans where the avatar should sit for one target. Uses the target's visible
@@ -169,15 +199,29 @@ const planFor = (
 
     if (!target) return null;
 
-    return placeAvatar({
+    const size = avatarSize();
+    // Scored placement is still used for the list of boxes the message must
+    // avoid, but Onee itself stays docked on the right edge: it only glides
+    // vertically to line up with the target, so it never swings left/right
+    // across the page or lands on top of content.
+    const scored = placeAvatar({
         target,
-        avatarSize: avatarSize(),
+        avatarSize: size,
         overlay,
         viewport,
         obstacles: collectObstacles(element, root, viewport),
         preferred: PREFERRED_SIDES[trigger.kind],
         previous,
     });
+    const home = homeFor(size);
+    const centre = (target.top + target.bottom) / 2 - size / 2;
+
+    return {
+        ...scored,
+        point: { x: home.x, y: clamp(centre, dockTop(), home.y) },
+        side: 'right',
+        along: 0.5,
+    };
 };
 
 const AvatarInteractions = () => {
@@ -208,7 +252,11 @@ const AvatarInteractions = () => {
     const restingLabelRef = useRef<string | null>(null);
     /** When the current hop lands (`performance.now()`); 0 means standing still. */
     const landingAtRef = useRef(0);
-    const moveTimerRef = useRef<number | null>(null);
+    /** Live spring state: rendered position, velocity (px/s), and stiffness. */
+    const posRef = useRef<Point>({ x: 0, y: 0 });
+    const velRef = useRef<Point>({ x: 0, y: 0 });
+    const stiffnessRef = useRef(TRAVEL_STIFFNESS);
+    const springFrameRef = useRef(0);
     const selfHoverRef = useRef(false);
     const visitsRef = useRef(new Map<string, number>());
     const lastMessageAtRef = useRef(new Map<string, number>());
@@ -259,64 +307,105 @@ const AvatarInteractions = () => {
         place(panelRef.current, overlayWidth(PANEL_W));
     }, []);
 
+    const applyPosition = useCallback(() => {
+        const root = rootRef.current;
+        const { x, y } = posRef.current;
+
+        if (root) root.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+    }, []);
+
+    /** Steps the spring once per frame until the avatar has settled. */
+    const stepSpring = useCallback(() => {
+        let last = performance.now();
+
+        const tick = (now: number) => {
+            // Clamp dt so a background tab or long frame can't fling the avatar.
+            const dt = Math.min((now - last) / 1000, 0.05);
+            last = now;
+
+            const w = stiffnessRef.current;
+            const decay = Math.exp(-w * dt);
+            const pos = posRef.current;
+            const vel = velRef.current;
+            const dest = destRef.current;
+            let settled = true;
+
+            // Exact critically damped solution per axis: stable at any frame rate.
+            (['x', 'y'] as const).forEach((axis) => {
+                const offset = pos[axis] - dest[axis];
+                const term = vel[axis] + w * offset;
+                const nextOffset = (offset + term * dt) * decay;
+
+                vel[axis] = (vel[axis] - w * term * dt) * decay;
+                pos[axis] = dest[axis] + nextOffset;
+
+                if (
+                    Math.abs(nextOffset) > SETTLE_PX ||
+                    Math.abs(vel[axis]) > SETTLE_SPEED
+                ) {
+                    settled = false;
+                }
+            });
+
+            if (settled) {
+                posRef.current = { ...dest };
+                velRef.current = { x: 0, y: 0 };
+                applyPosition();
+                springFrameRef.current = 0;
+                landingAtRef.current = Math.min(landingAtRef.current, now);
+                placeOverlays();
+                return;
+            }
+
+            applyPosition();
+            springFrameRef.current = requestAnimationFrame(tick);
+        };
+
+        if (!springFrameRef.current) {
+            springFrameRef.current = requestAnimationFrame(tick);
+        }
+    }, [applyPosition, placeOverlays]);
+
     /**
-     * Moves the single avatar from wherever it currently is to a new point.
-     * A hop in flight is never interrupted: a new destination waits for the
-     * current one to land plus a short beat of stillness, which keeps the
-     * motion free of mid-tween jumps.
+     * Moves the single avatar toward a new point. The spring retargets from
+     * its live position and velocity, so new destinations never snap or queue.
      */
     const moveTo = useCallback(
-        (dest: Point, duration: number) => {
-            const root = rootRef.current;
+        (dest: Point, motion: Motion) => {
+            if (!rootRef.current) return;
 
-            if (!root) return;
-
-            // The destination is recorded at once, so re-planning compares
-            // against the intent instead of the position still being left behind.
             destRef.current = dest;
 
-            const start = () => {
-                if (moveTimerRef.current !== null) {
-                    window.clearTimeout(moveTimerRef.current);
-                    moveTimerRef.current = null;
+            if (motion === 'instant' || reducedRef.current) {
+                if (springFrameRef.current) {
+                    cancelAnimationFrame(springFrameRef.current);
+                    springFrameRef.current = 0;
                 }
-
-                destRef.current = dest;
-                const ms = reducedRef.current ? 0 : duration;
-
-                landingAtRef.current = performance.now() + ms;
-                // overwrite:true retargets from the live position, so redirects never snap.
-                gsap.to(root, {
-                    x: dest.x,
-                    y: dest.y,
-                    duration: ms,
-                    ease: 'power2.inOut',
-                    overwrite: true,
-                    onComplete: () => {
-                        landingAtRef.current = performance.now();
-                        // The overlays belong to the destination, so they settle with it.
-                        placeOverlays();
-                    },
-                });
+                posRef.current = { ...dest };
+                velRef.current = { x: 0, y: 0 };
+                landingAtRef.current = performance.now();
+                applyPosition();
                 placeOverlays();
-            };
-
-            const readyAt = Math.max(
-                landingAtRef.current + ARRIVE_GAP_MS,
-                performance.now(),
-            );
-
-            if (reducedRef.current || readyAt <= performance.now()) {
-                start();
-            } else {
-                if (moveTimerRef.current !== null) {
-                    window.clearTimeout(moveTimerRef.current);
-                }
-
-                moveTimerRef.current = window.setTimeout(start, readyAt - performance.now());
+                return;
             }
+
+            const now = performance.now();
+
+            if (motion === 'travel') {
+                stiffnessRef.current = TRAVEL_STIFFNESS;
+                // ~3 time constants: ~80% of the way there, close enough for the
+                // message to start while the last bit of the glide finishes.
+                landingAtRef.current = now + (3 / TRAVEL_STIFFNESS) * 1000;
+            } else if (landingAtRef.current <= now) {
+                // Following only tightens the spring when no hop is in flight,
+                // so a scroll mid-hop doesn't jerk the glide faster.
+                stiffnessRef.current = FOLLOW_STIFFNESS;
+            }
+
+            placeOverlays();
+            stepSpring();
         },
-        [placeOverlays],
+        [applyPosition, placeOverlays, stepSpring],
     );
 
     /** Fades the hover message in or out. Hidden whenever the panel is open. */
@@ -626,7 +715,7 @@ const AvatarInteractions = () => {
                         : reaction.animation,
                 label: selfHoverRef.current ? null : reaction.label,
             }));
-            moveTo(plan.point, TRAVEL_S);
+            moveTo(plan.point, 'travel');
             scheduleMessage(trigger, visit, token);
         },
         [moveTo, scheduleMessage],
@@ -646,7 +735,7 @@ const AvatarInteractions = () => {
         setTyping(false);
         showMessage(false);
         setView({ animation: AVATAR_HOME_ANIMATION, label: null });
-        moveTo(homeRef.current, TRAVEL_S);
+        moveTo(homeRef.current, 'travel');
     }, [clearMessageTimer, moveTo, showMessage]);
 
     /** Re-plans the active target after scroll, resize, or layout changes. Holds position if the target is off-screen. */
@@ -680,15 +769,13 @@ const AvatarInteractions = () => {
             ) {
                 placeOverlays();
             } else {
-                moveTo(plan.point, FOLLOW_S);
+                moveTo(plan.point, 'follow');
             }
         } else {
-            moveTo(
-                clampPoint(destRef.current, avatarSize(), viewportSize()),
-                FOLLOW_S,
-            );
+            // Target scrolled out of view: head home instead of clinging to the edge.
+            reset();
         }
-    }, [moveTo, placeOverlays]);
+    }, [moveTo, placeOverlays, reset]);
 
     const runAction = (action: QuickAction) => {
         setPanel(false);
@@ -790,23 +877,53 @@ const AvatarInteractions = () => {
 
         applySize();
         homeRef.current = homeFor(avatarSize());
-        moveTo(homeRef.current, 0);
+        moveTo(homeRef.current, 'instant');
 
         // Mouse drives the gaze and hover activation. Touch and pen get tap activation below.
+        // Hover intent: Onee only hops once the pointer rests on a target,
+        // so sweeping the mouse across the page doesn't drag it around.
+        let hoverTimer: number | null = null;
+        let hoverElement: HTMLElement | null = null;
         const onPointerOver = (event: PointerEvent) => {
             if (event.pointerType !== 'mouse') return;
 
             const found = findAvatarTrigger(event.target);
+            const element = found?.element ?? null;
 
-            if (found) activate(found.element, found.trigger);
+            if (element === hoverElement) return;
+
+            hoverElement = element;
+            if (hoverTimer !== null) window.clearTimeout(hoverTimer);
+            hoverTimer = null;
+
+            if (!found) return;
+
+            // Wait for hover intent, and never start a hop until the previous
+            // one has landed and rested. Only the latest target is kept.
+            const tryActivate = () => {
+                hoverTimer = null;
+                if (hoverElement !== found.element) return;
+
+                const wait =
+                    landingAtRef.current + HOP_REST_MS - performance.now();
+
+                if (wait > 0) {
+                    hoverTimer = window.setTimeout(tryActivate, wait);
+                    return;
+                }
+
+                activate(found.element, found.trigger);
+            };
+
+            hoverTimer = window.setTimeout(tryActivate, HOVER_INTENT_MS);
         };
 
         const onPointerMove = (event: PointerEvent) => {
             if (event.pointerType !== 'mouse' || reducedRef.current) return;
 
             const size = avatarSize();
-            const cx = Number(gsap.getProperty(root, 'x')) + size / 2;
-            const cy = Number(gsap.getProperty(root, 'y')) + size / 2;
+            const cx = posRef.current.x + size / 2;
+            const cy = posRef.current.y + size / 2;
 
             avatarRef.current?.look(
                 clamp((event.clientX - cx) / REACH_PX, -1, 1),
@@ -841,8 +958,17 @@ const AvatarInteractions = () => {
             else reset();
         };
 
-        // Scroll, resize, and layout shifts all funnel through one frame-throttled re-plan.
+        // Resize and layout shifts funnel through one frame-throttled re-plan.
+        // Scroll waits until it settles, so Onee doesn't chase every frame.
         let frame = 0;
+        let scrollTimer: number | null = null;
+        const onScroll = () => {
+            if (scrollTimer !== null) window.clearTimeout(scrollTimer);
+            scrollTimer = window.setTimeout(() => {
+                scrollTimer = null;
+                scheduleFollow();
+            }, SCROLL_SETTLE_MS);
+        };
         const scheduleFollow = () => {
             if (frame) return;
 
@@ -861,7 +987,7 @@ const AvatarInteractions = () => {
                 // Still at home: keep it in the corner for the new viewport size.
                 homeRef.current = homeFor(avatarSize());
                 layoutRef.current = { avoid: [], choice: null };
-                moveTo(homeRef.current, 0);
+                moveTo(homeRef.current, 'instant');
             }
         };
 
@@ -879,7 +1005,7 @@ const AvatarInteractions = () => {
         document.addEventListener('pointerdown', onPointerDown);
         document.addEventListener('focusin', onFocusIn);
         document.addEventListener('keydown', onKeyDown);
-        window.addEventListener('scroll', scheduleFollow, { passive: true });
+        window.addEventListener('scroll', onScroll, { passive: true });
         window.addEventListener('resize', onResize);
 
         return () => {
@@ -889,15 +1015,17 @@ const AvatarInteractions = () => {
             document.removeEventListener('pointerdown', onPointerDown);
             document.removeEventListener('focusin', onFocusIn);
             document.removeEventListener('keydown', onKeyDown);
-            window.removeEventListener('scroll', scheduleFollow);
+            window.removeEventListener('scroll', onScroll);
+            if (scrollTimer !== null) window.clearTimeout(scrollTimer);
             window.removeEventListener('resize', onResize);
             layoutObserver?.disconnect();
 
             if (frame) cancelAnimationFrame(frame);
+            if (hoverTimer !== null) window.clearTimeout(hoverTimer);
             clearMessageTimer();
-            if (moveTimerRef.current !== null) {
-                window.clearTimeout(moveTimerRef.current);
-                moveTimerRef.current = null;
+            if (springFrameRef.current) {
+                cancelAnimationFrame(springFrameRef.current);
+                springFrameRef.current = 0;
             }
 
             tokenRef.current++;
@@ -915,7 +1043,7 @@ const AvatarInteractions = () => {
     const togglePanel = () => setPanel(!panelOpenRef.current);
 
     const dotClass =
-        'size-1.5 rounded-full bg-muted-foreground animate-pulse motion-reduce:animate-none';
+        'size-1.5 rounded-full bg-primary/80 animate-pulse motion-reduce:animate-none';
 
     return (
         <div
@@ -952,11 +1080,11 @@ const AvatarInteractions = () => {
             <div
                 ref={messageRef}
                 data-avatar-message=""
-                className="pointer-events-none absolute left-0 top-0 rounded-lg border border-border/60 bg-background-light px-3 py-2 text-sm leading-snug text-foreground opacity-0"
+                className="pointer-events-none absolute left-0 top-0 rounded-2xl border border-primary/20 bg-background-light/90 px-4 py-3 font-roboto-flex text-[13.5px] leading-relaxed text-foreground opacity-0 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.6)] backdrop-blur-md"
                 style={{ maxWidth: 'calc(100vw - 2rem)' }}
             >
                 {view.label && (
-                    <p className="mb-1 text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
+                    <p className="mb-1.5 text-[10px] font-medium uppercase tracking-[0.18em] text-primary">
                         {view.label}
                     </p>
                 )}
@@ -978,7 +1106,7 @@ const AvatarInteractions = () => {
                 id={PANEL_ID}
                 role="dialog"
                 aria-label="Portfolio assistant"
-                className="pointer-events-auto invisible absolute left-0 top-0 rounded-2xl border border-border/60 bg-background-light p-4 text-foreground opacity-0"
+                className="pointer-events-auto invisible absolute left-0 top-0 rounded-2xl border border-primary/20 bg-background-light/95 p-4 font-roboto-flex text-foreground opacity-0 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.6)] backdrop-blur-md"
                 style={{ maxWidth: 'calc(100vw - 2rem)' }}
             >
                 <div className="mb-3 flex items-start justify-between gap-3">
@@ -1001,7 +1129,7 @@ const AvatarInteractions = () => {
                             <button
                                 type="button"
                                 onClick={() => runAction(action)}
-                                className="w-full rounded-lg border border-border/60 px-3 py-2 text-left text-sm text-muted-foreground transition-colors duration-150 hover:border-primary hover:bg-primary hover:text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                                className={cn(PILL_BASE, PILL_IDLE, 'h-10 w-full justify-start px-3.5 text-left hover:bg-primary hover:text-primary-foreground')}
                             >
                                 {action.label}
                             </button>

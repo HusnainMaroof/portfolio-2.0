@@ -66,7 +66,7 @@ const Footer = () => {
     return (
         <footer className="relative overflow-hidden" id="contact">
             <div
-                className="page-container pb-section flex flex-col justify-center items-center text-center"
+                className="page-container pb-8 md:pb-10 flex flex-col justify-center items-center text-center"
                 ref={containerRef}
             >
                 {/* nameplate pill, matches Banner's availability tag */}
@@ -130,7 +130,7 @@ const Footer = () => {
                 </div>
 
                 {/* CTA button, same Button component as Banner */}
-                <div className="slide-up-and-fade mb-16">
+                <div className="slide-up-and-fade mb-12">
                     <Button
                         as="link"
                         target="_blank"

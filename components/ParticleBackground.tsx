@@ -39,7 +39,8 @@ const ParticleBackground = () => {
                 <div
                     key={i}
                     ref={(el) => {
-                        particlesRef.current.push(el!);
+                        // Assign by index: pushing grew the list on every re-render.
+                        if (el) particlesRef.current[i] = el;
                     }}
                     className="absolute rounded-full"
                     style={{ backgroundColor: particleColor }}

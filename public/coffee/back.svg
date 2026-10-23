@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1440" viewBox="0 0 1024 1440">
+  <rect width="1024" height="1440" fill="#00F050"/>
+  <rect x="48" y="48" width="928" height="1344" rx="40" fill="none" stroke="#0f0f0f" stroke-opacity="0.3" stroke-width="4"/>
+  <text x="512" y="700" text-anchor="middle" font-family="Georgia, serif" font-size="120" font-style="italic" fill="#0f0f0f">Thank you!</text>
+  <text x="512" y="820" text-anchor="middle" font-family="Arial, sans-serif" font-size="48" fill="#0f0f0f" fill-opacity="0.75">Every coffee keeps</text>
+  <text x="512" y="885" text-anchor="middle" font-family="Arial, sans-serif" font-size="48" fill="#0f0f0f" fill-opacity="0.75">the code flowing.</text>
+  <text x="512" y="1290" text-anchor="middle" font-family="Arial, sans-serif" font-size="34" letter-spacing="5" fill="#0f0f0f" fill-opacity="0.6">CHAILINK.CO/HUSNAINMAROOF</text>
+</svg>
