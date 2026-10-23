@@ -27,10 +27,12 @@ const Footer = () => {
 
     useEffect(() => {
         let cancelled = false;
-        fetch('https://api.github.com/repos/husnainmaroof/portfolio')
-            .then((res) => res.json())
-            .then((data: RepoStats) => {
-                if (!cancelled) setStats(data);
+        fetch('https://api.github.com/repos/HusnainMaroof/portfolio-2.0')
+            // A 404 or rate-limit reply is JSON too; only real stats are shown.
+            .then((res) => (res.ok ? res.json() : null))
+            .then((data: RepoStats | null) => {
+                if (!cancelled && typeof data?.stargazers_count === 'number')
+                    setStats(data);
             })
             .catch(() => {
                 // Stats are decorative, fail silently
@@ -150,7 +152,7 @@ const Footer = () => {
                     </span>
 
                     <a
-                        href="https://github.com/husnainmaroof/portfolio" data-avatar="social"
+                        href="https://github.com/HusnainMaroof/portfolio-2.0" data-avatar="social"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="group flex flex-col items-center md:items-end gap-1"

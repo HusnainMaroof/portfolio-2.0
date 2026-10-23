@@ -1,6 +1,6 @@
 # Husnain Maroof
 
-> Freelance full-stack developer based in Islamabad, Pakistan, building fast, polished, high-performing web applications with Next.js, React, TypeScript, Tailwind CSS, and Node.js. Available for remote projects worldwide.
+> Full-stack developer based in Islamabad, Pakistan, building fast, reliable web and mobile products with Next.js, React, TypeScript, Tailwind CSS, and Node.js. Freelancing since November 2025; available for remote projects worldwide.
 
 Husnain Maroof's portfolio showcases production web applications: e-commerce and click & collect ordering (Crispies), business record-keeping dashboards (Tijartt), marketing sites (Rafin Solutions), and open-source security tooling (Warden).
 
@@ -14,6 +14,12 @@ Husnain Maroof's portfolio showcases production web applications: e-commerce and
 - [Rafin Solutions](https://husnain.cc/projects/rafin-solutions): Official marketing website for a digital solutions company. Stack: Next.js, React, TypeScript, Tailwind CSS.
 - [Exam System](https://husnain.cc/projects/exam-system): Web application for taking and managing exams online. Stack: Next.js, React, TypeScript, Tailwind CSS.
 
+## Experience
+
+- Full Stack (Frontend), Freelance: Nov 2025 - Present
+- Frontend Developer, Paymit: Jan 2025 - Nov 2025
+- Frontend Engineer, TangoPay: Jul 2024 - Jan 2025
+
 ## Expertise
 
 Frontend: Next.js, React, TypeScript, Redux, Tailwind CSS, GSAP, Framer Motion. Backend: Node.js, NestJS, Express. Databases: PostgreSQL, MySQL, MongoDB, Prisma, Supabase. Tools: Git, Docker, AWS.
@@ -21,5 +27,7 @@ Frontend: Next.js, React, TypeScript, Redux, Tailwind CSS, GSAP, Framer Motion. 
 ## Contact
 
 - Email: husnainmaroof95@gmail.com
+- GitHub: https://github.com/HusnainMaroof
+- LinkedIn: https://www.linkedin.com/in/husnain-maroof-aa80212b5/
 - Upwork: https://www.upwork.com/freelancers/~01e3f0c7b1d8a5e2f9
 - Website: https://husnain.cc

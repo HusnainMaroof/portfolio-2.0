@@ -51,12 +51,11 @@ export const generateMetadata = async ({
             siteName: 'Husnain Maroof Portfolio',
             title: `${project.title} — Husnain Maroof`,
             description,
-            // The generated PNG (AVIF screenshots are not rendered by
-            // Facebook/Twitter/X or most AI crawlers, so previews use the
-            // site-wide PNG that all crawlers support).
+            // The site-wide JPEG card (AVIF screenshots are not rendered by
+            // Facebook/Twitter/X or most AI crawlers).
             images: [
                 {
-                    url: '/opengraph-image',
+                    url: '/opengraph-image.jpg',
                     alt: `${project.title} case study preview`,
                 },
             ],
@@ -65,7 +64,7 @@ export const generateMetadata = async ({
             card: 'summary_large_image',
             title: `${project.title} — Husnain Maroof`,
             description,
-            images: ['/opengraph-image'],
+            images: ['/opengraph-image.jpg'],
         },
     } as Metadata;
 };

@@ -15,10 +15,11 @@ const container: Variants = {
     shown: { transition: { delayChildren: 0.35, staggerChildren: 0.09 } },
 };
 
+// No opacity fade: Chrome ignores fully transparent elements for LCP, so a
+// fade delayed the largest paint. The portrait only rises into place.
 const portrait: Variants = {
-    hidden: { opacity: 0, y: 24 },
+    hidden: { y: 24 },
     shown: {
-        opacity: 1,
         y: 0,
         transition: { duration: 0.9, ease: [0.22, 1, 0.36, 1] },
     },
@@ -184,6 +185,8 @@ const Banner = () => {
                             width={HERO.portrait.width}
                             height={HERO.portrait.height}
                             priority
+                            // The halftone AVIF is already 110KB; re-encoding made it 285-383KB.
+                            unoptimized
                             sizes="(min-width: 1024px) min(48vw, 850px), (min-width: 768px) 600px, min(92vw, 560px)"
                             className="hero-portrait h-auto w-full select-none"
                             style={{

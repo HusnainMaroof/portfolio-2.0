@@ -26,7 +26,7 @@ export interface ApproachContent {
 export const HERO: HeroContent = {
     name: { roman: 'Husnain', italic: 'Maroof' },
     tagline: {
-        lead: 'I build fast, reliable web and mobile products , from first line of code to something ',
+        lead: 'I build fast, reliable web and mobile products, from first line of code to something ',
         accent: 'real users depend on',
         tail: '.',
     },

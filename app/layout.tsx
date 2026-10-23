@@ -15,14 +15,23 @@ import { ThemeProvider } from '@/components/ThemeProvider';
 import Footer from '@/components/Footer';
 import PortfolioSidebar from '@/components/portfolio-sidebar';
 
+const SITE_DESCRIPTION =
+    'Husnain Maroof is a full-stack developer in Islamabad, Pakistan, building fast, reliable web and mobile products with Next.js, React, TypeScript, Tailwind CSS and Node.js: e-commerce, SaaS dashboards, marketing sites and developer tools. Available for remote projects.';
+const SHARE_DESCRIPTION =
+    'Full-stack developer building fast, reliable web and mobile products with Next.js, React, TypeScript and Node.js. Available for remote projects.';
+
 export const metadata: Metadata = {
     metadataBase: new URL('https://husnain.cc'),
     title: {
         default: 'Husnain Maroof — Full-Stack Developer (Next.js, React)',
         template: '%s — Husnain Maroof',
     },
-    description:
-        'Freelance full-stack developer in Islamabad, Pakistan. Husnain Maroof builds fast, polished, high-performing web apps with Next.js, React, TypeScript, Tailwind CSS and Node.js. Available for remote projects.',
+    description: SITE_DESCRIPTION,
+    applicationName: 'Husnain Maroof Portfolio',
+    authors: [{ name: 'Husnain Maroof', url: 'https://husnain.cc' }],
+    creator: 'Husnain Maroof',
+    publisher: 'Husnain Maroof',
+    category: 'technology',
     keywords: [
         'Husnain Maroof',
         'full-stack developer',
@@ -31,6 +40,7 @@ export const metadata: Metadata = {
         'Next.js developer Pakistan',
         'React developer',
         'TypeScript developer',
+        'web and mobile app developer',
         'web application developer',
         'SaaS developer for hire',
         'freelance web developer Pakistan',
@@ -40,25 +50,33 @@ export const metadata: Metadata = {
     alternates: {
         canonical: '/',
     },
+    // Preview images come from app/opengraph-image.tsx and app/twitter-image.tsx.
     openGraph: {
-        type: 'website',
+        type: 'profile',
         url: '/',
         siteName: 'Husnain Maroof Portfolio',
         title: 'Husnain Maroof — Full-Stack Developer (Next.js, React)',
-        description:
-            'Freelance full-stack developer in Islamabad, Pakistan. Fast, polished web apps with Next.js, React, TypeScript and Node.js.',
+        description: SHARE_DESCRIPTION,
         locale: 'en_US',
+        firstName: 'Husnain',
+        lastName: 'Maroof',
     },
     twitter: {
         card: 'summary_large_image',
         title: 'Husnain Maroof — Full-Stack Developer (Next.js, React)',
-        description:
-            'Freelance full-stack developer in Islamabad, Pakistan. Fast, polished web apps with Next.js, React and TypeScript.',
+        description: SHARE_DESCRIPTION,
     },
     robots: {
         index: true,
         follow: true,
+        googleBot: {
+            index: true,
+            follow: true,
+            'max-image-preview': 'large',
+            'max-snippet': -1,
+        },
     },
+    formatDetection: { telephone: false },
 };
 const fraunces = Fraunces({
     subsets: ['latin'],
@@ -80,7 +98,9 @@ const PERSON_JSON_LD = {
             '@id': 'https://husnain.cc/#husnain-maroof',
             name: 'Husnain Maroof',
             jobTitle: 'Full-Stack Developer',
+            description: SHARE_DESCRIPTION,
             url: 'https://husnain.cc/',
+            image: 'https://husnain.cc/hero/portrait-og.png',
             email: 'mailto:husnainmaroof95@gmail.com',
             address: {
                 '@type': 'PostalAddress',
@@ -88,6 +108,8 @@ const PERSON_JSON_LD = {
                 addressCountry: 'PK',
             },
             sameAs: [
+                'https://github.com/HusnainMaroof',
+                'https://www.linkedin.com/in/husnain-maroof-aa80212b5/',
                 'https://www.upwork.com/freelancers/~01e3f0c7b1d8a5e2f9',
                 'https://husnain-maroof-portfolio.vercel.app',
             ],
@@ -107,6 +129,7 @@ const PERSON_JSON_LD = {
                 'GSAP',
                 'Framer Motion',
                 'Web application development',
+                'Mobile app development',
                 'SaaS development',
             ],
         },

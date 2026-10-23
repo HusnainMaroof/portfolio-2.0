@@ -1,8 +1,11 @@
 # Husnain Maroof
 
-**Full-Stack Developer, based in Pakistan**
+**Full-Stack Developer, based in Islamabad, Pakistan**
 
 - Email: husnainmaroof95@gmail.com
+- Website: https://husnain.cc
+- GitHub: https://github.com/HusnainMaroof
+- LinkedIn: https://www.linkedin.com/in/husnain-maroof-aa80212b5/
 - Upwork: https://www.upwork.com/freelancers/~01e3f0c7b1d8a5e2f9
 - Old portfolio: https://husnain-maroof-portfolio.vercel.app
 
@@ -14,7 +17,7 @@ I'm a full-stack developer focused on building fast, polished web experiences, f
 
 My approach focuses on creating scalable, high-performing solutions tailored to both user needs and business objectives. By prioritizing performance, accessibility, and responsiveness, I aim to deliver experiences that engage users and drive results.
 
-I build fast, reliable web products, from the first line of code to something real users depend on.
+I build fast, reliable web and mobile products, from the first line of code to something real users depend on.
 
 ---
 
