@@ -35,10 +35,10 @@ export const HERO: HeroContent = {
         location: 'Islamabad, Pakistan',
     },
     portrait: {
-        src: '/hero/portrait.avif',
+        src: '/hero/hero_portrate.png',
         alt: 'Halftone portrait of Husnain Maroof in a black hoodie, looking to the side',
-        width: 960,
-        height: 960,
+        width: 1254,
+        height: 1254,
     },
     credibility: {
         text: 'Top 5% of developers, recognized by Toptal',

@@ -8,7 +8,7 @@ import React from 'react';
  */
 const StickyEmail = () => {
     return (
-        <div data-avatar-dock-gutter="" className="fixed bottom-24 right-[22px] z-[4]">
+        <div data-avatar-dock-gutter="" className="fixed bottom-24 right-[22px] z-[4] hidden">
             <a
                 href={`mailto:${GENERAL_INFO.email}`}
                 data-avatar="contact"

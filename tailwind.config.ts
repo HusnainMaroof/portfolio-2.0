@@ -64,6 +64,7 @@ export default {
             fontFamily: {
                 anton: ['var(--font-anton)'],
                 display: ['var(--font-fraunces)', 'Georgia', 'serif'],
+                name: ['var(--font-display)', 'Georgia', 'serif'],
                 'roboto-flex': ['var(--font-roboto-flex)'],
             },
             padding: {

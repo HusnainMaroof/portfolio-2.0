@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { ReactLenis } from 'lenis/react';
-import { Fraunces } from 'next/font/google';
+import { Fraunces, Instrument_Serif } from 'next/font/google';
 import 'lenis/dist/lenis.css';
 import './globals.css';
 import ParticleBackground from '@/components/ParticleBackground';
@@ -84,6 +84,13 @@ const fraunces = Fraunces({
     variable: '--font-fraunces',
     display: 'swap',
 });
+const instrumentSerif = Instrument_Serif({
+    subsets: ['latin'],
+    weight: '400',
+    style: ['normal', 'italic'],
+    variable: '--font-display',
+    display: 'swap',
+});
 
 /*
  * Entity identity for search engines and AI answer engines. Every field is
@@ -111,7 +118,6 @@ const PERSON_JSON_LD = {
                 'https://github.com/HusnainMaroof',
                 'https://www.linkedin.com/in/husnain-maroof-aa80212b5/',
                 'https://www.upwork.com/freelancers/~01e3f0c7b1d8a5e2f9',
-                'https://husnain-maroof-portfolio.vercel.app',
             ],
             knowsAbout: [
                 'Next.js',
@@ -159,7 +165,7 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en" className={fraunces.variable}>
+        <html lang="en" className={`${fraunces.variable} ${instrumentSerif.variable}`}>
             <GoogleAnalytics gaId="G-MHLY1LNGY5" />
             <Script id="hotjar" strategy="afterInteractive">
                 {`(function(h,o,t,j,a,r){

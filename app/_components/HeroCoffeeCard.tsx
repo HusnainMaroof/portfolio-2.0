@@ -52,7 +52,7 @@ const HeroCoffeeCard = () => {
     const ready = useDeferredMount();
 
     return (
-        <div className="pointer-events-none absolute right-0 top-0 z-10 hidden md:block lg:right-4">
+        <div className="pointer-events-none absolute left-0 top-0 z-10 hidden md:block lg:left-[172px]">
             <a
                 href={HERO.coffee.href}
                 target="_blank"
