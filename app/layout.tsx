@@ -77,6 +77,9 @@ export const metadata: Metadata = {
         },
     },
     formatDetection: { telephone: false },
+    verification: {
+        google: 'Z9TNcDorxGrRvGmB1xHhg7v_VRvjqeO7YL-kvLlKlPM',
+    },
 };
 const fraunces = Fraunces({
     subsets: ['latin'],
