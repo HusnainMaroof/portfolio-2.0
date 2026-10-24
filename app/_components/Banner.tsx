@@ -1,13 +1,14 @@
 'use client';
 
-import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
 import { motion, MotionConfig, type Variants } from 'framer-motion';
 import { ArrowUpRight, Github, Linkedin } from 'lucide-react';
 import { HERO } from '@/content/hero';
 import BoldHoverText from '@/components/HoverText';
 import { useTheme } from '@/components/ThemeProvider';
 import HeroCoffeeCard from './HeroCoffeeCard';
+import ParticlePortrait from '@/components/hero/particle-portrait';
 
 /** Entry choreography: portrait rises first, then the copy staggers in. */
 const container: Variants = {
@@ -75,7 +76,7 @@ const Credibility = () => {
             {open && (
                 <div
                     role="status"
-                    className="animate-in fade-in slide-in-from-bottom-2 absolute left-0 top-full z-10 mt-3 w-max max-w-[260px] rounded-xl bg-green-600 px-4 py-3 text-left text-sm leading-relaxed text-white shadow-lg duration-300"
+                    className="animate-in fade-in slide-in-from-bottom-2 absolute left-0 top-full z-10 mt-3 lg:left-auto lg:right-0 w-max max-w-[260px] rounded-xl bg-green-600 px-4 py-3 text-left text-sm leading-relaxed text-white shadow-lg duration-300"
                 >
                     {HERO.credibility.notice}
                 </div>
@@ -140,26 +141,42 @@ const Stats = ({ className }: { className: string }) => (
 
 const Banner = () => {
     const { theme } = useTheme();
-    const nameColor = theme === 'light' ? '#111111' : '#DEDEDE';
+    const nameColor = theme === 'light' ? '#111111' : '#f2efe8';
     const nameHover = theme === 'light' ? '#111111' : '#00F050';
     const nameProps = {
-        fontFamily: 'var(--font-fraunces), Georgia, serif',
+        fontFamily: 'var(--font-display), Georgia, serif',
+        // Instrument Serif ships only 400, so hover changes colour, not weight.
         baseWeight: 400,
-        hoverWeight: 800,
+        hoverWeight: 400,
         color: nameColor,
         hoverColor: nameHover,
     } as const;
+
+    const sectionRef = useRef<HTMLElement>(null);
+    const portraitRef = useRef<HTMLDivElement>(null);
+    const imageLayerRef = useRef<HTMLDivElement>(null);
+    const nameRef = useRef<HTMLHeadingElement>(null);
 
     return (
         <MotionConfig reducedMotion="user">
             <section
                 id="banner"
+                ref={sectionRef}
                 className="hero-surface relative isolate overflow-hidden lg:-ml-[156px] lg:pl-[156px]"
             >
                 {/* Faint vertical grid, pure CSS. */}
                 <div
                     aria-hidden
                     className="hero-grid pointer-events-none absolute inset-0 -z-10"
+                />
+
+                {/* GPU particle layer: aligned over the portrait, dissolves into the name on scroll. */}
+                <ParticlePortrait
+                    sectionRef={sectionRef}
+                    portraitRef={portraitRef}
+                    nameRef={nameRef}
+                    imageLayerRef={imageLayerRef}
+                    theme={theme}
                 />
 
                 <HeroCoffeeCard />
@@ -170,41 +187,38 @@ const Banner = () => {
                     animate="shown"
                     className="page-container relative flex min-h-[100svh] flex-col items-center justify-end pb-[88px] pt-16 lg:pb-10 lg:pt-12"
                 >
-                    {/* Desktop: stats sit top-left, clear of the portrait. */}
-                    <Stats className="absolute -left-10 top-16 hidden max-w-[220px] flex-col gap-6 border-l border-border pl-6 lg:flex" />
+                    {/* Desktop: stats sit top-right, clear of the portrait. */}
+                    <Stats className="absolute -right-10 top-16 hidden max-w-[220px] flex-col items-end gap-6 border-r border-border pr-6 text-right lg:flex" />
 
                     <motion.div
+                        ref={portraitRef}
                         variants={portrait}
                         data-avatar="portrait"
                         data-avatar-label={HERO.name.roman}
-                        className="group relative w-[min(92vw,560px,calc(100svh-480px))] min-w-[220px] md:w-[min(600px,calc(100svh-500px))] lg:w-[min(48vw,850px,calc(100svh-270px))]"
+                        className="hero-portrait relative w-[min(92vw,620px,62svh)] lg:w-[clamp(620px,40vw,680px)] [mask-image:linear-gradient(to_bottom,black_55%,transparent_92%)]"
                     >
-                        <Image
-                            src={HERO.portrait.src}
-                            alt={HERO.portrait.alt}
-                            width={HERO.portrait.width}
-                            height={HERO.portrait.height}
-                            priority
-                            // The halftone AVIF is already 110KB; re-encoding made it 285-383KB.
-                            unoptimized
-                            sizes="(min-width: 1024px) min(48vw, 850px), (min-width: 768px) 600px, min(92vw, 560px)"
-                            className="hero-portrait h-auto w-full select-none"
-                            style={{
-                                maskImage:
-                                    'linear-gradient(to bottom, black 60%, transparent)',
-                                WebkitMaskImage:
-                                    'linear-gradient(to bottom, black 60%, transparent)',
-                            }}
-                            draggable={false}
-                        />
+                        {/* LCP, no-JS and fallback layer. The particle canvas samples this exact image. */}
+                        <div ref={imageLayerRef}>
+                            <Image
+                                src={HERO.portrait.src}
+                                alt={HERO.portrait.alt}
+                                width={HERO.portrait.width}
+                                height={HERO.portrait.height}
+                                priority
+                                sizes="(min-width: 1024px) clamp(620px, 40vw, 680px), min(92vw, 620px)"
+                                draggable={false}
+                                className="h-auto w-full select-none grayscale"
+                            />
+                        </div>
                     </motion.div>
 
          
 
                     <motion.h1
+                        ref={nameRef}
                         variants={item}
                         data-avatar="name"
-                        className="font-display relative -mt-[clamp(2rem,min(7vw,9svh),6rem)] text-center text-[clamp(2.5rem,min(8.5vw,13svh),7.5rem)] font-normal leading-[0.9] tracking-[-0.02em] text-foreground"
+                        className="font-name pointer-events-none relative z-10 -mt-[clamp(70px,6.5vw,220px)] text-center text-[clamp(4.5rem,9.5vw,12.5rem)] font-normal leading-[0.9] tracking-[-0.025em] text-foreground dark:text-[#f2efe8]"
                     >
                         <BoldHoverText
                             text={HERO.name.roman}
@@ -238,7 +252,7 @@ const Banner = () => {
                     <motion.p
                         variants={item}
                         data-avatar="bio"
-                        className="font-display mt-4 max-w-[34rem] text-balance text-center text-base leading-snug text-foreground/75 sm:text-lg lg:mt-5 lg:text-[clamp(1.125rem,2.6svh,1.5rem)]"
+                        className="font-display mt-4 max-w-[40rem] text-balance text-center text-base leading-snug text-foreground/75 sm:text-lg lg:mt-5 lg:text-[clamp(1.125rem,2.6svh,1.5rem)]"
                     >
                         {HERO.tagline.lead}
                         <em className="italic text-primary">

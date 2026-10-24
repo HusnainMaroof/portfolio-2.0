@@ -25,8 +25,8 @@ I build fast, reliable web and mobile products, from the first line of code to s
 
 | Role | Company | Duration |
 | --- | --- | --- |
-| Full Stack (Frontend) | Freelance | Nov 2025 - Present |
-| Frontend Developer | Paymit | Jan 2025 - Nov 2025 |
+| Full Stack Developer (MERN Stack) | Freelance | Nov 2025 - Present |
+| Full Stack & Backend Developer | Paymit | Jan 2025 - Nov 2025 |
 | Frontend Engineer | TangoPay | Jul 2024 - Jan 2025 |
 
 ---

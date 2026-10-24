@@ -454,12 +454,12 @@ export const PROJECTS: IProject[] = [
 
 export const MY_EXPERIENCE = [
     {
-        title: 'Full Stack (Frontend)',
+        title: 'Full Stack Developer (MERN Stack)',
         company: 'Freelance',
         duration: 'Nov 2025 - Present',
     },
     {
-        title: 'Frontend Developer',
+        title: 'Full Stack & Backend Developer',
         company: 'Paymit',
         duration: 'Jan 2025 - Nov 2025',
     },
