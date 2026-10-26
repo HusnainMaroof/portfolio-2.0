@@ -25,6 +25,7 @@ export interface IProject {
     longThumbnail: string;
     images: string[];
     slug: string;
+    metaTitle?: string;
     liveUrl?: string;
     sourceCode?: string;
 }

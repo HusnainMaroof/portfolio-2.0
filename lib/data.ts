@@ -131,6 +131,7 @@ export const MY_STACK = {
  * {
  *     title: 'My Project',
  *     slug: 'my-project',
+ *     metaTitle: 'What it is',     // optional, used in the <title>
  *     liveUrl: 'https://…',          // optional
  *     sourceCode: 'https://…',       // optional
  *     year: 2026,
@@ -146,6 +147,7 @@ export const PROJECTS: IProject[] = [
     {
         title: 'Crispies',
         slug: 'crispies',
+        metaTitle: 'Halal Burger Brand Website',
         liveUrl: 'https://crispiesuk.com/',
         year: 2026,
         description: `
@@ -208,6 +210,7 @@ export const PROJECTS: IProject[] = [
     {
         title: 'Tijartt',
         slug: 'tijartt',
+        metaTitle: 'Inventory & Business Records App',
         liveUrl: 'https://www.tijartt.com/',
         year: 2026,
         description: `
@@ -268,6 +271,7 @@ export const PROJECTS: IProject[] = [
     {
         title: 'Warden',
         slug: 'warden',
+        metaTitle: 'Sandbox for MCP Servers',
         liveUrl: 'https://warden.blog/',
         year: 2026,
         description: `
@@ -320,22 +324,29 @@ export const PROJECTS: IProject[] = [
     {
         title: 'Paymit',
         slug: 'paymit',
+        metaTitle: 'International Money Transfer Website',
         liveUrl: 'https://paymit-iota.vercel.app/',
         year: 2024,
         description: `
-      Paymit is a payment product project built as a clean, easy to use web experience. <br/> <br/>
+      Paymit is a UK-based international money transfer service for sending money home to Nigeria, Ghana, Gambia, Senegal, Pakistan, India, Bangladesh and more. The website has to earn trust fast: it shows the live exchange rate and exactly what the recipient gets before the user signs up. <br/> <br/>
 
       Key Features:<br/>
       <ul>
-        <li>Clear, simple layouts for everyday payment flows</li>
-        <li>Fully responsive design for all device sizes</li>
+        <li>Live Transfer Calculator: enter the GBP amount and see the converted payout and rate instantly</li>
+        <li>Destination Pages: dedicated "Send money to" pages for each corridor, from Nigeria to Bangladesh</li>
+        <li>Three-Step Flow: sign up, send remittance, money delivered, explained with an interactive walkthrough</li>
+        <li>Mobile Money Payouts: recipients can be paid out to wallets such as MTN Mobile Money</li>
+        <li>Trust Signals: average savings versus the market, transfer speed and repeat-customer stats</li>
+        <li>Company Pages: About Us, Careers, Promotions and mobile app download</li>
       </ul>
       `,
         role: `
       Frontend Developer <br/>
       <ul>
-        <li>Built the user interface with reusable components</li>
-        <li>Made the layouts responsive and consistent across pages</li>
+        <li>Built the marketing site and transfer calculator UI with Next.js, TypeScript and Tailwind CSS</li>
+        <li>Created the per-country destination pages from a shared, reusable layout</li>
+        <li>Implemented the custom 24-column responsive grid used across the hero and sections</li>
+        <li>Built the interactive sign up → send → delivered walkthrough</li>
       </ul>
       `,
         techStack: ['Next.js', 'React', 'TypeScript', 'Tailwind CSS'],
@@ -355,22 +366,26 @@ export const PROJECTS: IProject[] = [
     {
         title: 'Pulse',
         slug: 'pulse',
+        metaTitle: 'AI Tools & Models Discovery Platform',
         liveUrl: 'https://pulse-iota-one-11.vercel.app/',
         year: 2026,
         description: `
-      Pulse is a web project with a clean, modern interface and a focus on a smooth user experience. <br/> <br/>
+      Pulse is an AI technology intelligence platform: one place to discover new AI tools, models, trends and developer signals before they go mainstream. Instead of following dozens of feeds, readers get a single, curated view of what is moving in AI right now. <br/> <br/>
 
       Key Features:<br/>
       <ul>
-        <li>Clear, simple layouts across all pages</li>
-        <li>Fully responsive design for all device sizes</li>
+        <li>AI Tool Discovery: browse newly launched AI tools and products in one feed</li>
+        <li>Model Tracking: follow new and updated AI models as they are released</li>
+        <li>Trend Signals: spot emerging topics and developer activity early</li>
+        <li>Fast, App-Like Interface: a single-page experience built for quick scanning</li>
       </ul>
       `,
         role: `
       Frontend Developer <br/>
       <ul>
-        <li>Built the user interface with reusable components</li>
-        <li>Made the layouts responsive and consistent across pages</li>
+        <li>Built the Pulse interface as a single-page React app with Next.js and TypeScript</li>
+        <li>Designed the feed and card layouts for scanning lots of tools and models quickly</li>
+        <li>Styled the product with Tailwind CSS and kept it responsive from mobile to desktop</li>
       </ul>
       `,
         techStack: ['Next.js', 'React', 'TypeScript', 'Tailwind CSS'],
@@ -388,22 +403,28 @@ export const PROJECTS: IProject[] = [
     {
         title: 'Rafin Solutions',
         slug: 'rafin-solutions',
+        metaTitle: 'Compliance Consultancy Website',
         liveUrl: 'https://rafinsolutions.com/',
         year: 2026,
         description: `
-      Rafin Solutions is the official website for Rafin Solutions, a company offering digital solutions for its clients. <br/> <br/>
+      Rafin Solutions is the official website for a compliance and fintech consultancy that helps regulated financial businesses (payment firms, remittance companies, EMIs and MSBs) with AML/CFT compliance, KYC/KYB, payment operations, training and outsourced back-office support. <br/> <br/>
 
       Key Features:<br/>
       <ul>
-        <li>Clear presentation of the company's services</li>
-        <li>Fully responsive design for all device sizes</li>
+        <li>Service Pages: dedicated pages for AML/CFT Compliance, KYC and KYB, Transaction Monitoring, Payment Operations, Customer Support, IT Governance and Meta Ads for Fintech</li>
+        <li>Value Proposition: a clear Control → Operate → Evidence → Scale story for the firm's offering</li>
+        <li>Jurisdiction Coverage: UK FCA/HMRC, EU EBA/AMLA, US FinCEN/OFAC, Canada FINTRAC, Australia AUSTRAC and FATF</li>
+        <li>Lead Capture: "Book a Consultation" calls to action and a contact page throughout the site</li>
+        <li>Legal Pages: privacy, terms and cookie policies</li>
       </ul>
       `,
         role: `
       Frontend Developer <br/>
       <ul>
-        <li>Built the user interface with reusable components</li>
-        <li>Made the layouts responsive and consistent across pages</li>
+        <li>Built the marketing site and every service page with Next.js, TypeScript and Tailwind CSS</li>
+        <li>Structured the services navigation so each compliance offering has its own page</li>
+        <li>Wrote SEO metadata for a specialist B2B audience</li>
+        <li>Added accessibility basics such as a skip-to-content link and a responsive menu</li>
       </ul>
       `,
         techStack: ['Next.js', 'React', 'TypeScript', 'Tailwind CSS'],
@@ -421,6 +442,7 @@ export const PROJECTS: IProject[] = [
     {
         title: 'Exam System',
         slug: 'exam-system',
+        metaTitle: 'Online Exam Web App',
         year: 2026,
         description: `
       Exam System is a web application for taking and managing exams online. <br/> <br/>

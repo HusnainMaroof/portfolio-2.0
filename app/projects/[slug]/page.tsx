@@ -38,9 +38,10 @@ export const generateMetadata = async ({
     const canonicalPath = `/projects/${project.slug}`;
 
     return {
-        title: `${project.title} — ${project.techStack
-            .slice(0, 2)
-            .join(' & ')} Project`,
+        title: `${project.title} — ${
+            project.metaTitle ??
+            `${project.techStack.slice(0, 2).join(' & ')} Project`
+        }`,
         description,
         alternates: {
             canonical: canonicalPath,
