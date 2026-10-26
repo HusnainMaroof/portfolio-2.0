@@ -8,6 +8,13 @@ const nextConfig: NextConfig = {
 
         return [
             {
+                // www.husnain.cc served a 200 duplicate; consolidate on the apex
+                source: '/:path*',
+                has: [{ type: 'host', value: 'www.husnain.cc' }],
+                destination: 'https://husnain.cc/:path*',
+                permanent: true,
+            },
+            {
                 source: '/:path*',
                 has: [{ type: 'host', value: '.+\\.vercel\\.app' }],
                 destination: 'https://husnain.cc/:path*',

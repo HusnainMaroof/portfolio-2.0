@@ -4,7 +4,9 @@ import { PROJECTS } from '@/lib/data';
 const SITE_URL = 'https://husnain.cc';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-    const lastModified = new Date();
+    // Bump when content actually changes; new Date() changed on every deploy,
+    // which teaches Google to ignore lastmod.
+    const lastModified = new Date('2026-10-26');
 
     return [
         {
