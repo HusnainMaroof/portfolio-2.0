@@ -29,8 +29,9 @@ const TWEEN_SWAP_LEAVE: Transition = { duration: 0.14, ease: [0.4, 0, 1, 1] };
 
 const useReducedMotionPreference = () => useReducedMotion() ?? false;
 
-/** Resting tile side, px. */
-const TILE = 72;
+/** Resting tile side, px. Local: 56 (upstream 72), a lighter top bar that
+ *  fits five tiles on a 375px phone unscaled. */
+const TILE = 56;
 /** Room either side of the label in an open tile, px. */
 const PAD = 28;
 /** Badge dot diameter and how far it hangs past the tile's corner, px. */
@@ -303,7 +304,7 @@ function Tab({
                   filter: "blur(4px)",
                   transition: leave,
                 }}
-                className="absolute grid place-items-center [&>svg:not([class*='size-'])]:size-6"
+                className="absolute grid place-items-center [&>svg:not([class*='size-'])]:size-5"
               >
                 {item.icon}
               </motion.span>

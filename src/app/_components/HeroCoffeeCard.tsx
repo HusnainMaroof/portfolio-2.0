@@ -4,36 +4,42 @@ import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { HERO } from '@/content/hero';
 
-// three.js is heavy; load it only on the client, after the hero paints.
-const Lanyard = dynamic(() => import('@/components/Lanyard'), { ssr: false });
+const loadLanyard = () => import('@/components/Lanyard');
+// three.js is heavy; client only, never in the server render.
+const Lanyard = dynamic(loadLanyard, { ssr: false });
+
+/** Safety net if the preloader never reports (it unmounted early, an error). */
+const FALLBACK_MS = 4500;
 
 /**
- * three.js is ~600KB and WebGL setup blocks the main thread, so the card waits
- * until the preloader and hero entrance have finished, then for an idle moment.
+ * three.js is ~600KB, so the card used to wait a fixed 3s plus an idle slot
+ * (up to 4.5s) before even downloading it, and appeared well after the page
+ * was uncovered. Now the download starts at once, while the preloader still
+ * covers the page, and the card mounts the moment the preloader finishes, so
+ * it swings in as the hero is revealed. WebGL setup still waits for that
+ * moment, so it never competes with the preloader animation.
  * Phones never load it: the card is hidden below 768px.
  */
-const MOUNT_DELAY_MS = 3000;
-
 const useDeferredMount = () => {
     const [ready, setReady] = useState(false);
 
     useEffect(() => {
         if (!window.matchMedia('(min-width: 768px)').matches) return;
 
-        let idle = 0;
-        const timer = window.setTimeout(() => {
-            if ('requestIdleCallback' in window) {
-                idle = window.requestIdleCallback(() => setReady(true), {
-                    timeout: 1500,
-                });
-            } else {
-                setReady(true);
-            }
-        }, MOUNT_DELAY_MS);
+        void loadLanyard();
+
+        if (document.documentElement.dataset.preloaded === 'true') {
+            setReady(true);
+            return;
+        }
+
+        const show = () => setReady(true);
+        window.addEventListener('preloader:done', show, { once: true });
+        const timer = window.setTimeout(show, FALLBACK_MS);
 
         return () => {
+            window.removeEventListener('preloader:done', show);
             window.clearTimeout(timer);
-            if (idle) window.cancelIdleCallback(idle);
         };
     }, []);
 
@@ -68,7 +74,7 @@ const HeroCoffeeCard = () => {
                 {HERO.coffee.label}
             </a>
             {/* Lanyard switches the canvas itself on while the pointer is over the card. */}
-            <div data-avatar-dock-keepout="" className="pointer-events-none h-[280px] w-[640px] lg:h-[330px] lg:w-[720px] xl:h-[380px] xl:w-[800px]">
+            <div data-avatar-dock-keepout="" className="pointer-events-none h-[380px] w-[640px] lg:h-[450px] lg:w-[720px] xl:h-[520px] xl:w-[800px]">
                 {ready && (
                     <Lanyard
                         frontImage="/coffee/front.svg"
@@ -77,8 +83,11 @@ const HeroCoffeeCard = () => {
                         strapColor="#00F050"
                         metal="silver"
                         finish="glossy"
-                        size={0.42}
-                        strapLength={0.45}
+                        // The card is a share of the canvas height, so the
+                        // taller canvas (for a longer strap) takes a smaller
+                        // share to keep the card itself the same size.
+                        size={0.31}
+                        strapLength={1}
                         breeze={0.3}
                         onCardClick={openCoffee}
                     />

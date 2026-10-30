@@ -10,7 +10,8 @@ import {
     useTransform,
     type Variants,
 } from 'framer-motion';
-import { ArrowUpRight, Github, Linkedin } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
+import TransitionLink from '@/components/TransitionLink';
 import { HERO } from '@/content/hero';
 import BoldHoverText from '@/components/HoverText';
 import { useTheme } from '@/components/ThemeProvider';
@@ -92,32 +93,19 @@ const Credibility = () => {
     );
 };
 
-const SOCIAL_ICONS = { GitHub: Github, LinkedIn: Linkedin } as const;
-
-/** GitHub and LinkedIn, stacked in the bottom-left corner of the viewport. */
+/** One link in the bottom-left corner to the socials page (LinkedIn, GitHub, resume). */
 const Socials = ({ className }: { className: string }) => (
-    <motion.ul variants={item} className={className}>
-        {HERO.socials.map((social) => {
-            const Icon = SOCIAL_ICONS[social.label];
-
-            return (
-                <li key={social.label}>
-                    <a
-                        href={social.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        data-avatar="social"
-                        data-avatar-label={social.label}
-                        className={`inline-flex items-center gap-2 text-sm font-medium uppercase tracking-[0.16em] text-primary underline-offset-4 transition-colors hover:text-foreground hover:underline ${focusRing}`}
-                    >
-                        <Icon size={16} strokeWidth={1.75} aria-hidden />
-                        {social.label}
-                        <ArrowUpRight size={14} strokeWidth={1.75} aria-hidden />
-                    </a>
-                </li>
-            );
-        })}
-    </motion.ul>
+    <motion.div variants={item} className={className}>
+        <TransitionLink
+            href="/socials"
+            data-avatar="social"
+            data-avatar-label="Socials"
+            className={`inline-flex items-center gap-2 text-sm font-medium uppercase tracking-[0.16em] text-primary underline-offset-4 transition-colors hover:text-foreground hover:underline ${focusRing}`}
+        >
+            Socials
+            <ArrowUpRight size={14} strokeWidth={1.75} aria-hidden />
+        </TransitionLink>
+    </motion.div>
 );
 
 const Stats = ({ className }: { className: string }) => (
@@ -283,8 +271,8 @@ const Banner = () => {
                         {HERO.tagline.tail}
                     </motion.p>
 
-                    {/* Desktop: socials pinned to the viewport's bottom-left corner. */}
-                    <Socials className="fixed bottom-5 left-[22px] z-[4] hidden flex-col items-start gap-2.5 lg:flex" />
+                    {/* Socials link pinned to the viewport's bottom-left corner, every size. */}
+                    <Socials className="fixed bottom-5 left-5 z-[4] lg:left-[22px]" />
 
                     {/* Tablet and phone: stats under the tagline. */}
                     <Stats className="mt-6 flex flex-col items-center gap-4 text-center lg:hidden" />                </motion.div>

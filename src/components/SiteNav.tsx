@@ -32,13 +32,13 @@ const NAV_ITEMS: readonly NavItem[] = [
 /**
  * Top-centre navigation (ExpandTabs). Each tile scrolls to its section; the
  * section on screen has its tile filled green (aria-current). Tiles show an
- * icon and open to their label on hover; phones get them scaled to fit 375px.
+ * icon and open to their label on hover; five 56px tiles fit a 375px phone.
  */
 export default function SiteNav() {
     const lenis = useLenis();
     const pathname = usePathname();
     const router = useRouter();
-    const [active, setActive] = useState(0);
+    const [active, setActive] = useState<number | null>(0);
 
     // The last section whose top has crossed the upper part of the viewport
     // owns the dot. This never skips a section, unlike an intersection band.
@@ -52,8 +52,10 @@ export default function SiteNav() {
                 el: document.getElementById(item.sectionId),
             })).filter((s) => s.el);
 
-            // Pages without the home sections (case studies) keep Intro.
-            if (present.length === 0) return setActive(0);
+            // Only the home page (it has the hero) tracks sections. Other pages
+            // (case studies, socials, resume) fill no tile; the footer's
+            // #contact is on every page, so it can't decide this.
+            if (!document.getElementById('banner')) return setActive(null);
 
             const line = window.innerHeight * 0.45;
             let current = present[0].i;
@@ -124,7 +126,7 @@ export default function SiteNav() {
                 color="hsl(var(--primary))"
                 value={active}
                 onValueChange={setActive}
-                className="pointer-events-auto origin-top scale-[0.8] sm:scale-90 md:scale-100"
+                className="pointer-events-auto"
                 classNames={{
                     // White text is unreadable on the green, so the open label is dark.
                     label: 'font-roboto-flex font-medium text-primary-foreground',

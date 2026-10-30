@@ -22,6 +22,10 @@ const Preloader = () => {
         document.documentElement.style.overflow = '';
         lenisRef.current?.start();
         preloaderRef.current?.classList.add('pointer-events-none');
+        // Lets things that wait for the reveal (the hero coffee card) start
+        // the moment the page is uncovered, and late mounts read the flag.
+        document.documentElement.dataset.preloaded = 'true';
+        window.dispatchEvent(new Event('preloader:done'));
     };
 
     // Lenis arrives a render later; stop it then if the loader is still up.

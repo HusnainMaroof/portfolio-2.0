@@ -221,3 +221,19 @@ html[data-theme='light'] .group:hover .hero-portrait {
         transition: none;
     }
 }
+
+/* Printing (the resume's "Save as PDF"): white paper, page content only. The
+   site chrome is all fixed-position overlays (nav, particles, preloader,
+   page transition, Onee, socials link) plus the footer. */
+@media print {
+    html,
+    body {
+        background: #fff !important;
+        color: #000 !important;
+    }
+
+    body .fixed,
+    body footer {
+        display: none !important;
+    }
+}
