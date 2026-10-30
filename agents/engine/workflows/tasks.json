@@ -1,0 +1,208 @@
+{
+  "name": "tasks",
+  "description": "Preset tasks (no senior planning): each task is routed, delegated, verified with evidence, reviewed, decided and integrated. Used when the owner or another tool already wrote the tasks.",
+  "start": "codemap",
+  "nodes": [
+    {
+      "id": "codemap",
+      "type": "context.codemap",
+      "position": [
+        750,
+        0
+      ]
+    },
+    {
+      "id": "next",
+      "type": "tasks.next",
+      "position": [
+        1000,
+        0
+      ]
+    },
+    {
+      "id": "prepare",
+      "type": "workspace.prepare",
+      "position": [
+        0,
+        230
+      ]
+    },
+    {
+      "id": "route",
+      "type": "router.select",
+      "position": [
+        250,
+        230
+      ]
+    },
+    {
+      "id": "delegate",
+      "type": "agent.delegate",
+      "position": [
+        500,
+        230
+      ]
+    },
+    {
+      "id": "verify",
+      "type": "verify.evidence",
+      "position": [
+        750,
+        230
+      ]
+    },
+    {
+      "id": "review",
+      "type": "agent.review",
+      "position": [
+        1000,
+        230
+      ]
+    },
+    {
+      "id": "decide",
+      "type": "senior.decide",
+      "position": [
+        1250,
+        230
+      ]
+    },
+    {
+      "id": "integrate",
+      "type": "workspace.integrate",
+      "position": [
+        1500,
+        230
+      ]
+    },
+    {
+      "id": "escalate",
+      "type": "human.escalation",
+      "position": [
+        1000,
+        500
+      ]
+    },
+    {
+      "id": "close",
+      "type": "task.close",
+      "position": [
+        500,
+        500
+      ]
+    },
+    {
+      "id": "report",
+      "type": "report.final",
+      "position": [
+        1250,
+        0
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "from": "codemap",
+      "to": "next"
+    },
+    {
+      "from": "next",
+      "port": "task",
+      "to": "prepare"
+    },
+    {
+      "from": "next",
+      "port": "done",
+      "to": "report"
+    },
+    {
+      "from": "prepare",
+      "to": "route"
+    },
+    {
+      "from": "route",
+      "port": "ok",
+      "to": "delegate"
+    },
+    {
+      "from": "route",
+      "port": "none",
+      "to": "escalate"
+    },
+    {
+      "from": "delegate",
+      "to": "verify"
+    },
+    {
+      "from": "delegate",
+      "port": "none",
+      "to": "escalate"
+    },
+    {
+      "from": "verify",
+      "to": "review"
+    },
+    {
+      "from": "review",
+      "to": "decide"
+    },
+    {
+      "from": "decide",
+      "port": "accept",
+      "to": "integrate"
+    },
+    {
+      "from": "decide",
+      "port": "retry",
+      "to": "delegate"
+    },
+    {
+      "from": "decide",
+      "port": "reassign",
+      "to": "route"
+    },
+    {
+      "from": "decide",
+      "port": "escalate",
+      "to": "escalate"
+    },
+    {
+      "from": "integrate",
+      "to": "next"
+    },
+    {
+      "from": "integrate",
+      "port": "conflict",
+      "to": "escalate"
+    },
+    {
+      "from": "escalate",
+      "port": "accept",
+      "to": "integrate"
+    },
+    {
+      "from": "escalate",
+      "port": "retry",
+      "to": "delegate"
+    },
+    {
+      "from": "escalate",
+      "port": "reassign",
+      "to": "route"
+    },
+    {
+      "from": "escalate",
+      "port": "skip",
+      "to": "close"
+    },
+    {
+      "from": "escalate",
+      "port": "abort",
+      "to": "report"
+    },
+    {
+      "from": "close",
+      "to": "next"
+    }
+  ]
+}

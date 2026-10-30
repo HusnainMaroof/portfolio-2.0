@@ -41,3 +41,9 @@ next-env.d.ts
 
 # ContextGit worktrees and repository
 .contextgit/
+
+# smurf orchestrator (agents/): generated skills and local agent state
+.claude/skills/
+.claude/worktrees/
+.claude/settings.local.json
+graphify-out/

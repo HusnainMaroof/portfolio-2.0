@@ -2,8 +2,8 @@
 
 ## 1. How the avatar works
 
-The avatar ("Onee") is one fixed-position element, rendered once in `app/layout.tsx`
-through `components/AvatarInteractions.tsx`. It never re-mounts and there is only one
+The avatar ("Onee") is one fixed-position element, rendered once in `src/app/layout.tsx`
+through `src/components/AvatarInteractions.tsx`. It never re-mounts and there is only one
 instance on the page.
 
 ### Where it is
@@ -21,13 +21,13 @@ Real page elements opt in with `data-avatar="<kind>"`:
 
 | Kind | Where it is in the page |
 | --- | --- |
-| `name` | Your name in the banner (`app/_components/Banner.tsx`) |
+| `name` | Your name in the banner (`src/app/_components/Banner.tsx`) |
 | `bio` | Bio text in the banner |
 | `action` | Banner action button |
 | `project` | Project cards in `SelectedWorkList.tsx` and `SelectedWorkCarousel.tsx` |
 | `skill` | Skill tags in `Skills.tsx` |
-| `nav` | Section pills in `components/SectionPills.tsx` |
-| `contact` | Contact links in `StickyEmail.tsx` and `components/Footer.tsx` |
+| `nav` | Section pills in `src/components/SectionPills.tsx` |
+| `contact` | Contact links in `StickyEmail.tsx` and `src/components/Footer.tsx` |
 
 Placement rule (`destinationFor`): the avatar tries four spots around the target's visible
 part, in this order: right, left, below, above. It takes the first one that fits inside the
@@ -49,7 +49,7 @@ viewport, clamped to the viewport edges. It never overlaps the target.
 ### Hover text
 
 - Hovering a registered target shows a short contextual message in a plain, compact text box
-  beside the avatar (no cloud shape). The message is chosen from `lib/avatar-interactions.ts`
+  beside the avatar (no cloud shape). The message is chosen from `src/lib/avatar-interactions.ts`
   and uses real portfolio data, such as the project title as a label.
 - The text reveals character by character (GSAP SplitText, the same reveal used by `HoverText`).
 - Hovering a different target replaces the message. Re-hovering the same target within
@@ -77,9 +77,9 @@ viewport, clamped to the viewport edges. It never overlaps the target.
 
 ### Animation source
 
-- `Onee_avatar/` holds the avatar runtime and data (`avatar-runtime.ts`, `onee.avatar.ts`,
+- `src/Onee_avatar/` holds the avatar runtime and data (`avatar-runtime.ts`, `onee.avatar.ts`,
   `Onee.tsx`, `onee.index.ts`). The runtime draws the avatar as SVG and runs named animations.
-- `lib/avatar-interactions.ts` maps trigger kinds to animations and reads `data-avatar` attributes.
+- `src/lib/avatar-interactions.ts` maps trigger kinds to animations and reads `data-avatar` attributes.
 - Movement is done with GSAP on the avatar's root element, using `overwrite: true` so each
   new move starts from the live position, with no snapping.
 
@@ -87,17 +87,17 @@ viewport, clamped to the viewport edges. It never overlaps the target.
 
 | Path | Purpose |
 | --- | --- |
-| `app/layout.tsx` | Root layout. Mounts the smooth-scroll provider (Lenis), cursor, avatar, preloader, particle background, sticky email, footer, and section pills. |
-| `app/page.tsx` | Home page: Banner, SelectedWork (projects), Skills, Experiences. |
-| `app/_components/` | Page sections: `Banner`, `SelectedWork*`, `Skills`, `Experiences`, `Project`, `AboutMe`, `StickyEmail`. |
-| `app/projects/[slug]/` | Project detail page and `ProjectDetails` component. |
-| `app/globals.css`, `tailwind.config.ts` | Styling. Colors are CSS variables (for example `background-light`, `primary`). |
-| `components/` | Shared UI: `AvatarInteractions`, `SectionPills`, `Footer`, `Navbar`, `Button`, `HoverText`, `Scrollreveal`, `ThemeProvider`, and others. |
-| `Onee_avatar/` | Avatar runtime and data (see above). |
-| `lib/data.ts` | Site content: general info, projects, skills, and experience data. |
-| `lib/projects.ts` | Helpers for project text and slide counters. Does not invent copy. |
-| `lib/avatar-interactions.ts` | Avatar trigger kinds, reaction animations, and `data-avatar` parsing. |
-| `types/index.ts` | Shared TypeScript types (for example `IProject`). |
+| `src/app/layout.tsx` | Root layout. Mounts the smooth-scroll provider (Lenis), cursor, avatar, preloader, particle background, sticky email, footer, and section pills. |
+| `src/app/page.tsx` | Home page: Banner, SelectedWork (projects), Skills, Experiences. |
+| `src/app/_components/` | Page sections: `Banner`, `SelectedWork*`, `Skills`, `Experiences`, `Project`, `AboutMe`, `StickyEmail`. |
+| `src/app/projects/[slug]/` | Project detail page and `ProjectDetails` component. |
+| `src/app/globals.css`, `tailwind.config.ts` | Styling. Colors are CSS variables (for example `background-light`, `primary`). |
+| `src/components/` | Shared UI: `AvatarInteractions`, `SectionPills`, `Footer`, `Navbar`, `Button`, `HoverText`, `Scrollreveal`, `ThemeProvider`, and others. |
+| `src/Onee_avatar/` | Avatar runtime and data (see above). |
+| `src/lib/data.ts` | Site content: general info, projects, skills, and experience data. |
+| `src/lib/projects.ts` | Helpers for project text and slide counters. Does not invent copy. |
+| `src/lib/avatar-interactions.ts` | Avatar trigger kinds, reaction animations, and `data-avatar` parsing. |
+| `src/types/index.ts` | Shared TypeScript types (for example `IProject`). |
 | `public/` | Static assets and fonts. |
 
 ### Stack
@@ -111,12 +111,12 @@ viewport, clamped to the viewport edges. It never overlaps the target.
 ### Adding a new avatar target
 
 1. Add `data-avatar="<kind>"` to a real element. Add `data-avatar-label` for a real name or title.
-2. Use only kinds defined in `lib/avatar-interactions.ts`.
+2. Use only kinds defined in `src/lib/avatar-interactions.ts`.
 3. Do not add copy the site does not already contain. The avatar only moves and animates.
 
 ### Adding a new quick-action section
 
-Add an entry to `QUICK_ACTIONS` in `components/AvatarInteractions.tsx`, with the target
+Add an entry to `QUICK_ACTIONS` in `src/components/AvatarInteractions.tsx`, with the target
 section's real `id`. It appears only when that element exists on the page.
 
 ## 3. Verification

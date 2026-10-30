@@ -1,0 +1,16 @@
+{
+  "id": "slugify",
+  "title": "Implement slugify()",
+  "category": "coding",
+  "risk": "low",
+  "brief": "Implement slugify(text) in src/slug.js: lowercase, strip accents (\u00e9 -> e), replace every run of characters that are not a-z or 0-9 with a single \"-\", and trim \"-\" from both ends. Empty input returns \"\". The tests in test/slug.test.js define the behaviour; do not change them.",
+  "files": [
+    "src/slug.js"
+  ],
+  "checks": [
+    {
+      "name": "tests",
+      "cmd": "node test/slug.test.js"
+    }
+  ]
+}

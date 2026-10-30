@@ -1,0 +1,16 @@
+{
+  "id": "pagination",
+  "title": "Fix pagination bugs",
+  "category": "debugging",
+  "risk": "low",
+  "brief": "Users report that page 1 of the product list skips the first items and the last partial page is missing from the page count. paginate(items, page, size) in src/paginate.js uses 1-based pages. Find the root cause and fix it. The tests in test/paginate.test.js describe the expected behaviour.",
+  "files": [
+    "src/paginate.js"
+  ],
+  "checks": [
+    {
+      "name": "tests",
+      "cmd": "node test/paginate.test.js"
+    }
+  ]
+}

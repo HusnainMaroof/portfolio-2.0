@@ -1,0 +1,13 @@
+{
+  "id": "discount-review",
+  "title": "Review the discount function",
+  "category": "review",
+  "risk": "low",
+  "brief": "Read-only code review of src/discount.js. applyDiscount(price, percent) must return the discounted price rounded to cents and never below 0. List every correctness bug with file:line, severity, and a concrete input that shows it. Do not change any file.",
+  "files": [],
+  "checks": [],
+  "reportMatch": [
+    "(negative|below (0|zero)|> ?100|over 100|more than 100|greater than 100|exceed)",
+    "(round|cents)"
+  ]
+}

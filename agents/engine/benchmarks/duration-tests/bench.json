@@ -1,0 +1,16 @@
+{
+  "id": "duration-tests",
+  "title": "Write tests for parseDuration",
+  "category": "testing",
+  "risk": "low",
+  "brief": "Write thorough tests for parseDuration in test/duration.test.js (plain node:assert, no test framework, exit non-zero on failure). The file MUST load the module with: const { parseDuration } = require(process.env.DURATION_IMPL || \"../src/duration\"); Cover every unit (h, m, s, ms), combinations, and invalid input that must throw. The check also runs your tests against broken versions of the module (mutants/), and every one of them must make your tests fail. Do not change src/ or mutants/.",
+  "files": [
+    "test/duration.test.js"
+  ],
+  "checks": [
+    {
+      "name": "tests-kill-mutants",
+      "cmd": "node test/duration.test.js && for m in mutants/*.js; do if DURATION_IMPL=../$m node test/duration.test.js >/dev/null 2>&1; then echo \"weak tests: mutant $m survived\"; exit 1; fi; done; echo \"all mutants killed\""
+    }
+  ]
+}

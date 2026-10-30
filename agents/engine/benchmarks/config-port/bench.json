@@ -1,0 +1,14 @@
+{
+  "id": "config-port",
+  "title": "Which port does the server use?",
+  "category": "research",
+  "risk": "low",
+  "brief": "Read-only investigation. The server is started with the environment variable PORT=8080 and the repo's config.json present. Which port does it actually listen on, and why? Trace the config loading through the code and cite file:line for each step. Do not change any file.",
+  "files": [],
+  "checks": [],
+  "reportMatch": [
+    "3001",
+    "APP_PORT",
+    "config\\.js"
+  ]
+}

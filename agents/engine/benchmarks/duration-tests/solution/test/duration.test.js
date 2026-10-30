@@ -1,0 +1,10 @@
+const assert = require("node:assert/strict");
+const { parseDuration } = require(process.env.DURATION_IMPL || "../src/duration");
+assert.equal(parseDuration("2h"), 7200000);
+assert.equal(parseDuration("3m"), 180000);
+assert.equal(parseDuration("4s"), 4000);
+assert.equal(parseDuration("250ms"), 250);
+assert.equal(parseDuration("1h30m"), 5400000);
+assert.equal(parseDuration("1m1s1ms"), 61001);
+for (const bad of ["", "abc", "10", "5x", "h1"]) assert.throws(() => parseDuration(bad));
+console.log("duration ok");

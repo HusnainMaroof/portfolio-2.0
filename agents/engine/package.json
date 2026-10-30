@@ -1,0 +1,25 @@
+{
+  "name": "agents-orchestrator",
+  "version": "0.1.0",
+  "description": "A senior model managing a team of multi-provider coding agents through a dynamic, n8n-style workflow graph.",
+  "type": "module",
+  "private": true,
+  "bin": {
+    "orch": "src/cli.ts"
+  },
+  "engines": {
+    "node": ">=23.6"
+  },
+  "scripts": {
+    "orch": "node src/cli.ts",
+    "setup": "node scripts/setup.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "node tests/e2e.ts && node tests/parallel.ts && node tests/pick.ts && node tests/guards.ts && node tests/setup.ts && node tests/graph.ts && node tests/lessons.ts && node tests/verify.ts && node tests/adapters.ts",
+    "server": "node src/cli.ts server",
+    "runner": "node src/cli.ts runner"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^5.9.0"
+  }
+}

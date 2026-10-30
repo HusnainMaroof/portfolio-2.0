@@ -1,0 +1,13 @@
+# Run data and machine settings stay local; the rest of agents/ is shared.
+config/local.json
+vault/.orch/
+vault/Runs/
+vault/Executions/
+vault/Models/
+vault/Code/
+vault/Projects/
+vault/Workflows/
+vault/Benchmarks/
+vault/.obsidian/workspace*.json
+node_modules/
+*.log

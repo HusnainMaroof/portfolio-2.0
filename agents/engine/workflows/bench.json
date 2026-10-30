@@ -1,0 +1,109 @@
+{
+  "name": "bench",
+  "description": "Benchmark: preset tasks, each forced to one model, one attempt, scored from engine evidence only. Results train the router.",
+  "start": "next",
+  "nodes": [
+    {
+      "id": "next",
+      "type": "tasks.next",
+      "position": [
+        0,
+        0
+      ],
+      "params": {
+        "parallel": 1
+      }
+    },
+    {
+      "id": "prepare",
+      "type": "workspace.prepare",
+      "position": [
+        250,
+        0
+      ]
+    },
+    {
+      "id": "route",
+      "type": "router.select",
+      "position": [
+        500,
+        0
+      ]
+    },
+    {
+      "id": "delegate",
+      "type": "agent.delegate",
+      "position": [
+        750,
+        0
+      ]
+    },
+    {
+      "id": "verify",
+      "type": "verify.evidence",
+      "position": [
+        1000,
+        0
+      ]
+    },
+    {
+      "id": "score",
+      "type": "bench.score",
+      "position": [
+        1250,
+        0
+      ]
+    },
+    {
+      "id": "report",
+      "type": "report.final",
+      "position": [
+        250,
+        230
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "from": "next",
+      "port": "task",
+      "to": "prepare"
+    },
+    {
+      "from": "next",
+      "port": "done",
+      "to": "report"
+    },
+    {
+      "from": "prepare",
+      "to": "route"
+    },
+    {
+      "from": "route",
+      "port": "ok",
+      "to": "delegate"
+    },
+    {
+      "from": "route",
+      "port": "none",
+      "to": "score"
+    },
+    {
+      "from": "delegate",
+      "to": "verify"
+    },
+    {
+      "from": "delegate",
+      "port": "none",
+      "to": "score"
+    },
+    {
+      "from": "verify",
+      "to": "score"
+    },
+    {
+      "from": "score",
+      "to": "next"
+    }
+  ]
+}

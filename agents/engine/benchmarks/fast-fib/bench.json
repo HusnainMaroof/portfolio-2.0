@@ -1,0 +1,22 @@
+{
+  "id": "fast-fib",
+  "title": "Make fib() fast and exact",
+  "category": "coding",
+  "risk": "medium",
+  "brief": "fib(n) in src/fib.js is exponential and loses precision for large n. Make it fast and exact: it must return a BigInt, fib(0) = 0n, fib(1) = 1n, and fib(90) must return in well under a second. Keep the same export. test/fib.test.js checks correctness; bench.js prints the time for fib(30) in ms, which must get lower.",
+  "files": [
+    "src/fib.js"
+  ],
+  "checks": [
+    {
+      "name": "tests",
+      "cmd": "node test/fib.test.js"
+    },
+    {
+      "name": "fib30-ms",
+      "cmd": "node bench.js",
+      "measure": true,
+      "expect": "lower"
+    }
+  ]
+}

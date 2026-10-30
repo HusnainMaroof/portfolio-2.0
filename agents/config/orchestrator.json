@@ -1,0 +1,342 @@
+{
+  "_about": "Main config. Put machine-specific overrides in config/local.json (same shape, merged on top, git-ignored). API keys are read from the env vars named here, never stored.",
+  "vault": "vault",
+  "worktreeRoot": "~/.orch/worktrees",
+  "senior": {
+    "model": "claude:opus",
+    "fallback": [
+      "claude:sonnet"
+    ],
+    "timeoutMin": 20
+  },
+  "terse": "full",
+  "budget": {
+    "perRunUsd": 2,
+    "perTaskUsd": 0.5
+  },
+  "limits": {
+    "maxAttempts": 4,
+    "maxSameModel": 2,
+    "reassignsBeforeTierUp": 1,
+    "maxNodeVisits": 60,
+    "idleMin": 8,
+    "watchMin": 10
+  },
+  "router": {
+    "weights": {
+      "benchmark": 0.3,
+      "correctness": 0.25,
+      "tools": 0.15,
+      "context": 0.1,
+      "latency": 0.1,
+      "cost": 0.1
+    },
+    "prior": 0.5,
+    "priorWeight": 2,
+    "exploreLowRisk": 0.15,
+    "premium": "escalation",
+    "latencyTargetSec": {
+      "coding": 600,
+      "debugging": 600,
+      "testing": 600,
+      "research": 300,
+      "review": 180,
+      "architecture": 300,
+      "docs": 300
+    },
+    "modelsTtlHours": 24,
+    "exclude": [
+      "content-safety",
+      "nemotron-3-super",
+      "lfm-",
+      "-vl",
+      "nano",
+      "inkling-small",
+      "embed",
+      "guard",
+      "whisper",
+      "tts",
+      "image"
+    ],
+    "tiers": {
+      "strong": [
+        "laguna-s-",
+        "deepseek",
+        "nemotron-3-ultra",
+        "nemotron-3-super",
+        "glm-5",
+        "gemma-4-31b",
+        "minimax",
+        "kilo-auto",
+        "qwen3-coder",
+        "kimi-k2",
+        "GPT-6 Luna",
+        "longcat",
+        "beam",
+        "inkling"
+      ],
+      "light": [
+        "laguna-xs",
+        "north-mini",
+        "lightning",
+        "Lightning",
+        "mimo",
+        "gemma-4-26b",
+        "dots-3",
+        "xing",
+        ":1b",
+        ":3b",
+        "-1b",
+        "-3b",
+        "mini"
+      ]
+    },
+    "cooldownMin": {
+      "rate_limit": 30,
+      "auth": 1440,
+      "not_found": 10080,
+      "no_response": 120,
+      "crash": 15,
+      "timeout": 30,
+      "bad_output": 10,
+      "stalled": 20
+    }
+  },
+  "providers": {
+    "claude": {
+      "kind": "cli",
+      "enabled": true,
+      "command": "claude",
+      "billing": "subscription",
+      "isolateGit": false,
+      "parse": "claude-json",
+      "run": {
+        "readonly": "claude -p --model {model} --output-format json --allowedTools \"Read,Glob,Grep\" --disallowedTools \"Edit,Write,Bash\" < '{promptFile}'",
+        "edit": "claude -p --model {model} --output-format json --permission-mode acceptEdits --allowedTools \"Read,Glob,Grep,Edit,Write,Bash\" < '{promptFile}'"
+      },
+      "models": [
+        {
+          "model": "opus",
+          "tier": "premium",
+          "contextLength": 200000
+        },
+        {
+          "model": "sonnet",
+          "tier": "premium",
+          "contextLength": 200000
+        },
+        {
+          "model": "haiku",
+          "tier": "strong",
+          "contextLength": 200000
+        }
+      ],
+      "streamsOutput": false
+    },
+    "cline": {
+      "kind": "cli",
+      "enabled": true,
+      "command": "cline",
+      "prestart": "cline hub start --cwd \"$HOME/.orch\"",
+      "poststop": "cline hub stop --cwd \"$HOME/.orch\"",
+      "billing": "free",
+      "isolateGit": true,
+      "parse": "text",
+      "run": {
+        "readonly": "cline -t {timeoutSec} -m {model} --json \"Follow the instructions given on stdin. ({title})\" < '{promptFile}'",
+        "edit": "cline -t {timeoutSec} -m {model} --json \"Follow the instructions given on stdin. ({title})\" < '{promptFile}'"
+      },
+      "discover": {
+        "url": "https://api.cline.bot/api/v1/ai/cline/models",
+        "match": "[a-z0-9._/-]+:free"
+      }
+    },
+    "opencode": {
+      "kind": "cli",
+      "enabled": true,
+      "command": "opencode",
+      "billing": "free",
+      "isolateGit": true,
+      "parse": "text",
+      "answerAfter": "^> (?:plan|build|code|ask) \u00b7 .*$",
+      "run": {
+        "readonly": "XDG_DATA_HOME=\"$HOME/.opencode-free\" opencode run --standalone --agent plan -m {model} --title '{title}' \"Follow the instructions given on stdin. ({title})\" < '{promptFile}'",
+        "edit": "XDG_DATA_HOME=\"$HOME/.opencode-free\" opencode run --standalone --agent build --auto -m {model} --title '{title}' \"Follow the instructions given on stdin. ({title})\" < '{promptFile}'"
+      },
+      "discover": {
+        "cmd": "XDG_DATA_HOME=\"$HOME/.opencode-free\" opencode models",
+        "match": "^\\S+(-free|:free)$"
+      }
+    },
+    "kilo": {
+      "kind": "cli",
+      "enabled": true,
+      "command": "kilo",
+      "billing": "free",
+      "isolateGit": true,
+      "parse": "text",
+      "answerAfter": "^> (?:plan|build|code|ask) \u00b7 .*$",
+      "run": {
+        "readonly": "kilo run --agent plan -m {model} --title '{title}' \"Follow the instructions given on stdin. ({title})\" < '{promptFile}'",
+        "edit": "kilo run --auto --agent code -m {model} --title '{title}' \"Follow the instructions given on stdin. ({title})\" < '{promptFile}'"
+      },
+      "discover": {
+        "cmd": "kilo models",
+        "match": "^kilo/\\S*free$"
+      }
+    },
+    "openhands": {
+      "kind": "openhands",
+      "enabled": true,
+      "_note": "OpenHands SDK as the agent runtime (LocalWorkspace, no Docker), driving the CLIs below over ACP with their own logins. Keys: openhands:<backend>/<model>. Venv: ~/.orch/openhands-venv (bin/python on Linux/macOS).",
+      "command": "$HOME/.orch/openhands-venv/Scripts/python.exe",
+      "billing": "free",
+      "backends": {
+        "opencode": {
+          "command": "opencode acp",
+          "env": "XDG_DATA_HOME=\"$HOME/.opencode-free\"",
+          "modes": {
+            "readonly": "plan",
+            "edit": "build"
+          }
+        },
+        "kilo": {
+          "command": "kilo acp",
+          "_warmup": "Kilo never answers the first ACP turn of a new session (7.4.23); a throwaway first turn gets past it.",
+          "warmupSec": 20,
+          "modes": {
+            "readonly": "plan",
+            "edit": "code"
+          }
+        },
+        "cline": {
+          "command": "cline --acp",
+          "modes": {
+            "readonly": "plan",
+            "edit": "act"
+          }
+        }
+      }
+    },
+    "codex": {
+      "kind": "cli",
+      "enabled": false,
+      "_note": "Enable after setting a model name you have access to.",
+      "command": "codex",
+      "billing": "subscription",
+      "isolateGit": false,
+      "parse": "out-file",
+      "run": {
+        "readonly": "codex exec --skip-git-repo-check -s read-only -m {model} -o '{outFile}' - < '{promptFile}'",
+        "edit": "codex exec --skip-git-repo-check -s workspace-write -m {model} -o '{outFile}' - < '{promptFile}'"
+      },
+      "models": [
+        {
+          "model": "gpt-5-codex",
+          "tier": "premium",
+          "contextLength": 200000
+        }
+      ],
+      "streamsOutput": false
+    },
+    "commandcode": {
+      "kind": "cli",
+      "enabled": false,
+      "_note": "Command Code CLI. Headless works (-p, prompt on stdin, tested 2026-10-22) and the NDJSON output of --output-format json is parsed now (parse: commandcode-json), but the account has no credits (pay-as-you-go). Enable after buying credits and a small bench run.",
+      "command": "commandcode",
+      "billing": "metered",
+      "isolateGit": true,
+      "parse": "commandcode-json",
+      "run": {
+        "readonly": "commandcode -p --trust --plan --output-format json -m {model} < '{promptFile}'",
+        "edit": "commandcode -p --trust --output-format json -m {model} < '{promptFile}'"
+      },
+      "models": [
+        { "model": "deepseek/deepseek-v4-flash", "tier": "strong" },
+        { "model": "moonshotai/kimi-k2.7-code", "tier": "strong" },
+        { "model": "zai-org/glm-5.3", "tier": "strong" }
+      ]
+    },
+    "freebuff": {
+      "kind": "cli",
+      "enabled": true,
+      "_note": "Freebuff has no headless mode: engine/scripts/freebuff_drive.cjs drives its TUI through a ConPTY (node-pty), picks the model in /model, auto-answers question menus and continue prompts, and finishes when .orch-report.md is stable for 60 s. Ads still show in the session. Starter plan: about 21 hours a day, roughly 1 hour per session; UNLIMITED models do not use hours. Paid hours are never confirmed unless FREEBUFF_ALLOW_PAID=1. Prompts may be used for training unless opted out in Freebuff settings. List the picker: node engine/scripts/freebuff_drive.cjs models. The UNLIMITED models and the OPTIMIZED ones (GLM 5.3 Flash, Muse Spark 1.3, GPT-6 Luna) are listed; OPTIMIZED ones spend the free daily hours with no router budget. When the hours run out Freebuff asks for paid hours, the driver refuses and reports a rate limit, so the router cools the model down (cooldownMin.rate_limit) and moves on to another model.",
+      "command": "freebuff",
+      "billing": "free",
+      "isolateGit": true,
+      "parse": "claude-json",
+      "streamsOutput": true,
+      "run": {
+        "readonly": "node '{root}/engine/scripts/freebuff_drive.cjs' run --cwd '{cwd}' --prompt-file '{promptFile}' --max-sec {timeoutSec} --model '{model}'",
+        "edit": "node '{root}/engine/scripts/freebuff_drive.cjs' run --cwd '{cwd}' --prompt-file '{promptFile}' --max-sec {timeoutSec} --model '{model}'"
+      },
+      "models": [
+        {
+          "model": "Nemotron 3.5 Lightning",
+          "tier": "light"
+        },
+        {
+          "model": "Glyph Cluster",
+          "tier": "strong"
+        },
+        {
+          "model": "GLM 5.3 Flash",
+          "tier": "strong"
+        },
+        {
+          "model": "Muse Spark 1.3",
+          "tier": "strong"
+        },
+        {
+          "model": "GPT-6 Luna",
+          "tier": "strong"
+        }
+      ]
+    },
+    "openrouter": {
+      "kind": "api",
+      "enabled": false,
+      "baseUrl": "https://openrouter.ai/api/v1",
+      "apiKeyEnv": "OPENROUTER_API_KEY",
+      "billing": "free",
+      "freeOnly": true,
+      "discover": {
+        "url": "https://openrouter.ai/api/v1/models"
+      }
+    },
+    "openai": {
+      "kind": "api",
+      "enabled": true,
+      "baseUrl": "https://api.openai.com/v1",
+      "apiKeyEnv": "OPENAI_API_KEY",
+      "billing": "metered",
+      "models": [
+        {
+          "model": "gpt-5.5",
+          "tier": "premium",
+          "contextLength": 400000,
+          "priceIn": 1.25,
+          "priceOut": 10
+        }
+      ]
+    },
+    "ollama": {
+      "kind": "api",
+      "enabled": false,
+      "baseUrl": "http://localhost:11434/v1",
+      "billing": "free",
+      "discover": {
+        "ollama": "http://localhost:11434/api/tags"
+      }
+    },
+    "mock": {
+      "kind": "mock",
+      "enabled": false,
+      "billing": "free"
+    }
+  },
+  "graphify": {
+    "command": "graphify",
+    "_note": "orch graph <project> runs Graphify on the project repo and copies graphify-out/ into vault/Code/<project>/."
+  }
+}

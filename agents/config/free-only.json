@@ -1,0 +1,24 @@
+{
+  "_about": "ORCH_CONFIG override: free models only (no Claude/Codex/OpenAI usage), no premium tier, free senior chain. Use: ORCH_CONFIG=config/free-only.json node src/cli.ts ...",
+  "providers": {
+    "claude": {
+      "enabled": false
+    },
+    "codex": {
+      "enabled": false
+    },
+    "openai": {
+      "enabled": false
+    }
+  },
+  "router": {
+    "premium": "never"
+  },
+  "senior": {
+    "model": "openhands:opencode/opencode/deepseek-v4.1-flash-free",
+    "fallback": [
+      "kilo:kilo/reflection/beam-free",
+      "opencode:opencode/glm-5.3-flash-free"
+    ]
+  }
+}

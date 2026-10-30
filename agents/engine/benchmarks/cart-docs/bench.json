@@ -1,0 +1,16 @@
+{
+  "id": "cart-docs",
+  "title": "Document the cart API",
+  "category": "docs",
+  "risk": "low",
+  "brief": "Add an \"## API\" section to README.md documenting every exported function of src/cart.js (addItem, removeItem, total): signature, what it returns, and the exact error messages it throws. Include at least one ```js usage example. Read the code; document it as it is.",
+  "files": [
+    "README.md"
+  ],
+  "checks": [
+    {
+      "name": "docs",
+      "cmd": "node check-docs.js"
+    }
+  ]
+}

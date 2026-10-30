@@ -1,0 +1,16 @@
+{
+  "id": "async-total",
+  "title": "Order total is always 0",
+  "category": "debugging",
+  "risk": "medium",
+  "brief": "totalFor(ids) in src/orders.js should add up the prices of the given orders, but it always returns 0. Find the root cause and fix it. Orders must still be fetched with fetchOrder() (it is async). Tests: test/orders.test.js.",
+  "files": [
+    "src/orders.js"
+  ],
+  "checks": [
+    {
+      "name": "tests",
+      "cmd": "node test/orders.test.js"
+    }
+  ]
+}

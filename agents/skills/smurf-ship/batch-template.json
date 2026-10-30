@@ -1,0 +1,16 @@
+[
+  {
+    "id": "short-kebab-id",
+    "title": "Imperative title of one bounded change",
+    "category": "coding",
+    "risk": "medium",
+    "timeoutMin": 30,
+    "files": ["src/feature.ts", "src/feature.test.ts"],
+    "deps": [],
+    "checks": [
+      { "name": "types", "cmd": "npx tsc --noEmit" },
+      { "name": "tests", "cmd": "npm test" }
+    ],
+    "brief": "Stack and folder (e.g. TypeScript, Node 24, folder src/). Read src/feature.ts and src/caller.ts first.\n1. In src/feature.ts add `export function name(arg: Type): Result` that ... (exact behaviour, edge cases).\n2. In src/feature.test.ts add tests for: ... (cases with expected values).\nDone when both checks pass. Do not change any other file; do not rename existing exports."
+  }
+]

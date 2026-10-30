@@ -1,0 +1,16 @@
+{
+  "id": "cli-json",
+  "title": "Add a --json flag to the CLI",
+  "category": "coding",
+  "risk": "low",
+  "brief": "src/cli.js prints a summary like \"3 items, total 12.50\". Add a --json flag: with it, print exactly one line of JSON {\"items\": <count>, \"total\": <number>} instead. Without the flag the output must not change. Tests: test/cli.test.js.",
+  "files": [
+    "src/cli.js"
+  ],
+  "checks": [
+    {
+      "name": "tests",
+      "cmd": "node test/cli.test.js"
+    }
+  ]
+}
