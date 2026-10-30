@@ -1,0 +1,115 @@
+[
+  {
+    "id": "hero",
+    "title": "Hero: portrait, name, one sentence, location and local time only",
+    "category": "coding",
+    "risk": "low",
+    "timeoutMin": 35,
+    "files": ["src/app/_components/Banner.tsx", "src/content/hero.ts", "src/app/_components/HeroCoffeeCard.tsx"],
+    "deps": [],
+    "checks": [
+      { "name": "types", "cmd": "npx tsc --noEmit" },
+      { "name": "lint", "cmd": "npm run lint" }
+    ],
+    "brief": "Next.js 15 App Router, React 19, TypeScript, Tailwind 3, framer-motion. Read docs/redesign-plan.md (the rules) and src/app/_components/Banner.tsx first.\n1. In Banner.tsx delete the `Credibility`, `Stats` and `Socials` components and every place they are rendered (desktop and mobile). Delete now-unused imports (useEffect, useState, ArrowUpRight, Github, Linkedin) and the `SOCIAL_ICONS` map.\n2. On the <section id=\"banner\"> remove `lg:-ml-[156px] lg:pl-[156px]` (the sidebar is being removed).\n3. Add one small corner line, absolutely positioned bottom-left inside the section (left-6 bottom-6, hidden below md): the text `HERO.address.location` then a middle dot then the live local time in Asia/Karachi as HH:MM (24h), e.g. `Islamabad, Pakistan · 14:05`. Use a tiny client component in the same file: useState + setInterval every 30s with `new Intl.DateTimeFormat('en-GB',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Karachi'})`; render an empty string until mounted to avoid hydration mismatch. Style: text-[11px] uppercase tracking-[0.2em] text-muted-foreground. No icons.\n4. In src/content/hero.ts delete `credibility` and `stats` from `HeroContent` and `HERO`, and delete the `HeroStat` interface. Keep `socials`, `address`, `tagline`, `name`, `portrait`, `coffee`, `APPROACH` unchanged.\n5. In HeroCoffeeCard.tsx remove `lg:left-[172px]` from the wrapper div.\nKeep the portrait, ParticlePortrait, the h1 name, the tagline paragraph, MotionConfig, every data-avatar attribute that remains, and all comments that still apply. Done when both checks pass. Change no other file."
+  },
+  {
+    "id": "projects",
+    "title": "Projects: one numbered list with a hover image, no switcher or intro",
+    "category": "coding",
+    "risk": "low",
+    "timeoutMin": 40,
+    "files": ["src/app/_components/SelectedWork.tsx", "src/app/_components/SelectedWorkList.tsx", "src/app/_components/SelectedWorkCarousel.tsx"],
+    "deps": [],
+    "checks": [
+      { "name": "types", "cmd": "npx tsc --noEmit" },
+      { "name": "lint", "cmd": "npm run lint" }
+    ],
+    "brief": "Next.js 15, React 19, TypeScript, Tailwind 3, GSAP. Read docs/redesign-plan.md and docs/research/11-snellenberg-work-list-menu-button.jpg, then SelectedWork.tsx, SelectedWorkList.tsx, src/lib/projects.ts, src/types/index.ts (IProject: title, year, slug, images: string[], thumbnail, techStack).\n1. SelectedWork.tsx: delete INTRO_COPY and its <p>, `ViewSwitcher`, `VIEW_OPTIONS`, the `view` state, the lenis/ScrollTrigger refresh effect and their imports. Heading text becomes `Work` (same h2 classes). Render only `<SelectedWorkList projects={PROJECTS} />`. Keep `id=\"my-projects\"`.\n2. Delete the file SelectedWorkCarousel.tsx.\n3. SelectedWorkList.tsx: each row is ONE `TransitionLink` to `/projects/${project.slug}` wrapping the row. Row layout (grid md:grid-cols-12, py-8 md:py-12, border-b border-border/50): col 1 `padIndex(index + 1)` (text-xs tabular-nums text-muted-foreground); cols 2-10 the title in `font-anton text-4xl md:text-7xl leading-none`, which turns text-primary on row hover/focus; cols 11-12 the year, right-aligned, text-sm text-muted-foreground. Remove the description, the action links and the tech stack line.\n4. Hover preview: one fixed-position image (w-[320px] aspect-[4/3], rounded-xl, overflow-hidden, pointer-events-none, z-20, aria-hidden) owned by SelectedWorkList. It shows `project.images[0] ?? project.thumbnail` of the hovered row via next/image (fill, sizes=\"320px\", object-cover) and follows the pointer with `gsap.quickTo` (x and y, duration 0.4, ease power3). Fade/scale it in on row mouseenter, out on mouseleave of the list. Only on `(pointer: fine)` and when `prefers-reduced-motion` is not reduce; otherwise never rendered.\n5. Keep the data-avatar, data-avatar-label, data-avatar-detail and data-avatar-slug attributes on each row's article. Keep focus-visible ring styles on the link.\nDone when both checks pass. No icons, no extra text. Change no other file."
+  },
+  {
+    "id": "stack",
+    "title": "Stack: plain typographic list, no logos",
+    "category": "coding",
+    "risk": "low",
+    "timeoutMin": 25,
+    "files": ["src/app/_components/Skills.tsx"],
+    "deps": [],
+    "checks": [
+      { "name": "types", "cmd": "npx tsc --noEmit" },
+      { "name": "lint", "cmd": "npm run lint" }
+    ],
+    "brief": "Next.js 15, React 19, TypeScript, Tailwind 3, GSAP. Read docs/redesign-plan.md, then src/app/_components/Skills.tsx and MY_STACK in src/lib/data.ts (Record<string, {name, icon}[]>).\n1. Replace `<SectionTitle title=\"My Stack\" />` with `<h2 className=\"mb-12 font-anton text-3xl leading-none text-foreground sm:text-4xl md:text-6xl\">Stack</h2>` and remove the SectionTitle import.\n2. Remove the logos: delete the next/image import and every <Image>. Each category row keeps its grid: left the category key (keep the current muted uppercase Anton classes), right the tool names as one flowing line of text, `text-2xl md:text-4xl leading-snug text-foreground`, names separated by a muted ` / ` span (aria-hidden). Each name stays its own span with the existing `slide-up` class and its data-avatar=\"skill\", data-avatar-label and data-avatar-group attributes.\n3. Use `border-t border-border/50 pt-8` on each row instead of the large space-y gap (space-y-10).\nKeep both useGSAP animations and `id=\"my-stack\"` exactly. Do not edit src/lib/data.ts. Done when both checks pass. Change no other file."
+  },
+  {
+    "id": "experience",
+    "title": "Experience: one aligned row per role with thin rules",
+    "category": "coding",
+    "risk": "low",
+    "timeoutMin": 25,
+    "files": ["src/app/_components/Experiences.tsx"],
+    "deps": [],
+    "checks": [
+      { "name": "types", "cmd": "npx tsc --noEmit" },
+      { "name": "lint", "cmd": "npm run lint" }
+    ],
+    "brief": "Next.js 15, React 19, TypeScript, Tailwind 3, GSAP. Read docs/redesign-plan.md, then src/app/_components/Experiences.tsx and MY_EXPERIENCE in src/lib/data.ts ({title, company, duration}[]).\n1. Replace `<SectionTitle title=\"My Experience\" />` with `<h2 className=\"mb-12 font-anton text-3xl leading-none text-foreground sm:text-4xl md:text-6xl\">Experience</h2>` and remove the SectionTitle import.\n2. Each item (keep the `experience-item` class and its data-avatar attributes) becomes one row: `grid gap-2 border-t border-border/50 py-8 md:grid-cols-12 md:items-baseline md:gap-6`. Company: md:col-span-3, text-base text-muted-foreground. Title: md:col-span-6, `font-anton text-3xl leading-none md:text-5xl`. Duration: md:col-span-3, md:text-right, text-sm text-muted-foreground tabular-nums. Add a closing `border-b border-border/50` on the list. Replace the outer `grid gap-10 md:gap-14` with a plain div.\nKeep both useGSAP animations and `id=\"my-experience\"`. Do not edit data. Done when both checks pass. Change no other file."
+  },
+  {
+    "id": "contact",
+    "title": "Contact: Let's talk, the email, local time, plain socials",
+    "category": "coding",
+    "risk": "low",
+    "timeoutMin": 30,
+    "files": ["src/components/Footer.tsx"],
+    "deps": [],
+    "checks": [
+      { "name": "types", "cmd": "npx tsc --noEmit" },
+      { "name": "lint", "cmd": "npm run lint" }
+    ],
+    "brief": "Next.js 15, React 19, TypeScript, Tailwind 3, GSAP. Read docs/redesign-plan.md and docs/research/03-snellenberg-contact.jpg, then src/components/Footer.tsx, GENERAL_INFO in src/lib/data.ts and HERO.socials in src/content/hero.ts.\n1. Delete: the green-dot `Available for new projects` block, the ScrollReveal paragraph, the Button CTA, the GitHub stats fetch (RepoStats, useState, useEffect) and the Star/GitFork icons and the `Design & built by` link. Remove now-unused imports.\n2. Keep the `Let's Talk` h2 with both BoldHoverText words and the `.footer-word` GSAP reveal exactly.\n3. Below it, the email as the main link: `<a href={`mailto:${GENERAL_INFO.email}`} data-avatar=\"contact\">` showing GENERAL_INFO.email in `font-display text-2xl md:text-5xl`, underline-offset-8 hover:underline hover:text-primary, mb-16.\n4. Bottom row (border-t border-muted-foreground/20 pt-6, flex wrap justify-between, text-xs uppercase tracking-[0.25em] text-muted-foreground): left `Husnain Maroof © {year}`; middle `Islamabad` plus live local time HH:MM in Asia/Karachi (Intl.DateTimeFormat en-GB, timeZone Asia/Karachi, update every 30s, empty until mounted); right plain text links: each of HERO.socials by label, plus `Upwork` -> GENERAL_INFO.upworkProfile, all target _blank rel noopener noreferrer, hover:text-primary, data-avatar=\"social\". No icons.\nKeep `id=\"contact\"` on the footer. Done when both checks pass. Change no other file."
+  },
+  {
+    "id": "menu",
+    "title": "Replace the sidebar with a top text nav that collapses into a round menu button",
+    "category": "coding",
+    "risk": "medium",
+    "timeoutMin": 50,
+    "files": ["src/components/SiteMenu.tsx", "src/components/portfolio-sidebar.tsx", "src/app/layout.tsx", "src/app/_components/StickyEmail.tsx", "src/app/projects/[slug]/_components/ProjectDetails.tsx", "src/lib/pill.ts"],
+    "deps": [],
+    "checks": [
+      { "name": "types", "cmd": "npx tsc --noEmit" },
+      { "name": "lint", "cmd": "npm run lint" }
+    ],
+    "brief": "Next.js 15, React 19, TypeScript, Tailwind 3, framer-motion, Lenis (lenis/react). Read docs/redesign-plan.md task 6, docs/research/11-snellenberg-work-list-menu-button.jpg and 12-snellenberg-menu-open.jpg, then src/components/portfolio-sidebar.tsx (copy its scrollToSection, hash-on-arrival effect and active-section effect) and src/app/layout.tsx.\n1. Create src/components/SiteMenu.tsx ('use client', default export). Items: Work->my-projects, Stack->my-stack, Experience->my-experience, Contact->contact.\n2. Top bar: a <header> absolute top-0 inset-x-0 z-[6], page padding px-6 py-6, flex justify-between. Left: `Husnain Maroof` text link to `/` (TransitionLink from @/components/TransitionLink). Right (hidden below md): the four items as text buttons, text-sm, muted, hover:text-foreground. It scrolls away with the page.\n3. Round button: fixed top-5 right-5 z-[60], size-16 rounded-full bg-primary text-primary-foreground, text `Menu` / `Close` in 11px uppercase tracking-[0.16em] (no icon). Visible (framer-motion scale 0->1) once window.scrollY > 0.6*innerHeight, always below md, and always while open. aria-expanded, aria-controls.\n4. Panel: framer-motion AnimatePresence. A click-to-close overlay bg-black/50 fixed inset-0 z-[55], and the panel fixed inset-y-0 right-0 z-[58] w-full sm:w-[480px] bg-[#111] text-[#f2efe8], slides from x:100% (spring stiffness 260 damping 32; instant with useReducedMotion). Inside, px-12 py-24: the items as big buttons `font-name text-5xl md:text-6xl leading-tight`, a size-2 rounded-full bg-primary dot before the active one; bottom: HERO.socials (src/content/hero.ts) and GENERAL_INFO.email as small uppercase plain text links. Clicking an item closes the panel then scrolls. Escape closes; focus moves to the first item on open, back to the button on close; Tab stays inside the panel. Call lenis.stop() while open and lenis.start() on close. Keep data-avatar=\"nav\" data-avatar-label on items; put data-avatar-keepout on the header, button and panel.\n5. layout.tsx: render <SiteMenu /> instead of <PortfolioSidebar />, remove the StickyEmail import and render, body className becomes `antialiased`, <main> loses its className and the comment above it.\n6. Delete src/components/portfolio-sidebar.tsx and src/app/_components/StickyEmail.tsx.\n7. ProjectDetails.tsx: remove `lg:left-[172px]` from the back link. src/lib/pill.ts: change the comment's sidebar reference to SiteMenu only.\nDone when both checks pass. No icons anywhere."
+  },
+  {
+    "id": "preloader",
+    "title": "Preloader: lock scrolling until it has finished",
+    "category": "debugging",
+    "risk": "low",
+    "timeoutMin": 20,
+    "files": ["src/components/Preloader.tsx"],
+    "deps": [],
+    "checks": [
+      { "name": "types", "cmd": "npx tsc --noEmit" },
+      { "name": "lint", "cmd": "npm run lint" }
+    ],
+    "brief": "Next.js 15, React 19, TypeScript, GSAP, Lenis (lenis/react). Bug: on the live site the page can be scrolled while the preloader runs, so its black bars and the name show over the projects section (docs/research/09-husnain-live-preloader-bug.jpg). Read src/components/Preloader.tsx.\n1. Get the Lenis instance with `const lenis = useLenis()` from 'lenis/react'.\n2. When the timeline starts: window.scrollTo(0, 0), lenis?.scrollTo(0, { immediate: true }), lenis?.stop(), and set document.documentElement.style.overflow = 'hidden'.\n3. Unlock in the timeline's onComplete: lenis?.start() and restore overflow to ''. Also unlock in the useGSAP cleanup so an unmount never leaves the page locked. Lenis may be undefined on the first render: also handle it in a small useEffect that stops it if the preloader has not finished yet (track finished in a ref).\n4. Add `pointer-events-none` to the wrapper once finished (set it in onComplete via the ref) so nothing under it is blocked.\nKeep the animation timing and markup the same. Done when both checks pass. Change no other file."
+  },
+  {
+    "id": "onee",
+    "title": "Onee: guide mode with one plain line per section, hover only on projects",
+    "category": "coding",
+    "risk": "medium",
+    "timeoutMin": 50,
+    "files": ["src/components/AvatarInteractions.tsx", "src/lib/avatar-interactions.ts", "src/lib/avatar-interactions.test.ts"],
+    "deps": [],
+    "checks": [
+      { "name": "types", "cmd": "npx tsc --noEmit" },
+      { "name": "lint", "cmd": "npm run lint" },
+      { "name": "tests", "cmd": "npm test" }
+    ],
+    "brief": "Next.js 15, React 19, TypeScript, GSAP. Onee is the avatar; read docs/AVATAR_AND_ARCHITECTURE.md, docs/redesign-plan.md task 8, docs/research/06-thakkar-hero-avatar.jpg, 07-thakkar-experience-avatar-docked.jpg, 08-thakkar-contact-avatar.jpg, then src/lib/avatar-interactions.ts and src/components/AvatarInteractions.tsx (speak, showText, showMessage, activate, the greeting effect using GREETING_DELAY_MS/GREETING_HOLD_MS, the pointer handlers that call activate around lines 900-955, NAV_BAR_HEIGHT).\n1. avatar-interactions.ts: add `export const SECTION_LINES: Readonly<Record<string, string>>` with exactly: banner: 'Hi, I am Onee. I will walk you through Husnain\\'s work.', 'my-projects': 'Open any project for the full story.', 'my-stack': 'The tools he uses every day.', 'my-experience': 'Where he has worked since 2024.', contact: 'Like what you see? Write to him.'.\n2. Rewrite every string in AVATAR_MESSAGES, AVATAR_GREETINGS, AVATAR_SELF_MESSAGES, SKILL_MESSAGES and STAT_MESSAGES: short (under 60 characters), plain, about the real content, no jokes about bugs, coffee, tabs or unions, no emoji. Keep every key, array shape and pool size >= 2. Keep the existing tests passing (update expectations only if they assert a literal string).\n3. AvatarInteractions.tsx: guide mode. Set NAV_BAR_HEIGHT to 0 (the bottom nav bar no longer exists) and update its comment. Add an effect with an IntersectionObserver (rootMargin '-45% 0px -45% 0px') on each element whose id is a SECTION_LINES key; when one enters and it is not the last section spoken, the panel is closed and no target is active, call speak(SECTION_LINES[id]) and hide the line after GREETING_HOLD_MS the same way the greeting does. At #contact play the 'happy' animation and use 1.25x the docked size; return to normal size when contact leaves. Replace the random greeting with SECTION_LINES.banner.\n4. In the pointer/focus handlers only call activate when found.trigger.kind is 'project' or 'contact'; other kinds no longer move Onee.\n5. Respect reduced motion (reducedRef) for any new movement. Add tests in avatar-interactions.test.ts that SECTION_LINES has the five ids and every pool line is under 60 characters.\nDone when all three checks pass. Change no other file."
+  }
+]
