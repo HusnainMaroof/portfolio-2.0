@@ -5,7 +5,6 @@ import 'lenis/dist/lenis.css';
 import './globals.css';
 import ParticleBackground from '@/components/ParticleBackground';
 // import Navbar from '@/components/Navbar';
-import CustomCursor from '@/components/CustomCursor';
 import AvatarInteractions from '@/components/AvatarInteractions';
 import Preloader from '../components/Preloader';
 import StickyEmail from './_components/StickyEmail';
@@ -13,7 +12,7 @@ import { GoogleAnalytics } from '@next/third-parties/google';
 import Script from 'next/script';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import Footer from '@/components/Footer';
-import PortfolioSidebar from '@/components/portfolio-sidebar';
+import SiteNav from '@/components/SiteNav';
 
 const SITE_DESCRIPTION =
     'Husnain Maroof is a full-stack developer in Islamabad, Pakistan, building fast, reliable web and mobile products with Next.js, React, TypeScript, Tailwind CSS and Node.js: e-commerce, SaaS dashboards, marketing sites and developer tools. Available for remote projects.';
@@ -180,7 +179,7 @@ export default function RootLayout({
                 a.appendChild(r);
             })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');`}
             </Script>
-            <body className="antialiased pb-[60px] lg:pb-0">
+            <body className="antialiased">
                 <ThemeProvider>
                     <ReactLenis
                         root
@@ -189,13 +188,10 @@ export default function RootLayout({
                             duration: 1.4,
                         }}
                     >
-                        {/* lg+: clear the fixed 148px left rail so no section's */}
-                        {/* 80%-centred container can ever slide under it. */}
-                        <main className="lg:pl-[156px]">{children}</main>
-                        <PortfolioSidebar />
+                        <SiteNav />
+                        <main>{children}</main>
                         <Footer />
 
-                        <CustomCursor />
                         <AvatarInteractions />
                         <Preloader />
                         <ParticleBackground />

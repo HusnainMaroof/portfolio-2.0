@@ -90,25 +90,33 @@
         display: none;
     }
 
-    /* The custom cursor only renders on fine pointers (see CustomCursor, which
-       is `hidden md:block`). Hiding the native cursor everywhere would leave
-       touch and coarse-pointer devices with no feedback at all, so both rules
-       are scoped to `@media (pointer: fine)`. */
+    * {
+        @apply border-border;
+    }
+
+    /* The custom arrow is a native CSS cursor image, not a JS-driven element.
+       The OS draws it at full mouse rate from the very first paint, so it is
+       there before JavaScript loads and never lags behind a busy main thread
+       (the old JS cursor was missing until hydration and stuttered during
+       load). Fine pointers only: touch devices have no cursor to replace.
+       Hotspot 1 2 is the arrow's tip; `auto` is the fallback. */
     @media (pointer: fine) {
-        * {
-            @apply border-border cursor-none;
+        :root {
+            --cursor: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2728%27%20height%3D%2731%27%20viewBox%3D%27-0.5%20-0.5%2028%2031%27%3E%3Cpath%20d%3D%27M20.0995%2011.0797L3.72518%201.13204C2.28687%200.258253%200.478228%201.44326%200.704999%203.11083L3.28667%2022.0953C3.58333%2024.2768%207.33319%2024.6415%208.3792%2022.7043C9.5038%2020.6215%2010.8639%2018.7382%2012.43%2017.7122C13.996%2016.6861%2016.2658%2016.1911%2018.6244%2015.9918C20.8181%2015.8063%2021.9811%2012.2227%2020.0995%2011.0797Z%27%20fill%3D%27%23dedede%27%20stroke%3D%27rgba(15%2C15%2C15%2C0.5)%27%20stroke-width%3D%272%27%2F%3E%3C%2Fsvg%3E") 1 2, auto;
         }
 
-        /* Tailwind preflight sets `cursor: pointer` on button/[role=button] and
-           `cursor: default` on :disabled. Those selectors outrank the universal
-           `cursor: none` above, so the native cursor flashed over the custom
-           one whenever a button (or a disabled carousel arrow) was hovered.
-           Re-assert `none` here, same layer, later in source, so these win the
-           tie. */
+        html[data-theme='light'] {
+            --cursor: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2728%27%20height%3D%2731%27%20viewBox%3D%27-0.5%20-0.5%2028%2031%27%3E%3Cpath%20d%3D%27M20.0995%2011.0797L3.72518%201.13204C2.28687%200.258253%200.478228%201.44326%200.704999%203.11083L3.28667%2022.0953C3.58333%2024.2768%207.33319%2024.6415%208.3792%2022.7043C9.5038%2020.6215%2010.8639%2018.7382%2012.43%2017.7122C13.996%2016.6861%2016.2658%2016.1911%2018.6244%2015.9918C20.8181%2015.8063%2021.9811%2012.2227%2020.0995%2011.0797Z%27%20fill%3D%27%2320242c%27%20stroke%3D%27rgba(255%2C255%2C255%2C0.5)%27%20stroke-width%3D%272%27%2F%3E%3C%2Fsvg%3E") 1 2, auto;
+        }
+
+        /* button/[role=button]/:disabled are listed too: Tailwind preflight
+           gives them `pointer`/`default`, which outrank a bare `*`. Same
+           layer, later in source, so these win the tie. */
+        *,
         button,
         [role='button'],
         :disabled {
-            @apply cursor-none;
+            cursor: var(--cursor);
         }
     }
 

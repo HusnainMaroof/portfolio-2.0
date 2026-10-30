@@ -127,7 +127,7 @@ export default function BoldHoverText({
                 letterSpacing: 'inherit',
                 color,
                 // no `cursor: 'default'`; an inline cursor beats the global
-                // `cursor: none` and flashes the native cursor over the custom one.
+                // custom arrow (globals.css) and shows the browser's default instead.
             }}
         >
             {text}

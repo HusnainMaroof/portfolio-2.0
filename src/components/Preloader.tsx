@@ -1,19 +1,47 @@
 'use client';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
-import React, { useRef } from 'react';
+import { useLenis } from 'lenis/react';
+import React, { useEffect, useRef } from 'react';
 
 gsap.registerPlugin(useGSAP);
 
 const Preloader = () => {
     const preloaderRef = useRef<HTMLDivElement>(null);
+    // Scrolling is locked while the loader covers the page: scrolling under it
+    // showed its bars and the name over the projects. Lenis is undefined on
+    // the first render, so it is read through a ref, or the unlock at the end
+    // would hold the stale undefined and never restart it.
+    const lenis = useLenis();
+    const lenisRef = useRef(lenis);
+    lenisRef.current = lenis;
+    const doneRef = useRef(false);
+
+    const unlock = () => {
+        doneRef.current = true;
+        document.documentElement.style.overflow = '';
+        lenisRef.current?.start();
+        preloaderRef.current?.classList.add('pointer-events-none');
+    };
+
+    // Lenis arrives a render later; stop it then if the loader is still up.
+    useEffect(() => {
+        if (lenis && !doneRef.current) {
+            lenis.scrollTo(0, { immediate: true });
+            lenis.stop();
+        }
+    }, [lenis]);
 
     useGSAP(
         () => {
+            window.scrollTo(0, 0);
+            document.documentElement.style.overflow = 'hidden';
+
             const tl = gsap.timeline({
                 defaults: {
                     ease: 'power1.inOut',
                 },
+                onComplete: unlock,
             });
 
             tl.to('.name-text span', {
@@ -36,6 +64,11 @@ const Preloader = () => {
                     },
                     '<1',
                 );
+
+            // Never leave the page locked if the loader unmounts early.
+            return () => {
+                if (!doneRef.current) unlock();
+            };
         },
         { scope: preloaderRef },
     );

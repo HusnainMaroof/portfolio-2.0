@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils';
 
 /**
- * Button styles shared with the sidebar nav pills (components/portfolio-sidebar):
+ * Shared pill button styles:
  * 12px radius, muted text that lifts on a faint white wash, and a solid
  * primary fill for the active/primary state.
  */

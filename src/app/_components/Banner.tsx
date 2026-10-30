@@ -2,7 +2,14 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
-import { motion, MotionConfig, type Variants } from 'framer-motion';
+import {
+    motion,
+    MotionConfig,
+    useReducedMotion,
+    useScroll,
+    useTransform,
+    type Variants,
+} from 'framer-motion';
 import { ArrowUpRight, Github, Linkedin } from 'lucide-react';
 import { HERO } from '@/content/hero';
 import BoldHoverText from '@/components/HoverText';
@@ -157,12 +164,25 @@ const Banner = () => {
     const imageLayerRef = useRef<HTMLDivElement>(null);
     const nameRef = useRef<HTMLHeadingElement>(null);
 
+    // Scroll fade: the portrait lags behind the page, so it seems to stay put
+    // while the name slides up over it, and sinks into the dark over the first
+    // half of the hero. The particle layer fades its dots over the same range.
+    const reduceMotion = useReducedMotion();
+    const { scrollYProgress } = useScroll({
+        target: sectionRef,
+        offset: ['start start', 'end start'],
+    });
+    const portraitFade = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
+    const portraitLag = useTransform(scrollYProgress, (v) =>
+        reduceMotion ? '0%' : `${Math.min(v, 0.6) * 55}%`,
+    );
+
     return (
         <MotionConfig reducedMotion="user">
             <section
                 id="banner"
                 ref={sectionRef}
-                className="hero-surface relative isolate overflow-hidden lg:-ml-[156px] lg:pl-[156px]"
+                className="hero-surface relative isolate overflow-hidden"
             >
                 {/* Faint vertical grid, pure CSS. */}
                 <div
@@ -187,9 +207,10 @@ const Banner = () => {
                     animate="shown"
                     className="page-container relative flex min-h-[100svh] flex-col items-center justify-end pb-[88px] pt-16 lg:pb-10 lg:pt-12"
                 >
-                    {/* Desktop: stats sit top-right, clear of the portrait. */}
-                    <Stats className="absolute -right-10 top-16 hidden max-w-[220px] flex-col items-end gap-6 border-r border-border pr-6 text-right lg:flex" />
+                    {/* Desktop: stats sit top-right, clear of the portrait and below the top nav. */}
+                    <Stats className="absolute -right-10 top-32 hidden max-w-[220px] flex-col items-end gap-6 border-r border-border pr-6 text-right lg:flex" />
 
+                    <motion.div style={{ opacity: portraitFade, y: portraitLag }}>
                     <motion.div
                         ref={portraitRef}
                         variants={portrait}
@@ -210,6 +231,7 @@ const Banner = () => {
                                 className="h-auto w-full select-none grayscale"
                             />
                         </div>
+                    </motion.div>
                     </motion.div>
 
          

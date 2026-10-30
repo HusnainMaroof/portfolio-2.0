@@ -10,7 +10,7 @@ import type * as THREE_NS from 'three';
  * This canvas samples that already-downloaded image ONCE and uploads every point to the GPU.
  * Per frame the CPU only writes a few uniforms:
  *   - idle: subtle edge shimmer, capped at ~30fps
- *   - scroll: points collapse into streaks behind the name ("the name eats the image")
+ *   - scroll: points fade out in place, bottom rows first, as the name slides over them
  *
  * Lag guards:
  *   1. Never starts on reduced motion, data saver, ≤ 4 cores, or software-rendered WebGL.
@@ -48,8 +48,8 @@ const DOT_OPACITY = 0.5;
 /** Dot diameter as a share of the grid spacing (min at black, max at white). */
 const DOT_SIZE_MIN = 0.3;
 const DOT_SIZE_MAX = 0.6;
-/** Share of the hero height scrolled before the dissolve completes. */
-const DISSOLVE_DISTANCE = 0.7;
+/** Share of the hero height scrolled before the portrait has faded out. */
+const DISSOLVE_DISTANCE = 0.5;
 
 // ---- Budget ---------------------------------------------------------------
 const MAX_DPR = 1.25;
@@ -90,32 +90,29 @@ varying float vHeat;
 void main() {
     vec2 p0 = position.xy;
 
-    // Bottom rows leave first, so the name appears to eat the portrait upward.
-    float start = (p0.y + 0.5) * 0.45;
-    float t = smoothstep(start, start + 0.55, uProgress);
+    // Scroll fade: the points stay where they are and sink into the dark,
+    // bottom rows a little ahead of the top, with a per-dot jitter so the
+    // fade reads as grain rather than a hard line.
+    float start = (0.5 - p0.y) * 0.25 + aSeed * 0.12;
+    float t = smoothstep(start, start + 0.6, uProgress);
 
-    // Column-coherent bands keep the streaks structured instead of noisy.
-    float row = floor(p0.x * 4.0 + 2.0) - 2.0;
-    vec2 target = vec2(
-        (aSeed - 0.5) * 2.0 * uSpread,
-        uBandY + row * 0.03 + sin(aSeed * 25.13) * 0.012
-    );
-    vec2 p = mix(p0, target, t);
+    vec2 p = p0;
 
-    // Shimmer, strongest at the silhouette edges and while dissolving.
+    // Shimmer at the silhouette edges.
     float edge = smoothstep(0.18, 0.5, abs(p0.x));
-    p.x += sin(uTime * 0.6 + aSeed * 40.0) * 0.004 * (edge + t * 2.0);
-    p.y += cos(uTime * 0.5 + aSeed * 31.0) * 0.002 * (edge + t);
+    p.x += sin(uTime * 0.6 + aSeed * 40.0) * 0.004 * edge;
+    p.y += cos(uTime * 0.5 + aSeed * 31.0) * 0.002 * edge;
 
     vec2 world = uCenter + p * uSize;
     gl_Position = projectionMatrix * modelViewMatrix * vec4(world, 0.0, 1.0);
     gl_PointSize = uPoint * mix(${DOT_SIZE_MIN.toFixed(2)}, ${DOT_SIZE_MAX.toFixed(2)}, aBright) * uDpr;
 
-    // Mirror the CSS bottom fade on the static image; release it as points fly.
+    // Mirror the CSS bottom fade on the static image.
     float fromTop = 0.5 - p0.y;
     float mask = 1.0 - smoothstep(0.55, 0.92, fromTop);
-    vAlpha = aBright * mix(mask, 1.0, t) * (1.0 - t * 0.55) * mix(uDotOpacity, 1.0, t);
-    vHeat = t;
+    vAlpha = aBright * mask * uDotOpacity * (1.0 - t);
+    // A faint glow on the dots that are on their way out.
+    vHeat = t * (1.0 - t) * 2.0;
 }`;
 
 const fragmentShader = /* glsl */ `
@@ -366,8 +363,9 @@ const ParticlePortrait = ({ sectionRef, portraitRef, nameRef, imageLayerRef, the
                     uniforms.uProgress.value = progress;
                     uniforms.uIntro.value = intro;
 
-                    // Static image: fades under the points on intro, out with the dissolve.
-                    const opacity = (1 + (IMAGE_OPACITY_LIVE - 1) * intro) * (1 - progress);
+                    // Static image: dims under the points on intro. Its scroll fade
+                    // is on the portrait wrapper (Banner), so it also runs without WebGL.
+                    const opacity = 1 + (IMAGE_OPACITY_LIVE - 1) * intro;
                     if (Math.abs(opacity - lastOpacity) > 0.002) {
                         lastOpacity = opacity;
                         imageLayer.style.opacity = opacity.toFixed(3);

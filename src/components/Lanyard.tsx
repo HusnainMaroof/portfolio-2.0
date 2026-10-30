@@ -1318,8 +1318,11 @@ const Lanyard = ({
       return hits[0] || null;
     };
 
+    // A data attribute, not an inline cursor: an inline style outranks the
+    // site-wide custom arrow (globals.css) and swapped it for the
+    // browser's own cursor over the card.
     const setCursor = (value: string) => {
-      if (canvas.style.cursor !== value) canvas.style.cursor = value;
+      canvas.dataset.cursor = value;
     };
 
     const flip = (point: THREE.Vector3) => {
@@ -1355,7 +1358,18 @@ const Lanyard = ({
 
     const onPointerMove = (event: PointerEvent) => {
       if (!settingsRef.current!.interactive) return;
-      toPointer(event);
+      if (sim.grab) {
+        // Keep the dragged point far enough inside the canvas that the card
+        // cannot be pulled past its edge and get clipped mid-drag.
+        const rect = canvas.getBoundingClientRect();
+        const margin = Math.min(rect.width, rect.height) * 0.22;
+        toPointer({
+          clientX: clamp(event.clientX, rect.left + margin, rect.right - margin),
+          clientY: clamp(event.clientY, rect.top + margin, rect.bottom - margin)
+        });
+      } else {
+        toPointer(event);
+      }
       if (sim.grab) {
         if (press && Math.hypot(event.clientX - press.x, event.clientY - press.y) > 6) press = null;
         raycaster.ray.at(sim.grab.reach, sim.grab.target);
@@ -1386,6 +1400,19 @@ const Lanyard = ({
       toPointer(event.touches[0]);
       if (pickCard()) event.preventDefault();
     };
+
+    // The canvas is much larger than the card so a swing never leaves it. With
+    // a mouse, it only takes the pointer while the pointer is over the card (or
+    // a drag is in progress), so the empty canvas never blocks the page under
+    // it. Touch has no hover to test, so there it always takes the pointer.
+    const finePointer = window.matchMedia('(pointer: fine)').matches;
+    canvas.style.pointerEvents = finePointer ? 'none' : 'auto';
+    const onWindowPointerMove = (event: PointerEvent) => {
+      if (event.pointerType !== 'mouse' || sim.grab) return;
+      toPointer(event);
+      canvas.style.pointerEvents = pickCard() ? 'auto' : 'none';
+    };
+    if (finePointer) window.addEventListener('pointermove', onWindowPointerMove, { passive: true });
 
     canvas.addEventListener('pointerdown', onPointerDown);
     canvas.addEventListener('pointermove', onPointerMove);
@@ -1435,6 +1462,7 @@ const Lanyard = ({
       resizeObserver.disconnect();
       intersectionObserver.disconnect();
       document.removeEventListener('visibilitychange', onVisibility);
+      window.removeEventListener('pointermove', onWindowPointerMove);
       canvas.removeEventListener('pointerdown', onPointerDown);
       canvas.removeEventListener('pointermove', onPointerMove);
       canvas.removeEventListener('pointerup', onPointerUp);

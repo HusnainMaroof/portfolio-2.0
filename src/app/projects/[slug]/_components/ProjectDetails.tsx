@@ -96,7 +96,7 @@ const ProjectDetails = ({ project }: Props) => {
                 <TransitionLink
                     back
                     href="/"
-                    className="fixed top-6 left-6 z-[4] lg:left-[172px] inline-flex gap-2 items-center group h-12 px-3 rounded-[12px] bg-background/80 backdrop-blur-sm"
+                    className="fixed top-6 left-6 z-[4] inline-flex gap-2 items-center group h-12 px-3 rounded-[12px] bg-background/80 backdrop-blur-sm"
                 >
                     <ArrowLeft className="group-hover:-translate-x-1 group-hover:text-primary transition-all duration-300" />
                     Back

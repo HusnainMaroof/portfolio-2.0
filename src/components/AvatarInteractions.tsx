@@ -147,8 +147,8 @@ const viewportSize = (): Size => ({
     height: window.innerHeight,
 });
 
-/** Must match the mobile nav height in portfolio-sidebar and the body padding in layout. */
-const NAV_BAR_HEIGHT = 60;
+/** Height reserved for a bottom nav bar. None since the sidebar was removed. */
+const NAV_BAR_HEIGHT = 0;
 const NAV_BAR_BREAKPOINT = 1024;
 
 /** Home is the bottom-right corner of the viewport, clear of the centred navbar. */

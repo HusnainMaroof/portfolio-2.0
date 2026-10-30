@@ -52,7 +52,13 @@ const HeroCoffeeCard = () => {
     const ready = useDeferredMount();
 
     return (
-        <div className="pointer-events-none absolute left-0 top-0 z-10 hidden md:block lg:left-[172px]">
+        // The canvas is far wider than the card so a swing never runs off its
+        // edge (a narrow canvas clipped the strap and card mid-swing). Width
+        // only: the camera frames to the canvas height, so the card keeps its
+        // size. The strap hangs from the canvas centre, so each breakpoint
+        // shifts the box left by half its width to pin that centre: 96px from
+        // the left on md, 128px on lg, 160px on xl.
+        <div className="pointer-events-none absolute top-0 z-10 hidden md:block md:left-[-224px] lg:left-[-232px] xl:left-[-240px]">
             <a
                 href={HERO.coffee.href}
                 target="_blank"
@@ -61,7 +67,8 @@ const HeroCoffeeCard = () => {
             >
                 {HERO.coffee.label}
             </a>
-            <div data-avatar-dock-keepout="" className="pointer-events-auto h-[280px] w-[170px] lg:h-[330px] lg:w-[200px] xl:h-[380px] xl:w-[230px]">
+            {/* Lanyard switches the canvas itself on while the pointer is over the card. */}
+            <div data-avatar-dock-keepout="" className="pointer-events-none h-[280px] w-[640px] lg:h-[330px] lg:w-[720px] xl:h-[380px] xl:w-[800px]">
                 {ready && (
                     <Lanyard
                         frontImage="/coffee/front.svg"

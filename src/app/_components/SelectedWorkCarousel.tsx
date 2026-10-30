@@ -106,13 +106,17 @@ const ScreenshotCarousel = ({ images, title }: ScreenshotCarouselProps) => {
                         data-slide
                         className="group w-[82%] shrink-0 snap-start sm:w-[48%] lg:w-[31%]"
                     >
-                        <div className="relative aspect-[1000/873] w-full overflow-hidden rounded-xl">
+                        {/* One frame for every slide. Screenshots run from 1.1:1 to
+                            2.1:1, and object-contain shrank the wide ones into
+                            strips, so each fills the frame from the top, where a
+                            page's header and hero sit. */}
+                        <div className="relative aspect-[16/11] w-full overflow-hidden rounded-xl bg-background-light">
                                 <Image
                                     src={image}
                                     alt={`${title} screenshot ${index + 1}`}
                                     fill
                                     sizes={CARD_SIZES}
-                                    className="object-contain"
+                                    className="object-cover object-top"
                                 />
                                 <span className="absolute bottom-2 left-2 rounded-sm bg-background/85 px-1.5 py-0.5 text-[10px] tracking-[0.14em] text-muted-foreground">
                                     {formatSlideCounter(
