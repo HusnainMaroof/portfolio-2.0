@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-# orch: the agents/ entry point. Node 23.6+ runs the TypeScript directly; nothing to install.
-exec node "$(dirname "$0")/engine/src/cli.ts" "$@"
