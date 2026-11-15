@@ -45,7 +45,7 @@ export const HERO: HeroContent = {
         notice: 'Grinding toward that. The Top 5% badge is coming soon. 🚧',
     },
     stats: [
-        { value: '2.5+', label: 'Years', context: 'experience' },
+        { value: '3+', label: 'Years', context: 'experience' },
         { value: '22+', label: 'Apps Shipped', context: 'applications' },
     ],
     socials: [

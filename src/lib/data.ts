@@ -479,15 +479,71 @@ export const MY_EXPERIENCE = [
         title: 'Full Stack Developer (MERN Stack)',
         company: 'Freelance',
         duration: 'Nov 2025 - Present',
+        highlights: [
+            'Sole developer for Crispies (crispiesuk.com), a halal burger and chicken brand with 10+ London locations: design, frontend, backend, integrations and deployment.',
+            'Built click-and-collect ordering on a custom REST API, a store locator with live open/closed status and a Leaflet map, and an Instagram/TikTok feed.',
+            'Built the Rafin Solutions marketing site from reusable Next.js and Tailwind CSS components.',
+        ],
     },
     {
         title: 'Full Stack & Backend Developer',
         company: 'Paymit',
         duration: 'Jan 2025 - Nov 2025',
+        highlights: [
+            'Built Node.js REST APIs for transfer, quote and customer flows and cut response time on the core transfer endpoints.',
+            'Built the customer web app in React, TypeScript and Tailwind CSS with secure multi-step transfer flows on mobile, tablet and desktop.',
+        ],
     },
     {
         title: 'Frontend Engineer',
         company: 'TangoPay',
-        duration: 'Jul 2024 - Jan 2025',
+        duration: 'Dec 2023 - Jan 2025',
+        highlights: [
+            'Built and maintained product features for a fintech payments product in React, Next.js, TypeScript and Tailwind CSS.',
+            'Turned designs into responsive components and connected them to backend REST APIs.',
+        ],
+    },
+];
+
+export const OPEN_SOURCE = [
+    {
+        project: 'Cezar',
+        repo: 'open-mercato/cezar',
+        href: 'https://github.com/open-mercato/cezar/pulls?q=is%3Apr+author%3AHusnainMaroof',
+        status: '4 pull requests, 1 merged',
+        summary:
+            'Fixed a Graph tab crash on parallel outcome edges (merged), the Automations agent-time stats, and cancelled runs that stayed active.',
+    },
+    {
+        project: 'Paperclip',
+        repo: 'paperclipai/paperclip',
+        href: 'https://github.com/paperclipai/paperclip/pull/20633',
+        status: 'Pull request under review',
+        summary:
+            'Review stages could save agents that do not exist. The API now rejects them with a clear 422 error, with tests and docs.',
+    },
+    {
+        project: 'Quran.com',
+        repo: 'quran/quran.com-frontend-next',
+        href: 'https://github.com/quran/quran.com-frontend-next/pull/3366',
+        status: 'Pull requests under review',
+        summary:
+            'Fixed bugs in the official Next.js frontend, including the end-of-surah Continue Reading button that now wraps from An-Nas to Al-Fatiha.',
+    },
+    {
+        project: 'RepoSpine',
+        repo: 'HusnainMaroof/RepoSpine',
+        href: 'https://github.com/HusnainMaroof/RepoSpine',
+        status: 'Co-developer',
+        summary:
+            'Local-first codebase context engine for coding agents, with a CLI, MCP server, VS Code extension and SDK.',
+    },
+    {
+        project: 'Warden',
+        repo: 'warden.blog',
+        href: 'https://warden.blog',
+        status: 'Co-founder',
+        summary:
+            'Open source fail-closed sandbox for MCP servers, limited to allowed files, hosts and environment variables.',
     },
 ];

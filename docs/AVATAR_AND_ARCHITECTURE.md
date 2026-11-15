@@ -11,11 +11,11 @@ instance on the page.
 | State | Position |
 | --- | --- |
 | Initial load | Home: bottom-right corner, 16px from the viewport edges (112px desktop, 84px below 768px wide) |
-| After hovering a target | Beside the target (see rules below) |
-| After the pointer leaves | Stays at the last target |
-| Explicit reset (Escape, panel closed) | Returns to home |
+| After hovering a target | Stays at home; reacts with animation, caption and message |
+| After the pointer leaves | Stays at home |
+| Explicit reset (Escape, panel closed) | Clears the hover reaction; stays at home |
 
-### Where it moves to
+### What it reacts to
 
 Real page elements opt in with `data-avatar="<kind>"`:
 
@@ -29,21 +29,14 @@ Real page elements opt in with `data-avatar="<kind>"`:
 | `nav` | Section pills in `src/components/SectionPills.tsx` |
 | `contact` | Contact links in `StickyEmail.tsx` and `src/components/Footer.tsx` |
 
-Placement rule (`destinationFor`): the avatar tries four spots around the target's visible
-part, in this order: right, left, below, above. It takes the first one that fits inside the
-viewport, clamped to the viewport edges. It never overlaps the target.
+The reaction message is placed beside the docked avatar and avoids covering the hovered target.
 
 ### Movement rules
 
-- **Hover (mouse) or focus (keyboard) a target**: the avatar glides to that target over 0.9s
-  (`power3.inOut`). Re-hovering the same target does nothing.
-- **Pointer leaves a target**: nothing moves. The avatar stays at its last destination.
-- **Hover another target**: the same avatar glides to the new one.
-- **Scroll or resize while anchored to a target**: the avatar follows the target (0.25s).
-  If the target is off-screen, the avatar holds its last position, clamped inside the viewport.
-- **Resize while at home**: the avatar recalculates home for the new size.
-- **Escape** (with the panel closed): the explicit reset. The avatar returns home.
-- **Touch**: tapping a target moves the avatar to it. Tapping empty space does nothing.
+- **The avatar never leaves its dock** in the bottom-right corner. Hovering or focusing a target changes its animation and caption and shows a message beside it. It does not travel. Re-hovering the same target does nothing.
+- **Resize**: the avatar recalculates its bottom-right dock for the new size.
+- **Escape** (with the panel closed): clears the hover reaction. The avatar stays docked.
+- **Touch**: tapping a target shows the reaction message. Tapping empty space does nothing.
 - **Gaze**: the head and eyes follow the pointer, except under reduced-motion settings.
 
 ### Hover text

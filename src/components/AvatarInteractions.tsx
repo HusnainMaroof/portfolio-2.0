@@ -101,8 +101,6 @@ const SETTLE_SPEED = 2;
 const ARRIVE_GAP_MS = 60;
 const GREETING_DELAY_MS = 4000;
 const GREETING_HOLD_MS = 7000;
-/** Destinations closer than this are treated as unchanged: no new tween. */
-const RETARGET_PX = 24;
 const FADE_S = 0.28;
 const PANEL_S = 0.2;
 const OPEN_ANIMATION: AnimationName = 'happy';
@@ -715,10 +713,12 @@ const AvatarInteractions = () => {
                         : reaction.animation,
                 label: selfHoverRef.current ? null : reaction.label,
             }));
-            moveTo(plan.point, 'travel');
+            // Onee stays docked at the bottom corner. It reacts to the hovered
+            // target with its animation, caption and message, never by moving.
+            placeOverlays();
             scheduleMessage(trigger, visit, token);
         },
-        [moveTo, scheduleMessage],
+        [placeOverlays, scheduleMessage],
     );
 
     /** Explicit reset only (Escape). Leaving a target never calls this. */
@@ -760,22 +760,14 @@ const AvatarInteractions = () => {
                 avoid: plan.avoid,
                 choice: { side: plan.side, along: plan.along },
             };
-            const dest = destRef.current;
 
-            // Same destination: no new tween, only re-measure the overlays.
-            if (
-                Math.abs(plan.point.x - dest.x) < RETARGET_PX &&
-                Math.abs(plan.point.y - dest.y) < RETARGET_PX
-            ) {
-                placeOverlays();
-            } else {
-                moveTo(plan.point, 'follow');
-            }
+            // The avatar never leaves its dock, so only re-measure the overlays.
+            placeOverlays();
         } else {
             // Target scrolled out of view: head home instead of clinging to the edge.
             reset();
         }
-    }, [moveTo, placeOverlays, reset]);
+    }, [placeOverlays, reset]);
 
     const runAction = (action: QuickAction) => {
         setPanel(false);
@@ -981,13 +973,14 @@ const AvatarInteractions = () => {
         const onResize = () => {
             applySize();
 
+            // Always keep it in the bottom corner for the new viewport size.
+            homeRef.current = homeFor(avatarSize());
+            moveTo(homeRef.current, 'instant');
+
             if (activeRef.current) {
                 scheduleFollow();
             } else {
-                // Still at home: keep it in the corner for the new viewport size.
-                homeRef.current = homeFor(avatarSize());
                 layoutRef.current = { avoid: [], choice: null };
-                moveTo(homeRef.current, 'instant');
             }
         };
 

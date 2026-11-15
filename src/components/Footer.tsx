@@ -71,14 +71,6 @@ const Footer = () => {
                 className="page-container pb-8 md:pb-10 flex flex-col justify-center items-center text-center"
                 ref={containerRef}
             >
-                {/* nameplate pill, matches Banner's availability tag */}
-                <div className="slide-up-and-fade mb-10 flex items-center gap-2">
-                    <span className="size-2.5 rounded-full bg-primary" />
-                    <span className="text-sm font-medium text-muted-foreground">
-                        Available for new projects
-                    </span>
-                </div>
-
                 {/* headline, word-by-word reveal, same treatment as Banner's h1 */}
                 <a
                     href={`mailto:${GENERAL_INFO.email}`}

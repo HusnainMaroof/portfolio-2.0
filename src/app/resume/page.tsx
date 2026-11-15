@@ -1,5 +1,11 @@
 import type { Metadata } from 'next';
-import { GENERAL_INFO, MY_EXPERIENCE, MY_STACK, PROJECTS } from '@/lib/data';
+import {
+    GENERAL_INFO,
+    MY_EXPERIENCE,
+    MY_STACK,
+    OPEN_SOURCE,
+    PROJECTS,
+} from '@/lib/data';
 import { HERO } from '@/content/hero';
 import { getShortDescription } from '@/lib/projects';
 import PrintButton from './PrintButton';
@@ -91,6 +97,28 @@ const ResumePage = () => (
                         </div>
                         <p className="text-sm tabular-nums text-muted-foreground md:text-right print:text-neutral-600">
                             {role.duration}
+                        </p>
+                    </li>
+                ))}
+            </ul>
+        </section>
+
+        <section className="border-t border-border/50 py-10 print:border-neutral-300 print:py-5">
+            <SectionHeading>Open Source</SectionHeading>
+            <ul>
+                {OPEN_SOURCE.map((item) => (
+                    <li
+                        key={item.project}
+                        className="break-inside-avoid border-b border-border/30 py-4 last:border-b-0 print:border-neutral-200 print:py-2"
+                    >
+                        <p className="font-anton text-xl leading-tight md:text-2xl print:text-base">
+                            {item.project}{' '}
+                            <span className="font-roboto-flex text-sm font-normal text-muted-foreground print:text-neutral-600">
+                                {item.repo} · {item.status}
+                            </span>
+                        </p>
+                        <p className="text-sm text-muted-foreground print:text-neutral-600">
+                            {item.summary}
                         </p>
                     </li>
                 ))}

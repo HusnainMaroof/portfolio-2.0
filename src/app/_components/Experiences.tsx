@@ -1,6 +1,6 @@
 'use client';
 import SectionTitle from '@/components/SectionTitle';
-import { MY_EXPERIENCE } from '@/lib/data';
+import { MY_EXPERIENCE, OPEN_SOURCE } from '@/lib/data';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/all';
@@ -74,8 +74,49 @@ const Experiences = () => {
                             <p className="text-lg text-muted-foreground">
                                 {item.duration}
                             </p>
+                            <ul className="mt-4 max-w-3xl list-disc space-y-1.5 pl-5 text-base text-muted-foreground">
+                                {item.highlights.map((line) => (
+                                    <li key={line}>{line}</li>
+                                ))}
+                            </ul>
                         </div>
                     ))}
+
+                    <div
+                        className="experience-item"
+                        data-avatar="experience"
+                        data-avatar-label="Open Source"
+                        data-avatar-detail="Cezar, Paperclip, Quran.com"
+                    >
+                        <p className="text-xl text-muted-foreground">
+                            Contributions
+                        </p>
+                        <p className="text-3xl font-anton leading-none mt-3.5 mb-2.5 sm:text-4xl md:text-5xl">
+                            Open Source
+                        </p>
+                        <ul className="mt-4 grid max-w-3xl gap-4">
+                            {OPEN_SOURCE.map((item) => (
+                                <li key={item.project}>
+                                    <a
+                                        href={item.href}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="group block"
+                                    >
+                                        <p className="text-lg text-foreground group-hover:underline">
+                                            {item.project}{' '}
+                                            <span className="text-sm text-muted-foreground">
+                                                {item.repo} · {item.status}
+                                            </span>
+                                        </p>
+                                        <p className="text-base text-muted-foreground">
+                                            {item.summary}
+                                        </p>
+                                    </a>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
                 </div>
             </div>
         </section>
