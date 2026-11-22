@@ -2,6 +2,7 @@
 
 import {
     createContext,
+    useCallback,
     useContext,
     useEffect,
     useMemo,
@@ -9,41 +10,67 @@ import {
     type ReactNode,
 } from 'react';
 
-type Theme = 'dark' | 'light';
+export type Theme = 'dark' | 'light';
 
 type ThemeContextValue = {
     theme: Theme;
     toggleTheme: () => void;
-    setTheme: (theme: Theme) => void;
+    setTheme: (next: Theme) => void;
 };
 
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
+const STORAGE_KEY = 'theme';
+
+/** Writes the theme onto <html> at once (CSS variables key off data-theme). */
+const applyTheme = (next: Theme) => {
+    const root = document.documentElement;
+    root.setAttribute('data-theme', next);
+    root.style.colorScheme = next;
+};
+
+/**
+ * Runs in <head> before the first paint, so a visitor who chose the light
+ * theme never sees a dark frame first. Keep in sync with STORAGE_KEY.
+ */
+export const THEME_BOOT_SCRIPT = `try{var t=localStorage.getItem('${STORAGE_KEY}');if(t==='light'){var r=document.documentElement;r.setAttribute('data-theme','light');r.style.colorScheme='light'}}catch(e){}`;
+
 export function ThemeProvider({ children }: { children: ReactNode }) {
+    // Dark is the site's default; light is the visitor's choice, remembered.
     const [theme, setThemeState] = useState<Theme>('dark');
 
     useEffect(() => {
-        const savedTheme = window.localStorage.getItem('theme');
-        const initialTheme = savedTheme === 'light' ? 'light' : 'dark';
-        setThemeState(initialTheme);
-        document.documentElement.setAttribute('data-theme', initialTheme);
-        document.documentElement.style.colorScheme = initialTheme;
+        let saved: string | null = null;
+        try {
+            saved = window.localStorage.getItem(STORAGE_KEY);
+        } catch {
+            // Storage can be blocked (private mode); dark it is.
+        }
+        const initial: Theme = saved === 'light' ? 'light' : 'dark';
+        applyTheme(initial);
+        setThemeState(initial);
     }, []);
 
-    useEffect(() => {
-        document.documentElement.setAttribute('data-theme', theme);
-        document.documentElement.style.colorScheme = theme;
-        window.localStorage.setItem('theme', theme);
-    }, [theme]);
+    // The attribute is written synchronously here, not in an effect after the
+    // render: the theme switch animation snapshots the page right after this
+    // call, and needs the new colours already in place.
+    const setTheme = useCallback((next: Theme) => {
+        applyTheme(next);
+        try {
+            window.localStorage.setItem(STORAGE_KEY, next);
+        } catch {
+            // Not remembered, still applied.
+        }
+        setThemeState(next);
+    }, []);
 
     const value = useMemo(
         () => ({
             theme,
-            toggleTheme: () =>
-                setThemeState((prev) => (prev === 'dark' ? 'light' : 'dark')),
-            setTheme: setThemeState,
+            setTheme,
+            toggleTheme: () => setTheme(theme === 'dark' ? 'light' : 'dark'),
         }),
-        [theme],
+        [theme, setTheme],
     );
 
     return (

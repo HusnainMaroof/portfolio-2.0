@@ -8,9 +8,13 @@ import { cn } from '@/lib/utils';
 export const PILL_BASE =
     'inline-flex items-center justify-center gap-2 rounded-[12px] text-sm transition-colors duration-200 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-40';
 
-/** Resting pill: faint wash so it reads as a button outside the rail. */
+/**
+ * Resting pill: faint wash so it reads as a button outside the rail. The wash
+ * is the text colour at low strength, so it shows in both themes (a white
+ * wash disappeared on the light theme's white page).
+ */
 export const PILL_IDLE =
-    'bg-white/[0.04] text-muted-foreground hover:bg-white/[0.08] hover:text-foreground';
+    'bg-foreground/[0.05] text-muted-foreground hover:bg-foreground/[0.09] hover:text-foreground';
 
 /** Active or primary pill: the sidebar's selected state. */
 export const PILL_ACTIVE =

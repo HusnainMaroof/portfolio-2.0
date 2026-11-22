@@ -39,6 +39,9 @@ export interface LanyardProps {
   breeze?: number;
   interactive?: boolean;
   intro?: boolean;
+  /** Set up and draw, but hold the physics (and so the intro swing) until
+   *  this turns false. Lets the heavy setup happen out of sight. */
+  paused?: boolean;
   onCardClick?: () => void;
   className?: string;
   style?: CSSProperties;
@@ -65,6 +68,7 @@ interface Settings {
   breeze: number;
   interactive: boolean;
   intro: boolean;
+  paused: boolean;
   onCardClick?: () => void;
 }
 
@@ -856,6 +860,7 @@ const Lanyard = ({
   breeze = 0.5,
   interactive = true,
   intro = true,
+  paused = false,
   onCardClick,
   className = '',
   style
@@ -863,6 +868,7 @@ const Lanyard = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const settingsRef = useRef<Settings | null>(null);
   const applyRef = useRef<(() => void) | null>(null);
+  const startRef = useRef<(() => void) | null>(null);
 
   settingsRef.current = {
     frontImage,
@@ -885,12 +891,18 @@ const Lanyard = ({
     breeze,
     interactive,
     intro,
+    paused,
     onCardClick
   };
 
   useEffect(() => {
     applyRef.current?.();
   });
+
+  // Released: let the physics (and the intro swing) run.
+  useEffect(() => {
+    if (!paused) startRef.current?.();
+  }, [paused]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -1294,7 +1306,7 @@ const Lanyard = ({
     };
 
     const start = () => {
-      if (raf || !visible || !alive || !ready) return;
+      if (raf || !visible || !alive || !ready || settingsRef.current!.paused) return;
       sim.calm = 0;
       last = performance.now();
       raf = requestAnimationFrame(tick);
@@ -1443,6 +1455,7 @@ const Lanyard = ({
     document.addEventListener('visibilitychange', onVisibility);
 
     applyRef.current = apply;
+    startRef.current = start;
     resize();
 
     renderer
@@ -1459,6 +1472,7 @@ const Lanyard = ({
       alive = false;
       cancelAnimationFrame(raf);
       applyRef.current = null;
+      startRef.current = null;
       resizeObserver.disconnect();
       intersectionObserver.disconnect();
       document.removeEventListener('visibilitychange', onVisibility);

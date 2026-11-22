@@ -13,9 +13,13 @@ export default function Home() {
 
     return (
         <div className="page-">
-            <Banner />
-            {/* <Approach /> */}
-            {hasProjects && <SelectedWork />}
+            {/* Shared containing block: the hero sticks here while the project
+                panels slide up over it. */}
+            <div className="relative">
+                <Banner />
+                {/* <Approach /> */}
+                {hasProjects && <SelectedWork />}
+            </div>
             <Skills />
             <Experiences />
             {/* {hasTestimonials && hasProjects && <ClientProof />} */}

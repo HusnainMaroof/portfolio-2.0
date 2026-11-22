@@ -19,8 +19,12 @@ import {
     type AnimationName,
     type AvatarHandle,
 } from '@/Onee_avatar/onee.index';
+import { EASE, SPRING_UI } from '@/lib/motion';
+import { afterPreloader, afterPreloaderStage } from '@/lib/preloader';
+import { scrollToSection } from '@/lib/scroll';
 import {
     AVATAR_GREETINGS,
+    AVATAR_GREETINGS_TOUCH,
     AVATAR_HOME_ANIMATION,
     AVATAR_SELF_MESSAGES,
     PREFERRED_SIDES,
@@ -99,11 +103,24 @@ const SETTLE_PX = 0.15;
 const SETTLE_SPEED = 2;
 /** Beat of stillness after landing before a message appears. */
 const ARRIVE_GAP_MS = 60;
-const GREETING_DELAY_MS = 4000;
-const GREETING_HOLD_MS = 7000;
-const FADE_S = 0.28;
+/** Greeting: this long after the preloader lifts, so it never talks to a covered page. */
+const GREETING_DELAY_MS = 1600;
+const FADE_S = 0.3;
 const PANEL_S = 0.2;
 const OPEN_ANIMATION: AnimationName = 'happy';
+/**
+ * A line stays up long enough to read, then steps down on its own. Before,
+ * a line stayed until another target was hovered, so a bubble could sit over
+ * the page for as long as the visitor kept reading.
+ */
+const readingMs = (text: string) =>
+    Math.min(Math.max(2600 + text.length * 45, 3800), 8500);
+/** Hovering Onee itself again within this window keeps the current line. */
+const SELF_COOLDOWN_MS = 2500;
+/** No input for this long and Onee dozes off; any input wakes it. */
+const IDLE_MS = 45000;
+const DEEP_SLEEP_MS = 9000;
+const WAKE_MS = 1400;
 
 /** Quick-action targets must be real section IDs. Actions whose target is missing are omitted. */
 const QUICK_ACTIONS: readonly { label: string; targetId: string }[] = [
@@ -264,6 +281,8 @@ const AvatarInteractions = () => {
     const tokenRef = useRef(0);
     const splitRef = useRef<SplitText | null>(null);
     const messageTimerRef = useRef<number | null>(null);
+    const dismissTimerRef = useRef<number | null>(null);
+    const lastSelfLineAtRef = useRef(-Infinity);
     const messageActiveRef = useRef(false);
 
     const [reduced, setReduced] = useState(false);
@@ -299,6 +318,11 @@ const AvatarInteractions = () => {
             box.style.width = `${placed.width}px`;
             box.style.left = `${placed.left}px`;
             box.style.top = `${placed.top}px`;
+            // Grow out of the corner that faces Onee, like a speech bubble.
+            // Positions are relative to the avatar's own box (0..size).
+            const midX = placed.left + placed.width / 2;
+            const midY = placed.top + box.offsetHeight / 2;
+            box.style.transformOrigin = `${midX < size / 2 ? 'right' : 'left'} ${midY < size / 2 ? 'bottom' : 'top'}`;
         };
 
         place(messageRef.current, overlayWidth(MESSAGE_W));
@@ -414,12 +438,15 @@ const AvatarInteractions = () => {
 
         const shown =
             visible && messageActiveRef.current && !panelOpenRef.current;
+        const instant = reducedRef.current;
 
+        // In: grows from Onee's corner and settles. Out: quicker, easing in.
         gsap.to(box, {
             opacity: shown ? 1 : 0,
-            scale: shown ? 1 : 0.96,
-            duration: reducedRef.current ? 0 : FADE_S,
-            ease: 'power2.out',
+            scale: shown ? 1 : 0.92,
+            y: shown ? 0 : 6,
+            duration: instant ? 0 : shown ? FADE_S : FADE_S * 0.6,
+            ease: shown ? EASE.enter : EASE.exit,
             overwrite: true,
         });
     }, []);
@@ -488,7 +515,33 @@ const AvatarInteractions = () => {
             window.clearTimeout(messageTimerRef.current);
             messageTimerRef.current = null;
         }
+        if (dismissTimerRef.current !== null) {
+            window.clearTimeout(dismissTimerRef.current);
+            dismissTimerRef.current = null;
+        }
     }, []);
+
+    /**
+     * The line has been read: hide it and let Onee relax back to idle. The
+     * target is released too, so hovering it again later gets a fresh line
+     * instead of silence.
+     */
+    const settleDown = useCallback(
+        (token: number) => {
+            if (token !== tokenRef.current || panelOpenRef.current) return;
+
+            messageActiveRef.current = false;
+            activeRef.current = null;
+            restingRef.current = AVATAR_HOME_ANIMATION;
+            restingLabelRef.current = null;
+            setTyping(false);
+            showMessage(false);
+            if (!selfHoverRef.current) {
+                setView({ animation: AVATAR_HOME_ANIMATION, label: null });
+            }
+        },
+        [showMessage],
+    );
 
     /**
      * Shows `text` and reveals it. Only called from a dwell timer, so the
@@ -509,11 +562,21 @@ const AvatarInteractions = () => {
                     if (token !== tokenRef.current) return;
                     setTyping(false);
                     revealMessage();
+                    dismissTimerRef.current = window.setTimeout(() => {
+                        dismissTimerRef.current = null;
+                        settleDown(token);
+                    }, readingMs(text));
                 },
                 reducedRef.current ? 0 : TYPING_MS,
             );
         },
-        [clearMessageTimer, revealMessage, setMessageText, showMessage],
+        [
+            clearMessageTimer,
+            revealMessage,
+            setMessageText,
+            settleDown,
+            showMessage,
+        ],
     );
 
     /**
@@ -587,6 +650,12 @@ const AvatarInteractions = () => {
         if (selfHoverRef.current || panelOpenRef.current) return;
 
         selfHoverRef.current = true;
+        setView({ animation: 'playful', label: null });
+
+        // Sliding in and out of Onee quickly used to swap the line every time.
+        const now = performance.now();
+        if (now - lastSelfLineAtRef.current < SELF_COOLDOWN_MS) return;
+        lastSelfLineAtRef.current = now;
 
         const line = drawMessage(
             messageBagsRef.current,
@@ -596,7 +665,6 @@ const AvatarInteractions = () => {
 
         if (!line) return;
 
-        setView({ animation: 'playful', label: null });
         speak(line);
     }, [speak]);
 
@@ -777,19 +845,22 @@ const AvatarInteractions = () => {
             return;
         }
 
-        const el = document.getElementById(action.targetId ?? '');
+        // Same landing as the top nav: the section's top edge, so the
+        // projects stack opens exactly on its pinned screen.
+        if (action.targetId) scrollToSection(lenis, action.targetId);
+    };
 
-        if (!el) return;
+    /** Tactile press: a quick linear squeeze, then a spring back. */
+    const pressAvatar = (down: boolean) => {
+        const button = avatarBoxRef.current;
+        if (!button || reducedRef.current) return;
 
-        if (lenis) {
-            lenis.scrollTo(el, {
-                duration: 1.4,
-                // let the section title breathe below the top edge
-                offset: -24,
-            });
-        } else {
-            el.scrollIntoView({ behavior: 'smooth' });
-        }
+        gsap.to(button, {
+            scale: down ? 0.9 : 1,
+            duration: down ? 0.09 : SPRING_UI.duration,
+            ease: down ? 'none' : SPRING_UI.ease,
+            overwrite: 'auto',
+        });
     };
 
     // Overlay layout is recalculated whenever their contents change.
@@ -803,41 +874,170 @@ const AvatarInteractions = () => {
      * starts interacting with the avatar.
      */
     useEffect(() => {
-        let holdTimer: number | null = null;
+        let greetTimer: number | null = null;
 
-        const greetTimer = window.setTimeout(() => {
-            // Skip when the visitor is already busy with the avatar.
-            if (
-                activeRef.current ||
-                panelOpenRef.current ||
-                messageActiveRef.current
-            ) {
-                return;
-            }
+        const stopWaiting = afterPreloader(() => {
+            greetTimer = window.setTimeout(() => {
+                // Skip when the visitor is already busy with the avatar.
+                if (
+                    activeRef.current ||
+                    panelOpenRef.current ||
+                    messageActiveRef.current
+                ) {
+                    return;
+                }
 
-            const line =
-                AVATAR_GREETINGS[
-                    Math.floor(Math.random() * AVATAR_GREETINGS.length)
-                ];
+                // Phones and tablets have no hover: their lines say "tap".
+                const pool = window.matchMedia('(hover: none)').matches
+                    ? AVATAR_GREETINGS_TOUCH
+                    : AVATAR_GREETINGS;
+                const line = pool[Math.floor(Math.random() * pool.length)];
 
-            if (!line) return;
-
-            const token = speak(line);
-
-            holdTimer = window.setTimeout(() => {
-                if (token !== tokenRef.current) return;
-
-                messageActiveRef.current = false;
-                setTyping(false);
-                showMessage(false);
-            }, GREETING_HOLD_MS);
-        }, GREETING_DELAY_MS);
+                // Steps down on its own after a reading delay (see showText).
+                if (line) speak(line);
+            }, GREETING_DELAY_MS);
+        });
 
         return () => {
-            window.clearTimeout(greetTimer);
-            if (holdTimer !== null) window.clearTimeout(holdTimer);
+            stopWaiting();
+            if (greetTimer !== null) window.clearTimeout(greetTimer);
         };
-    }, [showMessage, speak]);
+    }, [speak]);
+
+    /**
+     * Entrance: Onee is hidden while the preloader covers the page, then
+     * springs up from its corner once the page is revealed (a quick spring
+     * with ~1% overshoot: felt, not seen). Opacity gets its own plain ease, as
+     * an overshooting curve would push it past 1.
+     */
+    useEffect(() => {
+        const button = avatarBoxRef.current;
+        if (!button) return;
+
+        let tweens: gsap.core.Tween[] = [];
+        // Starts as the curtain lifts; the bottom-right corner (the last
+        // strip) clears about a second in, so Onee pops up right as it does.
+        const stop = afterPreloaderStage('reveal', () => {
+            if (reducedRef.current) {
+                gsap.set(button, { autoAlpha: 1 });
+                return;
+            }
+            tweens = [
+                gsap.fromTo(
+                    button,
+                    { scale: 0.35, y: 26 },
+                    {
+                        scale: 1,
+                        y: 0,
+                        duration: SPRING_UI.duration * 1.6,
+                        ease: SPRING_UI.ease,
+                        delay: 1,
+                    },
+                ),
+                gsap.fromTo(
+                    button,
+                    { autoAlpha: 0 },
+                    {
+                        autoAlpha: 1,
+                        duration: 0.35,
+                        ease: 'power2.out',
+                        delay: 1,
+                    },
+                ),
+            ];
+        });
+
+        return () => {
+            stop();
+            tweens.forEach((tween) => tween.kill());
+        };
+    }, []);
+
+    /**
+     * Idle: after a long stretch with no input Onee gets drowsy, then falls
+     * asleep. Any pointer, key, touch or scroll wakes it, and it returns to
+     * whatever it was doing.
+     */
+    useEffect(() => {
+        let idleTimer: number | null = null;
+        let deepTimer: number | null = null;
+        let wakeTimer: number | null = null;
+        let asleep = false;
+        let lastArm = 0;
+
+        const clear = () => {
+            if (idleTimer !== null) window.clearTimeout(idleTimer);
+            if (deepTimer !== null) window.clearTimeout(deepTimer);
+            idleTimer = deepTimer = null;
+        };
+
+        const doze = () => {
+            if (
+                panelOpenRef.current ||
+                selfHoverRef.current ||
+                messageActiveRef.current
+            ) {
+                arm(true);
+                return;
+            }
+            asleep = true;
+            setView({ animation: 'drowsy', label: null });
+            deepTimer = window.setTimeout(
+                () => setView({ animation: 'sleeping', label: null }),
+                DEEP_SLEEP_MS,
+            );
+        };
+
+        const arm = (force = false) => {
+            const now = performance.now();
+            // pointermove fires constantly; re-arming once a second is plenty.
+            if (!force && now - lastArm < 1000) return;
+            lastArm = now;
+            clear();
+            idleTimer = window.setTimeout(doze, IDLE_MS);
+        };
+
+        const onActivity = () => {
+            if (asleep) {
+                asleep = false;
+                clear();
+                setView({ animation: 'waking', label: null });
+                if (wakeTimer !== null) window.clearTimeout(wakeTimer);
+                wakeTimer = window.setTimeout(() => {
+                    wakeTimer = null;
+                    if (panelOpenRef.current) return;
+                    setView({
+                        animation: restingRef.current,
+                        label: restingLabelRef.current,
+                    });
+                }, WAKE_MS);
+                arm(true);
+                return;
+            }
+            arm();
+        };
+
+        const events = [
+            'pointermove',
+            'pointerdown',
+            'keydown',
+            'wheel',
+            'touchstart',
+            'scroll',
+        ] as const;
+        events.forEach((name) =>
+            window.addEventListener(name, onActivity, { passive: true }),
+        );
+        arm(true);
+
+        return () => {
+            clear();
+            if (wakeTimer !== null) window.clearTimeout(wakeTimer);
+            events.forEach((name) =>
+                window.removeEventListener(name, onActivity),
+            );
+        };
+    }, []);
 
     useEffect(() => {
         const root = rootRef.current;
@@ -1058,11 +1258,19 @@ const AvatarInteractions = () => {
                 onPointerEnter={(event) => {
                     if (event.pointerType === 'mouse') onSelfHover();
                 }}
-                onPointerLeave={onSelfLeave}
-                className="pointer-events-auto absolute inset-0 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                onPointerLeave={() => {
+                    pressAvatar(false);
+                    onSelfLeave();
+                }}
+                onPointerDown={() => pressAvatar(true)}
+                onPointerUp={() => pressAvatar(false)}
+                onPointerCancel={() => pressAvatar(false)}
+                // Hidden until the entrance runs once the preloader lifts.
+                className="pointer-events-auto invisible absolute inset-0 origin-bottom rounded-full opacity-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
                 <Onee
                     ref={avatarRef}
+                    className="onee-avatar"
                     animation={view.animation}
                     playing={!reduced}
                     size="100%"

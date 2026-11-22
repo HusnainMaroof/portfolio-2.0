@@ -69,7 +69,7 @@ const INK = {
 } as const;
 const HEAT = {
     dark: [0.0, 0.941, 0.314], // #00F050
-    light: [0.0, 0.55, 0.22],
+    light: [0.055, 0.506, 0.278], // #0E8147, the light theme's green
 } as const;
 
 const vertexShader = /* glsl */ `
@@ -84,11 +84,17 @@ uniform float uSpread;
 uniform float uPoint;
 uniform float uDpr;
 uniform float uDotOpacity;
+uniform float uInvert;
 varying float vAlpha;
 varying float vHeat;
 
 void main() {
     vec2 p0 = position.xy;
+
+    // Light dots on a dark page grow with brightness (they draw the light).
+    // Dark dots on a light page must grow with darkness instead, like ink on
+    // paper; growing with brightness printed the face as a photo negative.
+    float tone = mix(aBright, 1.0 - aBright, uInvert);
 
     // Scroll fade: the points stay where they are and sink into the dark,
     // bottom rows a little ahead of the top, with a per-dot jitter so the
@@ -105,12 +111,12 @@ void main() {
 
     vec2 world = uCenter + p * uSize;
     gl_Position = projectionMatrix * modelViewMatrix * vec4(world, 0.0, 1.0);
-    gl_PointSize = uPoint * mix(${DOT_SIZE_MIN.toFixed(2)}, ${DOT_SIZE_MAX.toFixed(2)}, aBright) * uDpr;
+    gl_PointSize = uPoint * mix(${DOT_SIZE_MIN.toFixed(2)}, ${DOT_SIZE_MAX.toFixed(2)}, tone) * uDpr;
 
     // Mirror the CSS bottom fade on the static image.
     float fromTop = 0.5 - p0.y;
     float mask = 1.0 - smoothstep(0.55, 0.92, fromTop);
-    vAlpha = aBright * mask * uDotOpacity * (1.0 - t);
+    vAlpha = tone * mask * uDotOpacity * (1.0 - t);
     // A faint glow on the dots that are on their way out.
     vHeat = t * (1.0 - t) * 2.0;
 }`;
@@ -195,6 +201,7 @@ const ParticlePortrait = ({ sectionRef, portraitRef, nameRef, imageLayerRef, the
         if (!u) return;
         (u.uInk.value as THREE_NS.Vector3).fromArray(INK[theme]);
         (u.uHeat.value as THREE_NS.Vector3).fromArray(HEAT[theme]);
+        u.uInvert.value = theme === 'light' ? 1 : 0;
     }, [theme]);
 
     useEffect(() => {
@@ -257,6 +264,7 @@ const ParticlePortrait = ({ sectionRef, portraitRef, nameRef, imageLayerRef, the
                     uDpr: { value: renderer.getPixelRatio() },
                     uIntro: { value: 0 },
                     uDotOpacity: { value: DOT_OPACITY },
+                    uInvert: { value: themeRef.current === 'light' ? 1 : 0 },
                     // Vector3, not Color: raw sRGB values, no colour-management conversion.
                     uInk: { value: new THREE.Vector3().fromArray(INK[themeRef.current]) },
                     uHeat: { value: new THREE.Vector3().fromArray(HEAT[themeRef.current]) },
@@ -311,7 +319,12 @@ const ParticlePortrait = ({ sectionRef, portraitRef, nameRef, imageLayerRef, the
                     const n = nameRef.current?.getBoundingClientRect();
                     if (!p.width || !p.height) return;
 
-                    target = clamp01(-s.top / (s.height * DISSOLVE_DISTANCE));
+                    // Window scroll, not the section's own offset: the hero is
+                    // sticky on desktop, so its top never leaves 0 while the
+                    // project panels slide over it.
+                    target = clamp01(
+                        window.scrollY / (s.height * DISSOLVE_DISTANCE),
+                    );
                     // Portrait position relative to the section (canvas space, y up).
                     const pcx = p.left + p.width / 2 - s.left;
                     const pcy = p.top + p.height / 2 - s.top;

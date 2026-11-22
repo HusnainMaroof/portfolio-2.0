@@ -141,6 +141,13 @@ export interface ExpandTabsProps extends Omit<
    *  times, and the selected tile is filled like a hovered one (no swap, no
    *  badge dot needed). */
   showLabels?: boolean;
+  /** Local addition: the selected tile stays open on its label while no
+   *  other tile is hovered, so the bar always says where you are. Hovering
+   *  another tile hands the open state to it, so only one is ever open. */
+  expandSelected?: boolean;
+  /** Local addition: resting tile side in px (default 56). Phones pass a
+   *  smaller tile so the theme toggle fits in the same row. */
+  tile?: number;
 }
 
 function Tab({
@@ -156,8 +163,10 @@ function Tab({
   onClose,
   onActivate,
   showLabels,
+  tile,
 }: {
   showLabels?: boolean;
+  tile: number;
   item: ExpandTabsItem;
   open: boolean;
   selected: boolean;
@@ -219,12 +228,12 @@ function Tab({
           width: showLabels
             ? labelWidth + PAD * 2
             : open
-              ? Math.max(TILE, labelWidth + PAD * 2)
-              : TILE,
+              ? Math.max(tile, labelWidth + PAD * 2)
+              : tile,
         }}
         transition={box}
         style={{
-          height: TILE,
+          height: tile,
           ...(hasDot && {
             maskImage: mask,
             WebkitMaskImage: mask,
@@ -364,6 +373,8 @@ export const ExpandTabs = React.forwardRef<HTMLElement, ExpandTabsProps>(
       defaultValue = null,
       onValueChange,
       showLabels = false,
+      expandSelected = false,
+      tile = TILE,
       ...props
     },
     ref,
@@ -394,7 +405,10 @@ export const ExpandTabs = React.forwardRef<HTMLElement, ExpandTabsProps>(
             <Tab
               key={item.href ?? item.label}
               item={item}
-              open={hovered === i}
+              open={
+                hovered === i ||
+                (expandSelected && hovered === null && selected === i)
+              }
               selected={selected === i}
               dot={dotAt === i}
               hasDot={dotAt !== -1}
@@ -402,6 +416,7 @@ export const ExpandTabs = React.forwardRef<HTMLElement, ExpandTabsProps>(
               color={color}
               classNames={classNames}
               showLabels={showLabels}
+              tile={tile}
               onOpen={() => setHovered(i)}
               onClose={() => setHovered((h) => (h === i ? null : h))}
               onActivate={() => {

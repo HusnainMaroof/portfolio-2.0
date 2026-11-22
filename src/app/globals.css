@@ -69,8 +69,12 @@
         --popover: 0 0% 100%;
         --popover-foreground: 220 15% 15%;
 
-        --primary: 140 100% 47%;
-        --primary-foreground: 0 0% 13%;
+        /* The dark theme's neon green (#00F050) glows on black but is harsh
+           and hard to read on white (about 1.6:1 as text). Light mode uses a
+           deep emerald (#0E8147): 4.9:1 on white, so it works as text, and
+           it carries white text on filled buttons and tiles. */
+        --primary: 150 80% 28%;
+        --primary-foreground: 0 0% 100%;
         --secondary: 193 100% 47%;
         --secondary-foreground: 0 0% 13%;
         --muted: 0 0% 95%;
@@ -81,7 +85,7 @@
         --destructive-foreground: 0 0% 98%;
         --border: 220 10% 88%;
         --input: 220 10% 90%;
-        --ring: 140 100% 47%;
+        --ring: 150 80% 28%;
     }
 }
 
@@ -201,10 +205,9 @@ html[data-theme='light'] .hero-grid {
         transparent 1px
     );
 }
-/* Light dots vanish on white, so the halftone flips to dark dots. */
-html[data-theme='light'] .hero-portrait {
-    filter: invert(1);
-}
+/* Light theme: the photo is shown as it is (a black and white portrait reads
+   naturally on white) and the halftone draws dark dots on the dark areas.
+   Inverting it, as before, turned the face into a photo negative. */
 
 /* Portrait hover: a faint green glow through the dots, no movement. */
 .hero-portrait {
@@ -214,12 +217,183 @@ html[data-theme='light'] .hero-portrait {
     filter: brightness(1.12) drop-shadow(0 0 18px rgba(0, 240, 80, 0.22));
 }
 html[data-theme='light'] .group:hover .hero-portrait {
-    filter: invert(1) drop-shadow(0 0 18px rgba(0, 160, 60, 0.25));
+    filter: contrast(1.04) drop-shadow(0 0 18px rgba(14, 129, 71, 0.22));
 }
 @media (prefers-reduced-motion: reduce) {
     .hero-portrait {
         transition: none;
     }
+}
+
+/* ---------------------------------------------------------------------------
+   Hero + Projects stack.
+   Default (reduced motion, or a screen too short to hold a pinned header and a
+   project, e.g. a phone on its side): plain flow, projects one after another.
+   Stacked mode: the hero sticks, the Projects header pins, and each project is
+   a full-height panel that slides up over the previous one.
+   KEEP IN SYNC with STACK_QUERY in src/lib/stack.ts.
+   ------------------------------------------------------------------------- */
+.work-panel {
+    padding-block: 2.5rem;
+}
+.work-counter,
+.work-progress {
+    display: none;
+}
+
+@media (prefers-reduced-motion: no-preference) and (min-height: 500px) {
+    /* --hero-stick-top is negative when the hero is taller than the screen, so
+       it scrolls until its bottom edge is visible and only then sticks. */
+    .hero-stick {
+        position: sticky;
+        top: var(--hero-stick-top, 0px);
+    }
+
+    /* Rounded leading edge and a soft shadow while it slides over the hero. */
+    .work-stack {
+        height: var(--stack-h);
+        border-radius: 24px 24px 0 0;
+        box-shadow: 0 -28px 70px rgba(0, 0, 0, 0.55);
+    }
+
+    .work-counter {
+        display: block;
+    }
+
+    .work-progress {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        display: block;
+        height: 2px;
+        overflow: hidden;
+        border-radius: 999px;
+        background-color: hsl(var(--foreground) / 0.08);
+    }
+
+    .work-progress > span {
+        display: block;
+        height: 100%;
+        background-color: hsl(var(--primary));
+        transform: scaleX(0);
+        transform-origin: left center;
+    }
+
+    .work-stage {
+        position: sticky;
+        top: 0;
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        height: 100svh;
+        overflow: hidden;
+    }
+
+    /* Rounded bottom edge: the stack reads as one sheet, and leaves the
+       screen with soft corners instead of a hard line into the next section. */
+    .work-panels {
+        position: relative;
+        flex: 1 1 0%;
+        min-height: 0;
+        overflow: hidden;
+        border-radius: 0 0 22px 22px;
+    }
+
+    .work-panel {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        /* Room for the fixed corner UI (avatar, socials) on small screens. */
+        padding-block: 1.25rem 4.5rem;
+        border-top: 1px solid hsl(var(--border) / 0.4);
+        border-radius: 22px 22px 0 0;
+        background-color: hsl(var(--background-light));
+        box-shadow: 0 -18px 44px rgba(0, 0, 0, 0.35);
+        will-change: transform;
+    }
+
+    @media (min-width: 768px) {
+        .work-panel {
+            padding-block: 1.75rem;
+            border-radius: 32px 32px 0 0;
+            box-shadow: 0 -24px 60px rgba(0, 0, 0, 0.35);
+        }
+
+        .work-stack {
+            border-radius: 32px 32px 0 0;
+        }
+
+        .work-panels {
+            border-radius: 0 0 32px 32px;
+        }
+    }
+
+    /* Phones: the pinned header stays one line tall to leave the screen to
+       the project. */
+    @media (max-width: 767px) {
+        .work-intro {
+            display: none;
+        }
+    }
+}
+
+html[data-theme='light'] .work-panel {
+    box-shadow: 0 -18px 44px rgba(0, 0, 0, 0.08);
+}
+
+/* The dark shadow under the stack's leading edge showed as a grey haze along
+   the bottom of the white hero. */
+html[data-theme='light'] .work-stack {
+    box-shadow: 0 -12px 36px rgba(0, 0, 0, 0.07);
+}
+
+/* Onee is a pale lavender: on white it needs a soft shadow to keep its shape,
+   and its bubbles a lighter one than on black. */
+html[data-theme='light'] .onee-avatar {
+    filter: drop-shadow(0 6px 14px rgba(20, 24, 40, 0.18));
+}
+
+html[data-theme='light'] [data-avatar-message],
+html[data-theme='light'] #avatar-assistant-panel {
+    box-shadow: 0 12px 32px -12px rgba(20, 24, 40, 0.22);
+}
+
+/* Star rating: the chosen star pops and settles. */
+@keyframes star-pop {
+    0% {
+        transform: scale(1);
+    }
+    35% {
+        transform: scale(1.35) rotate(-8deg);
+    }
+    100% {
+        transform: scale(1) rotate(0);
+    }
+}
+.animate-star-pop {
+    animation: star-pop 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+    .animate-star-pop {
+        animation: none;
+    }
+}
+
+/* ---------------------------------------------------------------------------
+   Theme switch: the new theme is revealed as a circle growing out of the
+   toggle (ThemeToggle drives the clip-path). The browser's default
+   cross-fade is turned off so only the circle moves.
+   ------------------------------------------------------------------------- */
+::view-transition-old(root),
+::view-transition-new(root) {
+    animation: none;
+    mix-blend-mode: normal;
+}
+
+::view-transition-new(root) {
+    z-index: 2;
 }
 
 /* Printing (the resume's "Save as PDF"): white paper, page content only. The

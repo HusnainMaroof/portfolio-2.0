@@ -16,7 +16,8 @@ export type AvatarTriggerKind =
     | 'nav'
     | 'contact'
     | 'social'
-    | 'action';
+    | 'action'
+    | 'theme';
 
 interface AvatarReaction {
     /** Animation names verified against the exported AnimationName type. */
@@ -37,6 +38,7 @@ export const AVATAR_REACTIONS: Record<AvatarTriggerKind, AvatarReaction> = {
     contact: { animations: ['happy'] },
     social: { animations: ['playful'] },
     action: { animations: ['surprised'] },
+    theme: { animations: ['curious', 'playful'] },
 };
 
 /**
@@ -55,6 +57,7 @@ export const PREFERRED_SIDES: Record<AvatarTriggerKind, readonly Side[]> = {
     contact: ['right', 'left', 'above', 'below'],
     social: ['right', 'left', 'below', 'above'],
     action: ['right', 'below', 'above', 'left'],
+    theme: ['left', 'below', 'above', 'right'],
 };
 
 /**
@@ -136,6 +139,12 @@ export const AVATAR_MESSAGES: Record<AvatarTriggerKind, readonly string[]> = {
         'The link is the rest of the story.',
         "Don't take my word for it. Click through.",
     ],
+    theme: [
+        'One click, a whole new mood.',
+        'Light or dark, I look good in both.',
+        'Go on, flip it. Watch the light spill out.',
+        'Switching sides? I fully support it.',
+    ],
 };
 
 /**
@@ -148,6 +157,15 @@ export const AVATAR_GREETINGS: readonly string[] = [
     'Welcome in. Hover on me and see what happens.',
     'Psst... hover on me. I do not bite.',
     'Fresh page, same me. Give me a hover for a good time.',
+];
+
+/** The same greetings for touch screens, where there is nothing to hover. */
+export const AVATAR_GREETINGS_TOUCH: readonly string[] = [
+    'Hi! I am Onee. Tap around and I will narrate everything.',
+    'Say hi to Onee 👋',
+    'Welcome in. Tap me for shortcuts.',
+    'Psst... tap me. I do not bite.',
+    'Fresh page, same me. Tap me for a good time.',
 ];
 
 /**

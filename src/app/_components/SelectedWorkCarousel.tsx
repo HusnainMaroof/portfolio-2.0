@@ -1,7 +1,13 @@
 'use client';
 
 import Image from 'next/image';
-import { useCallback, useEffect, useRef, useState, type KeyboardEvent } from 'react';
+import {
+    useCallback,
+    useEffect,
+    useRef,
+    useState,
+    type KeyboardEvent,
+} from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import TransitionLink from '@/components/TransitionLink';
 import { IProject } from '@/types';
@@ -241,21 +247,3 @@ export const ProjectShowcase = ({ project, index }: ProjectShowcaseProps) => {
         </article>
     );
 };
-
-interface Props {
-    projects: IProject[];
-}
-
-const SelectedWorkCarousel = ({ projects }: Props) => (
-    <div className="space-y-20 md:space-y-28">
-        {projects.map((project, index) => (
-            <ProjectShowcase
-                key={project.slug}
-                project={project}
-                index={index}
-            />
-        ))}
-    </div>
-);
-
-export default SelectedWorkCarousel;

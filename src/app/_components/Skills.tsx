@@ -1,58 +1,27 @@
 'use client';
 import SectionTitle from '@/components/SectionTitle';
 import { MY_STACK } from '@/lib/data';
+import { revealOnEnter } from '@/lib/motion';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/all';
 import Image from 'next/image';
 import React, { useRef } from 'react';
 
-gsap.registerPlugin(ScrollTrigger, useGSAP);
+gsap.registerPlugin(useGSAP);
 
 const Skills = () => {
     const containerRef = useRef<HTMLDivElement>(null);
 
+    // Each row and tag rises in once as it enters, and then stays put. The
+    // old version scrubbed opacity against the whole section's scroll, so
+    // tags in the middle of the screen sat half-faded, and the section faded
+    // out while its last rows were still being read.
     useGSAP(
         () => {
-            const slideUpEl =
-                containerRef.current?.querySelectorAll('.slide-up');
+            const root = containerRef.current;
+            if (!root) return;
 
-            if (!slideUpEl?.length) return;
-
-            const tl = gsap.timeline({
-                scrollTrigger: {
-                    trigger: containerRef.current,
-                    start: 'top 80%',
-                    end: 'bottom 80%',
-                    scrub: 0.5,
-                },
-            });
-
-            tl.from('.slide-up', {
-                opacity: 0,
-                y: 40,
-                ease: 'none',
-                stagger: 0.4,
-            });
-        },
-        { scope: containerRef },
-    );
-
-    useGSAP(
-        () => {
-            const tl = gsap.timeline({
-                scrollTrigger: {
-                    trigger: containerRef.current,
-                    start: 'bottom 50%',
-                    end: 'bottom 10%',
-                    scrub: 1,
-                },
-            });
-
-            tl.to(containerRef.current, {
-                y: -150,
-                opacity: 0,
-            });
+            revealOnEnter(gsap.utils.toArray<HTMLElement>('.slide-up', root));
         },
         { scope: containerRef },
     );

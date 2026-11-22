@@ -24,6 +24,7 @@ const Preloader = () => {
         preloaderRef.current?.classList.add('pointer-events-none');
         // Lets things that wait for the reveal (the hero coffee card) start
         // the moment the page is uncovered, and late mounts read the flag.
+        document.documentElement.dataset.preloaderStage = 'done';
         document.documentElement.dataset.preloaded = 'true';
         window.dispatchEvent(new Event('preloader:done'));
     };
@@ -48,11 +49,20 @@ const Preloader = () => {
                 onComplete: unlock,
             });
 
+            // Earlier moments for the page to hook into (lib/preloader.ts):
+            // `hold` while the curtain is still closed, `reveal` as it lifts.
+            // Waiting for the very end made the coffee card, the counters and
+            // Onee show up well after the hero was already on screen.
+            const signal = (stage: 'hold' | 'reveal') => {
+                document.documentElement.dataset.preloaderStage = stage;
+                window.dispatchEvent(new Event(`preloader:${stage}`));
+            };
+
             tl.to('.name-text span', {
                 y: 0,
                 stagger: 0.05,
                 duration: 0.2,
-            });
+            }).call(() => signal('hold'));
 
             tl.to('.preloader-item', {
                 delay: 1,
@@ -60,6 +70,8 @@ const Preloader = () => {
                 duration: 0.5,
                 stagger: 0.1,
             })
+                // Same moment the first strip starts to slide away.
+                .call(() => signal('reveal'), undefined, '<')
                 .to('.name-text span', { autoAlpha: 0 }, '<0.5')
                 .to(
                     preloaderRef.current,
@@ -93,7 +105,9 @@ const Preloader = () => {
             <div className="preloader-item h-full w-[10%] bg-black"></div>
             <div className="preloader-item h-full w-[10%] bg-black"></div>
 
-            <p className="name-text flex whitespace-nowrap text-[clamp(2rem,8vw,110px)] font-name text-center absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 leading-none overflow-hidden">
+            {/* Always light: the curtain is black in both themes, and the
+                inherited text colour is dark in the light theme. */}
+            <p className="name-text flex whitespace-nowrap text-[clamp(2rem,8vw,110px)] font-name text-center text-[#f2efe8] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 leading-none overflow-hidden">
                 <span className="inline-block translate-y-full">H</span>
                 <span className="inline-block translate-y-full">U</span>
                 <span className="inline-block translate-y-full">S</span>

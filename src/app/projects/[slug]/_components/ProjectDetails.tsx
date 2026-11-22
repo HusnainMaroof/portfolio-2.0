@@ -2,6 +2,7 @@
 import parse from 'html-react-parser';
 import ArrowAnimation from '@/components/ArrowAnimation';
 import TransitionLink from '@/components/TransitionLink';
+import { DUR, EASE } from '@/lib/motion';
 import { IProject } from '@/types';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
@@ -34,30 +35,39 @@ const ProjectDetails = ({ project }: Props) => {
             tl.to('.fade-in-later', {
                 autoAlpha: 1,
                 y: 0,
-                stagger: 0.1,
+                duration: DUR.slow,
+                ease: EASE.enter,
+                stagger: 0.08,
             });
         },
         { scope: containerRef },
     );
 
-    // blur info div and make it smaller on scroll
+    // The details pin while the screenshots slide up over them, then sink
+    // back. They used to start fading (and blurring) the moment they pinned,
+    // so the last lines dimmed while still being read. Now the first 40% of
+    // the overlap keeps them fully readable, and there is no blur: a full-
+    // screen blur filter is expensive to repaint on every scroll frame.
     useGSAP(
         () => {
             if (window.innerWidth < 992) return;
 
-            gsap.to('#info', {
-                filter: 'blur(3px)',
-                autoAlpha: 0,
-                scale: 0.9,
-                // position: 'sticky',
+            const tl = gsap.timeline({
                 scrollTrigger: {
                     trigger: '#info',
                     start: 'bottom bottom',
                     end: 'bottom top',
                     pin: true,
                     pinSpacing: false,
-                    scrub: 0.5,
+                    scrub: true,
                 },
+            });
+
+            tl.to({}, { duration: 0.4 }).to('#info', {
+                opacity: 0.12,
+                scale: 0.94,
+                duration: 0.6,
+                ease: 'none',
             });
         },
         { scope: containerRef },
@@ -93,13 +103,18 @@ const ProjectDetails = ({ project }: Props) => {
     return (
         <section className="pt-24 pb-14">
             <div className="max-w-[80%] mx-auto" ref={containerRef}>
+                {/* Same height, radius and surface as the nav tiles, on the
+                    same top line, above the nav's scroll fade. */}
                 <TransitionLink
                     back
                     href="/"
-                    className="fixed top-6 left-6 z-[4] inline-flex gap-2 items-center group h-12 px-3 rounded-[12px] bg-background/80 backdrop-blur-sm"
+                    className="fixed left-4 top-4 z-[51] inline-flex h-14 items-center gap-2 rounded-[10px] bg-[color-mix(in_oklab,hsl(var(--foreground))_8%,hsl(var(--background)))] px-4 text-sm backdrop-blur-md transition-colors duration-200 group hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring md:left-6"
                 >
-                    <ArrowLeft className="group-hover:-translate-x-1 group-hover:text-primary transition-all duration-300" />
-                    Back
+                    <ArrowLeft
+                        size={18}
+                        className="transition-transform duration-300 group-hover:-translate-x-1 motion-reduce:transition-none"
+                    />
+                    <span className="max-sm:sr-only">Back</span>
                 </TransitionLink>
 
                 <div
@@ -202,7 +217,7 @@ const ProjectDetails = ({ project }: Props) => {
                                 href={image}
                                 target="_blank"
                                 aria-label={`Open ${project.title} screenshot ${index + 1} full size`}
-                                className="absolute top-4 right-4 z-[1] bg-background/70 text-foreground size-12 inline-flex justify-center items-center transition-all opacity-0 hover:bg-primary hover:text-primary-foreground group-hover:opacity-100"
+                                className="absolute top-4 right-4 z-[1] bg-background/70 text-foreground size-12 inline-flex justify-center items-center rounded-[10px] transition-all opacity-0 hover:bg-primary hover:text-primary-foreground group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring max-md:opacity-100"
                             >
                                 <ExternalLink />
                             </a>

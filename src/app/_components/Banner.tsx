@@ -10,9 +10,11 @@ import {
     useTransform,
     type Variants,
 } from 'framer-motion';
+import gsap from 'gsap';
 import { ArrowUpRight } from 'lucide-react';
-import TransitionLink from '@/components/TransitionLink';
 import { HERO } from '@/content/hero';
+import { EASE, MOTION_OK } from '@/lib/motion';
+import { afterPreloaderStage } from '@/lib/preloader';
 import BoldHoverText from '@/components/HoverText';
 import { useTheme } from '@/components/ThemeProvider';
 import HeroCoffeeCard from './HeroCoffeeCard';
@@ -93,20 +95,52 @@ const Credibility = () => {
     );
 };
 
-/** One link in the bottom-left corner to the socials page (LinkedIn, GitHub, resume). */
-const Socials = ({ className }: { className: string }) => (
-    <motion.div variants={item} className={className}>
-        <TransitionLink
-            href="/socials"
-            data-avatar="social"
-            data-avatar-label="Socials"
-            className={`inline-flex items-center gap-2 text-sm font-medium uppercase tracking-[0.16em] text-primary underline-offset-4 transition-colors hover:text-foreground hover:underline ${focusRing}`}
-        >
-            Socials
-            <ArrowUpRight size={14} strokeWidth={1.75} aria-hidden />
-        </TransitionLink>
-    </motion.div>
-);
+/**
+ * A stat that counts up from zero when the page is revealed, e.g. "22+".
+ * The server renders the final value (crawlers and no-JS see it); the count
+ * only plays with motion allowed. Tabular digits keep the width steady.
+ */
+const CountUp = ({ value }: { value: string }) => {
+    const ref = useRef<HTMLElement>(null);
+
+    useEffect(() => {
+        const el = ref.current;
+        const match = /^(\d+)(.*)$/.exec(value);
+        if (!el || !match || !window.matchMedia(MOTION_OK).matches) return;
+
+        const target = Number(match[1]);
+        const suffix = match[2];
+        const counter = { n: 0 };
+        let tween: gsap.core.Tween | null = null;
+
+        el.textContent = `0${suffix}`;
+        // Counts while the curtain lifts. The stats sit at the right edge,
+        // which the curtain's last strips uncover about 0.6s in.
+        const stop = afterPreloaderStage('reveal', () => {
+            tween = gsap.to(counter, {
+                n: target,
+                duration: 1.1,
+                delay: 0.6,
+                ease: EASE.punch,
+                onUpdate: () => {
+                    el.textContent = `${Math.round(counter.n)}${suffix}`;
+                },
+            });
+        });
+
+        return () => {
+            stop();
+            tween?.kill();
+            el.textContent = value;
+        };
+    }, [value]);
+
+    return (
+        <span ref={ref} className="tabular-nums">
+            {value}
+        </span>
+    );
+};
 
 const Stats = ({ className }: { className: string }) => (
     <motion.div variants={item} className={className}>
@@ -126,7 +160,7 @@ const Stats = ({ className }: { className: string }) => (
                         {stat.label}
                     </dt>
                     <dd className="text-2xl font-semibold leading-tight text-foreground md:text-3xl">
-                        {stat.value}
+                        <CountUp value={stat.value} />
                     </dd>
                 </div>
             ))}
@@ -137,7 +171,8 @@ const Stats = ({ className }: { className: string }) => (
 const Banner = () => {
     const { theme } = useTheme();
     const nameColor = theme === 'light' ? '#111111' : '#f2efe8';
-    const nameHover = theme === 'light' ? '#111111' : '#00F050';
+    // Hovered letters take the theme's green: neon on black, emerald on white.
+    const nameHover = theme === 'light' ? '#0E8147' : '#00F050';
     const nameProps = {
         fontFamily: 'var(--font-display), Georgia, serif',
         // Instrument Serif ships only 400, so hover changes colour, not weight.
@@ -156,10 +191,39 @@ const Banner = () => {
     // while the name slides up over it, and sinks into the dark over the first
     // half of the hero. The particle layer fades its dots over the same range.
     const reduceMotion = useReducedMotion();
-    const { scrollYProgress } = useScroll({
-        target: sectionRef,
-        offset: ['start start', 'end start'],
+    // Window scroll, not the section's own offset: the hero is sticky on
+    // desktop (project panels slide over it), so it never scrolls out itself.
+    const { scrollY } = useScroll();
+    const scrollYProgress = useTransform(scrollY, (v) => {
+        const height = sectionRef.current?.offsetHeight || 1;
+        return Math.min(Math.max(v / height, 0), 1);
     });
+    // Sticky offset for `.hero-stick`: when the hero is taller than the screen
+    // (phones, short laptops) it sticks with its bottom edge on screen instead
+    // of hiding the bottom under the projects.
+    useEffect(() => {
+        const section = sectionRef.current;
+        if (!section) return;
+
+        const update = () => {
+            const overflow = section.offsetHeight - window.innerHeight;
+            section.style.setProperty(
+                '--hero-stick-top',
+                `${Math.min(0, -overflow)}px`,
+            );
+        };
+
+        update();
+        const observer = new ResizeObserver(update);
+        observer.observe(section);
+        window.addEventListener('resize', update);
+
+        return () => {
+            observer.disconnect();
+            window.removeEventListener('resize', update);
+        };
+    }, []);
+
     const portraitFade = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
     const portraitLag = useTransform(scrollYProgress, (v) =>
         reduceMotion ? '0%' : `${Math.min(v, 0.6) * 55}%`,
@@ -170,7 +234,7 @@ const Banner = () => {
             <section
                 id="banner"
                 ref={sectionRef}
-                className="hero-surface relative isolate overflow-hidden"
+                className="hero-surface hero-stick relative isolate overflow-hidden"
             >
                 {/* Faint vertical grid, pure CSS. */}
                 <div
@@ -230,12 +294,17 @@ const Banner = () => {
                         data-avatar="name"
                         className="font-name pointer-events-none relative z-10 -mt-[clamp(70px,6.5vw,220px)] text-center text-[clamp(4.5rem,9.5vw,12.5rem)] font-normal leading-[0.9] tracking-[-0.025em] text-foreground dark:text-[#f2efe8]"
                     >
+                        {/* The heading's box overlaps the portrait, so it stays
+                            click-through; only the letters themselves take the
+                            pointer. Before, the whole name ignored the pointer:
+                            its hover weight never played and Onee answered
+                            with portrait lines instead of name lines. */}
                         <BoldHoverText
                             text={HERO.name.roman}
-                            className="inline-block"
+                            className="pointer-events-auto inline-block"
                             {...nameProps}
                         />{' '}
-                        <em className="inline-block italic">
+                        <em className="pointer-events-auto inline-block italic">
                             <BoldHoverText
                                 text={HERO.name.italic}
                                 {...nameProps}
@@ -270,9 +339,6 @@ const Banner = () => {
                         </em>
                         {HERO.tagline.tail}
                     </motion.p>
-
-                    {/* Socials link pinned to the viewport's bottom-left corner, every size. */}
-                    <Socials className="fixed bottom-5 left-5 z-[4] lg:left-[22px]" />
 
                     {/* Tablet and phone: stats under the tagline. */}
                     <Stats className="mt-6 flex flex-col items-center gap-4 text-center lg:hidden" />                </motion.div>

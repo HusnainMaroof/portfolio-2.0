@@ -1,0 +1,53 @@
+// Visitor analytics, live presence and star ratings for the portfolio.
+// Database: Neon (Postgres). See .env.example for the connection strings.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  // Pooled connection (Neon "-pooler" host): used by the app at runtime.
+  url       = env("DATABASE_URL")
+  // Direct connection: used by `prisma db push` / migrations only.
+  directUrl = env("DIRECT_URL")
+}
+
+/// One page view. No IP address is stored: a visitor is an anonymous random
+/// id kept in a first-party cookie, and location is the country/city the
+/// hosting edge reports.
+model Visit {
+  id         String   @id @default(cuid())
+  visitorId  String
+  path       String
+  referrer   String?
+  country    String?
+  city       String?
+  device     String?
+  browser    String?
+  os         String?
+  /// Time spent on the page, updated by the heartbeat while it is open.
+  durationMs Int      @default(0)
+  createdAt  DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([visitorId])
+}
+
+/// Who has the site open right now: one row per visitor, refreshed by the
+/// heartbeat. "Online" = seen in the last minute.
+model Presence {
+  visitorId String   @id
+  path      String
+  lastSeen  DateTime @default(now())
+
+  @@index([lastSeen])
+}
+
+/// One star rating (1-5) per visitor; rating again replaces it.
+model Rating {
+  visitorId String   @id
+  stars     Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

@@ -1,8 +1,10 @@
 import type { Metadata } from 'next';
-import { ReactLenis } from 'lenis/react';
 import { Fraunces, Instrument_Serif } from 'next/font/google';
 import 'lenis/dist/lenis.css';
 import './globals.css';
+import SmoothScroll from '@/components/SmoothScroll';
+import SocialsLink from '@/components/SocialsLink';
+import VisitTracker from '@/components/analytics/VisitTracker';
 import ParticleBackground from '@/components/ParticleBackground';
 // import Navbar from '@/components/Navbar';
 import AvatarInteractions from '@/components/AvatarInteractions';
@@ -10,7 +12,7 @@ import Preloader from '../components/Preloader';
 import StickyEmail from './_components/StickyEmail';
 import { GoogleAnalytics } from '@next/third-parties/google';
 import Script from 'next/script';
-import { ThemeProvider } from '@/components/ThemeProvider';
+import { THEME_BOOT_SCRIPT, ThemeProvider } from '@/components/ThemeProvider';
 import Footer from '@/components/Footer';
 import SiteNav from '@/components/SiteNav';
 
@@ -167,7 +169,19 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en" className={`${fraunces.variable} ${instrumentSerif.variable}`}>
+        // suppressHydrationWarning: the theme boot script below sets
+        // data-theme on <html> before React hydrates.
+        <html
+            lang="en"
+            className={`${fraunces.variable} ${instrumentSerif.variable}`}
+            suppressHydrationWarning
+        >
+            <head>
+                {/* Applies a saved light theme before the first paint. */}
+                <script
+                    dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }}
+                />
+            </head>
             <GoogleAnalytics gaId="G-MHLY1LNGY5" />
             <Script id="hotjar" strategy="afterInteractive">
                 {`(function(h,o,t,j,a,r){
@@ -181,22 +195,18 @@ export default function RootLayout({
             </Script>
             <body className="antialiased">
                 <ThemeProvider>
-                    <ReactLenis
-                        root
-                        options={{
-                            lerp: 0.1,
-                            duration: 1.4,
-                        }}
-                    >
+                    <SmoothScroll>
                         <SiteNav />
                         <main>{children}</main>
                         <Footer />
 
+                        <VisitTracker />
+                        <SocialsLink />
                         <AvatarInteractions />
                         <Preloader />
                         <ParticleBackground />
                         <StickyEmail />
-                    </ReactLenis>
+                    </SmoothScroll>
 
                     <script
                         type="application/ld+json"

@@ -3,48 +3,61 @@
 import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { HERO } from '@/content/hero';
+import { useTheme } from '@/components/ThemeProvider';
+import { afterPreloaderStage } from '@/lib/preloader';
 
 const loadLanyard = () => import('@/components/Lanyard');
 // three.js is heavy; client only, never in the server render.
 const Lanyard = dynamic(loadLanyard, { ssr: false });
 
-/** Safety net if the preloader never reports (it unmounted early, an error). */
-const FALLBACK_MS = 4500;
-
 /**
- * three.js is ~600KB, so the card used to wait a fixed 3s plus an idle slot
- * (up to 4.5s) before even downloading it, and appeared well after the page
- * was uncovered. Now the download starts at once, while the preloader still
- * covers the page, and the card mounts the moment the preloader finishes, so
- * it swings in as the hero is revealed. WebGL setup still waits for that
- * moment, so it never competes with the preloader animation.
+ * three.js is ~600KB. The download starts at once, while the preloader still
+ * covers the page. The card used to mount only when the preloader had fully
+ * finished, then compile its shaders and load its art, so it appeared a beat
+ * after the hero was already on screen.
+ *
+ * Now it mounts during the preloader's hold (the name has landed and the
+ * curtain stays closed for a second), so WebGL setup happens out of sight
+ * without competing with any animation, and its swing-in is released the
+ * moment the curtain starts to lift: it swings in as it is uncovered.
  * Phones never load it: the card is hidden below 768px.
  */
 const useDeferredMount = () => {
-    const [ready, setReady] = useState(false);
+    const [mounted, setMounted] = useState(false);
+    const [released, setReleased] = useState(false);
 
     useEffect(() => {
         if (!window.matchMedia('(min-width: 768px)').matches) return;
 
         void loadLanyard();
 
-        if (document.documentElement.dataset.preloaded === 'true') {
-            setReady(true);
-            return;
-        }
-
-        const show = () => setReady(true);
-        window.addEventListener('preloader:done', show, { once: true });
-        const timer = window.setTimeout(show, FALLBACK_MS);
+        const stopMount = afterPreloaderStage('hold', () => setMounted(true));
+        const stopRelease = afterPreloaderStage('reveal', () =>
+            setReleased(true),
+        );
 
         return () => {
-            window.removeEventListener('preloader:done', show);
-            window.clearTimeout(timer);
+            stopMount();
+            stopRelease();
         };
     }, []);
 
-    return ready;
+    return { mounted, released };
 };
+
+/** The card's colours per theme: neon on black, a deeper emerald on white. */
+const CARD = {
+    dark: {
+        front: '/coffee/front.svg',
+        back: '/coffee/back.svg',
+        color: '#00F050',
+    },
+    light: {
+        front: '/coffee/front-light.svg',
+        back: '/coffee/back-light.svg',
+        color: '#0E8147',
+    },
+} as const;
 
 const openCoffee = () =>
     window.open(HERO.coffee.href, '_blank', 'noopener,noreferrer');
@@ -55,7 +68,9 @@ const openCoffee = () =>
  * and keyboards, so a hidden link carries the same target.
  */
 const HeroCoffeeCard = () => {
-    const ready = useDeferredMount();
+    const { mounted, released } = useDeferredMount();
+    const { theme } = useTheme();
+    const card = CARD[theme];
 
     return (
         // The canvas is far wider than the card so a swing never runs off its
@@ -75,12 +90,13 @@ const HeroCoffeeCard = () => {
             </a>
             {/* Lanyard switches the canvas itself on while the pointer is over the card. */}
             <div data-avatar-dock-keepout="" className="pointer-events-none h-[380px] w-[640px] lg:h-[450px] lg:w-[720px] xl:h-[520px] xl:w-[800px]">
-                {ready && (
+                {mounted && (
                     <Lanyard
-                        frontImage="/coffee/front.svg"
-                        backImage="/coffee/back.svg"
-                        cardColor="#00F050"
-                        strapColor="#00F050"
+                        paused={!released}
+                        frontImage={card.front}
+                        backImage={card.back}
+                        cardColor={card.color}
+                        strapColor={card.color}
                         metal="silver"
                         finish="glossy"
                         // The card is a share of the canvas height, so the

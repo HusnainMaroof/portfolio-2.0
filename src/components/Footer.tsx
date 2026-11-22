@@ -1,6 +1,8 @@
 'use client';
-import ScrollReveal from '@/components/Scrollreveal';
 import Button from '@/components/Button';
+import LiveCounter from '@/components/analytics/LiveCounter';
+import RatingStars from '@/components/analytics/RatingStars';
+import { EASE, MOTION_OK, revealOnEnter } from '@/lib/motion';
 import BoldHoverText from '@/components/HoverText';
 import { useTheme } from '@/components/ThemeProvider';
 import { GENERAL_INFO } from '@/lib/data';
@@ -8,6 +10,7 @@ import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/all';
 import { useRef, useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import { GitFork, Star } from 'lucide-react';
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
@@ -20,8 +23,10 @@ interface RepoStats {
 const Footer = () => {
     const containerRef = useRef<HTMLDivElement>(null);
     const { theme } = useTheme();
+    // The private visitor dashboard gets no contact footer.
+    const hidden = usePathname().startsWith('/admin');
     const heroTextColor = theme === 'light' ? '#111111' : '#DEDEDE';
-    const heroAccentColor = theme === 'light' ? '#111111' : '#00F050';
+    const heroAccentColor = theme === 'light' ? '#0E8147' : '#00F050';
 
     const [stats, setStats] = useState<RepoStats | null>(null);
 
@@ -44,31 +49,47 @@ const Footer = () => {
 
     useGSAP(
         () => {
-            gsap.from('.footer-word', {
-                yPercent: 210,
-                stagger: 0.08,
-                duration: 6,
-                ease: 'power4.out',
-                delay: 0.15,
-                scrollTrigger: {
-                    id: 'footer-in',
-                    trigger: containerRef.current,
-                    start: 'top 75%',
-                    toggleActions: 'play none none reverse',
-                },
-            });
+            const root = containerRef.current;
+            if (!root) return;
 
-            return () => {
-                ScrollTrigger.getById('footer-in')?.kill();
-            };
+            // The headline rises out of its masks once. It used to take six
+            // seconds, so it was still half-hidden when visitors read it.
+            if (window.matchMedia(MOTION_OK).matches) {
+                const words = gsap.utils.toArray<HTMLElement>(
+                    '.footer-word',
+                    root,
+                );
+                gsap.set(words, { yPercent: 110 });
+                ScrollTrigger.create({
+                    trigger: root,
+                    start: 'top 80%',
+                    once: true,
+                    onEnter: () =>
+                        gsap.to(words, {
+                            yPercent: 0,
+                            duration: 1.1,
+                            ease: EASE.punch,
+                            stagger: 0.1,
+                        }),
+                });
+            }
+
+            revealOnEnter(
+                gsap.utils.toArray<HTMLElement>('[data-footer-reveal]', root),
+                { start: 'top 95%' },
+            );
         },
         { scope: containerRef },
     );
 
+    if (hidden) return null;
+
     return (
         <footer className="relative overflow-hidden" id="contact">
+            {/* Phones: extra bottom room so the fixed Socials link and Onee
+                (both in the bottom corners) never cover the credit line. */}
             <div
-                className="page-container pb-8 md:pb-10 flex flex-col justify-center items-center text-center"
+                className="page-container pb-28 md:pb-10 flex flex-col justify-center items-center text-center"
                 ref={containerRef}
             >
                 {/* headline, word-by-word reveal, same treatment as Banner's h1 */}
@@ -105,26 +126,22 @@ const Footer = () => {
                     </h2>
                 </a>
 
-                {/* scroll-scrubbed description, same pattern as AboutMe */}
-                <div className="max-w-[600px] text-base leading-relaxed text-muted-foreground tracking-wide mb-8 md:text-lg md:tracking-widest md:mb-10">
-                    <ScrollReveal
-                        id="footer-reveal"
-                        baseOpacity={0}
-                        enableBlur={false}
-                        baseRotation={0}
-                        blurStrength={10}
-                        rotationEnd="top 70%"
-                        wordAnimationEnd="top 55%"
-                    >
-                        Have a project in mind? Let&apos;s turn your vision into
-                        reality. Reach out and let&apos;s build something great
-                        together. Available for freelance and remote
-                        projects worldwide, based in Islamabad, Pakistan.
-                    </ScrollReveal>
-                </div>
+                {/* Revealed whole as it enters. It used to brighten word by
+                    word with scroll, but the page ends before the scroll
+                    reaches the end point on most screens, so the last words
+                    ("based in Islamabad, Pakistan") stayed faded for good. */}
+                <p
+                    data-footer-reveal=""
+                    className="max-w-[600px] text-base leading-relaxed text-muted-foreground tracking-wide mb-8 md:text-lg md:tracking-widest md:mb-10"
+                >
+                    Have a project in mind? Let&apos;s turn your vision into
+                    reality. Reach out and let&apos;s build something great
+                    together. Available for freelance and remote projects
+                    worldwide, based in Islamabad, Pakistan.
+                </p>
 
                 {/* CTA button, same Button component as Banner */}
-                <div className="slide-up-and-fade mb-12">
+                <div data-footer-reveal="" className="mb-12">
                     <Button
                         as="link"
                         target="_blank"
@@ -137,11 +154,22 @@ const Footer = () => {
                     </Button>
                 </div>
 
-                {/* bottom row, credit + live GitHub stats */}
-                <div className="w-full flex flex-col md:flex-row items-center justify-between gap-4 pt-6 border-t border-muted-foreground/20">
-                    <span className="text-xs uppercase tracking-[0.25em] text-muted-foreground">
-                        Husnain Maroof © {new Date().getFullYear()}
-                    </span>
+                {/* Rate the portfolio (hidden until analytics is set up). */}
+                <div data-footer-reveal="" className="mb-10">
+                    <RatingStars />
+                </div>
+
+                {/* bottom row, credit + live counter + live GitHub stats */}
+                <div
+                    data-footer-reveal=""
+                    className="w-full flex flex-col md:flex-row items-center justify-between gap-4 pt-6 border-t border-muted-foreground/20"
+                >
+                    <div className="flex flex-col items-center gap-2 md:items-start">
+                        <span className="text-xs uppercase tracking-[0.25em] text-muted-foreground">
+                            Husnain Maroof © {new Date().getFullYear()}
+                        </span>
+                        <LiveCounter />
+                    </div>
 
                     <a
                         href="https://github.com/HusnainMaroof/portfolio-2.0" data-avatar="social"

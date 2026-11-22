@@ -13,14 +13,27 @@ const ParticleBackground = () => {
     const particleCount = useMemo(() => 100, []);
 
     useGSAP(() => {
+        // Reduced motion: the dots stay as a still starfield.
+        const still = window.matchMedia(
+            '(prefers-reduced-motion: reduce)',
+        ).matches;
+
         particlesRef.current.forEach((particle) => {
+            // Phones hide every other dot (see the container class); a hidden
+            // dot needs no endless tween.
+            if (getComputedStyle(particle).display === 'none') return;
+
             gsap.set(particle, {
                 width: Math.random() * 3 + 1,
                 height: Math.random() * 3 + 1,
                 opacity: Math.random(),
-                left: Math.random() * window.innerWidth,
-                top: Math.random() * (window.innerHeight + 1),
+                // Percentages, so the field still covers the screen after a
+                // resize or a rotated phone.
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
             });
+
+            if (still) return;
 
             gsap.to(particle, {
                 y: window.innerHeight,
@@ -28,13 +41,12 @@ const ParticleBackground = () => {
                 opacity: 0,
                 repeat: -1,
                 ease: 'none',
-                // yoyo: true,
             });
         });
     }, []);
 
     return (
-        <div className="fixed inset-0 z-0 pointer-events-none">
+        <div className="fixed inset-0 z-0 pointer-events-none max-md:[&>div:nth-child(2n)]:hidden">
             {[...Array(particleCount)].map((_, i) => (
                 <div
                     key={i}

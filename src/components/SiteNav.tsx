@@ -4,14 +4,18 @@ import { useEffect, useState } from 'react';
 import { useLenis } from 'lenis/react';
 import { usePathname, useRouter } from 'next/navigation';
 import {
-    CalendarDays,
-    FileText,
+    BriefcaseBusiness,
+    House,
     Layers3,
     LayoutGrid,
-    UsersRound,
+    Mail,
     type LucideIcon,
 } from 'lucide-react';
+import ThemeToggle from '@/components/ThemeToggle';
+import StarsButton from '@/components/analytics/StarsButton';
 import { ExpandTabs } from '@/components/ui/expand-tabs';
+import { afterPreloader } from '@/lib/preloader';
+import { scrollToSection } from '@/lib/scroll';
 
 interface NavItem {
     label: string;
@@ -22,40 +26,60 @@ interface NavItem {
 
 /** The real section ids on the home page (Banner, SelectedWork, Skills, Experiences, Footer). */
 const NAV_ITEMS: readonly NavItem[] = [
-    { label: 'Intro', sectionId: 'banner', icon: LayoutGrid },
-    { label: 'Projects', sectionId: 'my-projects', icon: FileText },
+    { label: 'Intro', sectionId: 'banner', icon: House },
+    { label: 'Projects', sectionId: 'my-projects', icon: LayoutGrid },
     { label: 'Stack', sectionId: 'my-stack', icon: Layers3 },
-    { label: 'Experience', sectionId: 'my-experience', icon: CalendarDays },
-    { label: 'Contact', sectionId: 'contact', icon: UsersRound },
+    { label: 'Experience', sectionId: 'my-experience', icon: BriefcaseBusiness },
+    { label: 'Contact', sectionId: 'contact', icon: Mail },
 ];
+
+/** From this width the current section's tile stays open on its label. */
+const LABEL_QUERY = '(min-width: 640px)';
 
 /**
  * Top-centre navigation (ExpandTabs). Each tile scrolls to its section; the
- * section on screen has its tile filled green (aria-current). Tiles show an
- * icon and open to their label on hover; five 56px tiles fit a 375px phone.
+ * section on screen has its tile filled green (aria-current) and, from tablet
+ * width up, open on its label, so the bar always says where you are. Phones
+ * keep the compact icon row (five 56px tiles fit a 375px screen).
  */
 export default function SiteNav() {
     const lenis = useLenis();
     const pathname = usePathname();
     const router = useRouter();
-    const [active, setActive] = useState<number | null>(0);
+    // Only the home page has sections to mark. Starting at "Intro" on every
+    // page flashed that tile green on case studies until the first update.
+    const [active, setActive] = useState<number | null>(
+        pathname === '/' ? 0 : null,
+    );
+    const [showLabel, setShowLabel] = useState(false);
+    const [scrolled, setScrolled] = useState(false);
+
+    useEffect(() => {
+        const query = window.matchMedia(LABEL_QUERY);
+        const sync = () => setShowLabel(query.matches);
+        sync();
+        query.addEventListener('change', sync);
+        return () => query.removeEventListener('change', sync);
+    }, []);
 
     // The last section whose top has crossed the upper part of the viewport
-    // owns the dot. This never skips a section, unlike an intersection band.
+    // owns the tile. This never skips a section, unlike an intersection band.
     useEffect(() => {
         let frame = 0;
 
         const update = () => {
             frame = 0;
-            const present = NAV_ITEMS.map((item, i) => ({
-                i,
-                el: document.getElementById(item.sectionId),
-            })).filter((s) => s.el);
+            setScrolled(window.scrollY > 24);
 
             // Only the home page (it has the hero) tracks sections. Other pages
             // (case studies, socials, resume) fill no tile; the footer's
             // #contact is on every page, so it can't decide this.
             if (!document.getElementById('banner')) return setActive(null);
+
+            const present = NAV_ITEMS.map((item, i) => ({
+                i,
+                el: document.getElementById(item.sectionId),
+            })).filter((s) => s.el);
 
             const line = window.innerHeight * 0.45;
             let current = present[0].i;
@@ -86,58 +110,73 @@ export default function SiteNav() {
         };
     }, [pathname]);
 
-    // Lenis owns the page scroll; native scrollIntoView fights it.
-    const scrollToSection = (sectionId: string) => {
-        const el = document.getElementById(sectionId);
-
+    const goTo = (sectionId: string) => {
         // On a case study page the sections live on the home page.
-        if (!el) {
-            router.push(`/#${sectionId}`);
-            return;
-        }
-
-        if (lenis) lenis.scrollTo(el, { duration: 1.4, offset: -24 });
-        else el.scrollIntoView({ behavior: 'smooth' });
+        if (!scrollToSection(lenis, sectionId)) router.push(`/#${sectionId}`);
     };
 
-    // Arriving on the home page with a section hash scrolls there once the
-    // preloader has finished.
+    // Arriving with a section hash (/#my-projects) scrolls there once the
+    // preloader has lifted, instead of after a guessed fixed delay.
     useEffect(() => {
         const id = window.location.hash.slice(1);
         if (!id || !document.getElementById(id)) return;
 
-        const timer = window.setTimeout(() => {
-            const el = document.getElementById(id);
-            if (!el) return;
-            if (lenis) lenis.scrollTo(el, { duration: 1.4, offset: -24 });
-            else el.scrollIntoView({ behavior: 'smooth' });
-        }, 1500);
+        let timer = 0;
+        const stop = afterPreloader(() => {
+            timer = window.setTimeout(() => scrollToSection(lenis, id), 250);
+        });
 
-        return () => window.clearTimeout(timer);
+        return () => {
+            stop();
+            window.clearTimeout(timer);
+        };
     }, [pathname, lenis]);
 
     return (
-        <div
-            data-avatar-keepout=""
-            className="pointer-events-none fixed inset-x-0 top-4 z-[50] flex justify-center"
-        >
-            <ExpandTabs
-                label="Main navigation"
-                color="hsl(var(--primary))"
-                value={active}
-                onValueChange={setActive}
-                className="pointer-events-auto"
-                classNames={{
-                    // White text is unreadable on the green, so the open label is dark.
-                    label: 'font-roboto-flex font-medium text-primary-foreground',
-                    tab: 'backdrop-blur-md',
-                }}
-                items={NAV_ITEMS.map(({ label, sectionId, icon: Icon }) => ({
-                    label,
-                    icon: <Icon strokeWidth={1.8} />,
-                    onSelect: () => scrollToSection(sectionId),
-                }))}
+        <>
+            {/* A soft fade behind the bar once the page has scrolled, so text
+                never runs straight under the tiles. */}
+            <div
+                aria-hidden
+                className="pointer-events-none fixed inset-x-0 top-0 z-[49] h-24 bg-gradient-to-b from-background via-background/75 to-transparent transition-opacity duration-500 motion-reduce:transition-none"
+                style={{ opacity: scrolled ? 1 : 0 }}
             />
-        </div>
+            {/* Tablet and up: the theme switch has the top-right corner, with
+                the star rating beside it from md (there is no room beside the
+                centred bar below that; phones rate from the footer). */}
+            <ThemeToggle className="fixed right-4 top-4 z-[51] hidden sm:grid md:right-6" />
+            <StarsButton className="fixed right-[88px] top-4 z-[51] hidden md:block" />
+
+            <div
+                data-avatar-keepout=""
+                className="pointer-events-none fixed inset-x-0 top-4 z-[50] flex items-center justify-center gap-1.5"
+            >
+                <ExpandTabs
+                    label="Main navigation"
+                    color="hsl(var(--primary))"
+                    value={active}
+                    onValueChange={setActive}
+                    expandSelected={showLabel}
+                    // Phones: a slightly smaller tile, so the theme switch
+                    // fits in the same row (a corner tile would hit the bar).
+                    tile={showLabel ? 56 : 48}
+                    className="pointer-events-auto"
+                    classNames={{
+                        // White text is unreadable on the green, so the open label is dark.
+                        label: 'font-roboto-flex font-medium text-primary-foreground',
+                        tab: 'backdrop-blur-md',
+                    }}
+                    items={NAV_ITEMS.map(({ label, sectionId, icon: Icon }) => ({
+                        label,
+                        icon: <Icon strokeWidth={1.8} />,
+                        onSelect: () => goTo(sectionId),
+                    }))}
+                />
+                <ThemeToggle
+                    size={48}
+                    className="pointer-events-auto sm:hidden"
+                />
+            </div>
+        </>
     );
 }
