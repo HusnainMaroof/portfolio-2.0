@@ -12,12 +12,28 @@ import {
 /** Wrong guesses wait a moment, so the form can't be hammered quickly. */
 const FAILED_DELAY_MS = 900;
 
-export async function login(formData: FormData) {
+export interface LoginState {
+    error: string | null;
+    /** Bumps on every failure, so the form can replay its shake. */
+    attempt: number;
+}
+
+export async function login(
+    previous: LoginState,
+    formData: FormData,
+): Promise<LoginState> {
     const attempt = String(formData.get('password') ?? '');
+
+    if (!attempt) {
+        return { error: 'Enter your password.', attempt: previous.attempt + 1 };
+    }
 
     if (!passwordMatches(attempt)) {
         await new Promise((resolve) => setTimeout(resolve, FAILED_DELAY_MS));
-        redirect('/admin?error=1');
+        return {
+            error: 'That password is not right.',
+            attempt: previous.attempt + 1,
+        };
     }
 
     (await cookies()).set(ADMIN_COOKIE, createSessionValue(), sessionCookieOptions);

@@ -1,4 +1,5 @@
-import { NextResponse, type NextRequest } from 'next/server';
+import { after, NextResponse, type NextRequest } from 'next/server';
+import { clientIp, lookupOrg } from '@/lib/server/company';
 import { dbConfigured, prisma } from '@/lib/server/db';
 import {
     getOrCreateVisitorId,
@@ -24,7 +25,7 @@ export async function POST(req: NextRequest) {
     const userAgent = req.headers.get('user-agent') ?? '';
     if (isBot(userAgent)) return NextResponse.json({ ok: false }, { status: 202 });
 
-    let body: { path?: unknown; referrer?: unknown } = {};
+    let body: { path?: unknown; referrer?: unknown; source?: unknown } = {};
     try {
         body = await req.json();
     } catch {
@@ -43,6 +44,13 @@ export async function POST(req: NextRequest) {
     } catch {
         referrer = null;
     }
+
+    // Tracking-link tag: letters, numbers, dashes, dots, underscores only.
+    const source =
+        clip(body.source, 60)
+            ?.toLowerCase()
+            .replace(/[^a-z0-9._-]+/g, '-')
+            .replace(/^-+|-+$/g, '') || null;
 
     const visitor = getOrCreateVisitorId(req);
 
@@ -63,11 +71,42 @@ export async function POST(req: NextRequest) {
                     visitorId: visitor.id,
                     path,
                     referrer,
+                    source,
                     ...readLocation(req),
                     ...parseUserAgent(userAgent),
                 },
                 select: { id: true },
             }));
+
+        // Which company's network this came from. Runs after the response
+        // is sent, so the visitor never waits on the lookup.
+        const ip = recent ? null : clientIp(req);
+        if (ip) {
+            after(async () => {
+                try {
+                    // Same visitor in the last 30 minutes: same network.
+                    const earlier = await prisma.visit.findFirst({
+                        where: {
+                            visitorId: visitor.id,
+                            org: { not: null },
+                            createdAt: { gte: new Date(Date.now() - 30 * 60 * 1000) },
+                        },
+                        select: { org: true, orgType: true },
+                    });
+                    const org = earlier?.org
+                        ? { name: earlier.org, type: earlier.orgType }
+                        : await lookupOrg(ip);
+                    if (org) {
+                        await prisma.visit.update({
+                            where: { id: visit.id },
+                            data: { org: org.name, orgType: org.type },
+                        });
+                    }
+                } catch {
+                    // The visit is already recorded; the company is a bonus.
+                }
+            });
+        }
 
         await prisma.presence.upsert({
             where: { visitorId: visitor.id },

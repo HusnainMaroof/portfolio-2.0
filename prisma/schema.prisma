@@ -21,6 +21,13 @@ model Visit {
   visitorId  String
   path       String
   referrer   String?
+  /// Tracking-link tag, from ?ref= or ?utm_source= (e.g. "acme-recruiter").
+  source     String?
+  /// Network owner of the visitor's IP (e.g. "Microsoft Corporation"),
+  /// looked up once per visit. The IP itself is never stored.
+  org        String?
+  /// "company", "isp" (home/mobile internet) or "hosting" (cloud/VPN).
+  orgType    String?
   country    String?
   city       String?
   device     String?

@@ -360,6 +360,34 @@ html[data-theme='light'] #avatar-assistant-panel {
     box-shadow: 0 12px 32px -12px rgba(20, 24, 40, 0.22);
 }
 
+/* Wrong password: a short horizontal shake. */
+@keyframes shake {
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+    20% {
+        transform: translateX(-8px);
+    }
+    40% {
+        transform: translateX(7px);
+    }
+    60% {
+        transform: translateX(-4px);
+    }
+    80% {
+        transform: translateX(2px);
+    }
+}
+.animate-shake {
+    animation: shake 380ms cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
+@media (prefers-reduced-motion: reduce) {
+    .animate-shake {
+        animation: none;
+    }
+}
+
 /* Star rating: the chosen star pops and settles. */
 @keyframes star-pop {
     0% {

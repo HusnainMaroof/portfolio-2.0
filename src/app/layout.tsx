@@ -5,6 +5,7 @@ import './globals.css';
 import SmoothScroll from '@/components/SmoothScroll';
 import SocialsLink from '@/components/SocialsLink';
 import VisitTracker from '@/components/analytics/VisitTracker';
+import HideOnAdmin from '@/components/HideOnAdmin';
 import ParticleBackground from '@/components/ParticleBackground';
 // import Navbar from '@/components/Navbar';
 import AvatarInteractions from '@/components/AvatarInteractions';
@@ -201,8 +202,10 @@ export default function RootLayout({
                         <Footer />
 
                         <VisitTracker />
-                        <SocialsLink />
-                        <AvatarInteractions />
+                        <HideOnAdmin>
+                            <SocialsLink />
+                            <AvatarInteractions />
+                        </HideOnAdmin>
                         <Preloader />
                         <ParticleBackground />
                         <StickyEmail />
