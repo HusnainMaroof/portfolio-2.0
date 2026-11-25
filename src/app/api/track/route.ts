@@ -3,6 +3,7 @@ import { clientIp, lookupOrg } from '@/lib/server/company';
 import { dbConfigured, prisma } from '@/lib/server/db';
 import {
     getOrCreateVisitorId,
+    hashIp,
     isBot,
     parseUserAgent,
     readLocation,
@@ -12,8 +13,12 @@ import {
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-/** A repeat of the same page by the same visitor within this window is one view. */
-const DEDUPE_MS = 10_000;
+/**
+ * The same person opening the same page again within this window (a reload,
+ * a back-and-forth, a second tab) updates their existing view instead of
+ * counting a new one.
+ */
+const DEDUPE_MS = 30 * 60 * 1000;
 
 const clip = (value: unknown, max: number) =>
     typeof value === 'string' && value.length > 0 ? value.slice(0, max) : null;
@@ -53,14 +58,22 @@ export async function POST(req: NextRequest) {
             .replace(/^-+|-+$/g, '') || null;
 
     const visitor = getOrCreateVisitorId(req);
+    const ip = clientIp(req);
+    const ipHash = hashIp(ip);
 
     try {
+        // "Same person" = same browser cookie, or same network fingerprint
+        // (a new browser, private window or cleared cookies on one device).
         const recent = await prisma.visit.findFirst({
             where: {
-                visitorId: visitor.id,
                 path,
                 createdAt: { gte: new Date(Date.now() - DEDUPE_MS) },
+                OR: [
+                    { visitorId: visitor.id },
+                    ...(ipHash ? [{ ipHash }] : []),
+                ],
             },
+            orderBy: { createdAt: 'desc' },
             select: { id: true },
         });
 
@@ -69,6 +82,7 @@ export async function POST(req: NextRequest) {
             (await prisma.visit.create({
                 data: {
                     visitorId: visitor.id,
+                    ipHash,
                     path,
                     referrer,
                     source,
@@ -80,8 +94,7 @@ export async function POST(req: NextRequest) {
 
         // Which company's network this came from. Runs after the response
         // is sent, so the visitor never waits on the lookup.
-        const ip = recent ? null : clientIp(req);
-        if (ip) {
+        if (ip && !recent) {
             after(async () => {
                 try {
                     // Same visitor in the last 30 minutes: same network.

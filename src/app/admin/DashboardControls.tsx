@@ -208,3 +208,29 @@ export function LinkBuilder() {
         </div>
     );
 }
+
+/** Moderation button that shows progress while the server updates the note. */
+export function ModerateButton({
+    label,
+    tone = 'neutral',
+}: {
+    label: string;
+    tone?: 'primary' | 'neutral' | 'danger';
+}) {
+    const { pending } = useFormStatus();
+    return (
+        <button
+            type="submit"
+            disabled={pending}
+            className={cn(
+                'inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-xs font-medium transition-colors disabled:cursor-wait disabled:opacity-60',
+                tone === 'primary' && 'bg-primary text-primary-foreground hover:bg-primary/90',
+                tone === 'neutral' && 'bg-foreground/[0.06] text-foreground hover:bg-foreground/[0.1]',
+                tone === 'danger' && 'text-red-500 hover:bg-red-500/10',
+            )}
+        >
+            {pending && <Loader2 size={13} className="animate-spin" aria-hidden />}
+            {label}
+        </button>
+    );
+}

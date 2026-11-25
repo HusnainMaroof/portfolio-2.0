@@ -50,3 +50,6 @@ graphify-out/
 
 # Template with no secrets in it: safe to commit.
 !.env.example
+
+# Research output
+.firecrawl/

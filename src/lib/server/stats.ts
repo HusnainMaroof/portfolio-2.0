@@ -9,9 +9,15 @@ export const onlineSince = () => new Date(Date.now() - ONLINE_WINDOW_MS);
 export const countOnline = () =>
     prisma.presence.count({ where: { lastSeen: { gte: onlineSince() } } });
 
-export const countUniqueVisitors = async () => {
+/**
+ * Distinct people since `since` (all time by default). A person is their
+ * network fingerprint when known, else their browser cookie (older visits
+ * recorded before fingerprints existed). Reloads and revisits never add.
+ */
+export const countUniqueVisitors = async (since = new Date(0)) => {
     const rows = await prisma.$queryRaw<{ count: bigint }[]>`
-        SELECT COUNT(DISTINCT "visitorId") AS count FROM "Visit"`;
+        SELECT COUNT(DISTINCT COALESCE("ipHash", "visitorId")) AS count
+        FROM "Visit" WHERE "createdAt" >= ${since}`;
     return Number(rows[0]?.count ?? 0);
 };
 

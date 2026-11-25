@@ -1,5 +1,5 @@
 import 'server-only';
-import { randomUUID } from 'node:crypto';
+import { createHmac, randomUUID } from 'node:crypto';
 import type { NextRequest, NextResponse } from 'next/server';
 
 /**
@@ -85,4 +85,15 @@ export const parseUserAgent = (ua: string) => {
                 : 'Other';
 
     return { device, browser, os };
+};
+
+/**
+ * Keyed fingerprint of an IP address: the same IP always gives the same
+ * value, but without ADMIN_SECRET it can't be reversed (IPs are few enough
+ * to brute-force a plain hash). Used only to recognise a repeat visitor.
+ */
+export const hashIp = (ip: string | null) => {
+    const secret = process.env.ADMIN_SECRET ?? '';
+    if (!ip || secret.length < 32) return null;
+    return createHmac('sha256', secret).update(ip).digest('hex').slice(0, 32);
 };

@@ -2,6 +2,7 @@
 import Button from '@/components/Button';
 import LiveCounter from '@/components/analytics/LiveCounter';
 import RatingStars from '@/components/analytics/RatingStars';
+import NotesWall from '@/components/notes/NotesWall';
 import { EASE, MOTION_OK, revealOnEnter } from '@/lib/motion';
 import BoldHoverText from '@/components/HoverText';
 import { useTheme } from '@/components/ThemeProvider';
@@ -86,6 +87,9 @@ const Footer = () => {
 
     return (
         <footer className="relative overflow-hidden" id="contact">
+            {/* Guestbook: visitors' notes drift across, anyone can pin one. */}
+            <NotesWall />
+
             {/* Phones: extra bottom room so the fixed Socials link and Onee
                 (both in the bottom corners) never cover the credit line. */}
             <div

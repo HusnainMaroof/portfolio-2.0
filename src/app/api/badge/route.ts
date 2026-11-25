@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
-import { dbConfigured, prisma } from '@/lib/server/db';
-import { countOnline } from '@/lib/server/stats';
+import { dbConfigured } from '@/lib/server/db';
+import { countOnline, countUniqueVisitors } from '@/lib/server/stats';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -30,8 +30,9 @@ export async function GET(req: NextRequest) {
             const online = await countOnline();
             return badge('online now', formatter.format(Math.max(online, 0)));
         }
-        const visits = await prisma.visit.count();
-        return badge('portfolio visits', formatter.format(visits));
+        // Unique people, not page views: reloads and revisits don't add.
+        const visitors = await countUniqueVisitors();
+        return badge('portfolio visitors', formatter.format(visitors));
     } catch {
         return badge('portfolio', 'husnain.cc', 'lightgrey');
     }

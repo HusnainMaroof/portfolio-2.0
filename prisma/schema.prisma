@@ -19,6 +19,10 @@ datasource db {
 model Visit {
   id         String   @id @default(cuid())
   visitorId  String
+  /// Keyed hash of the visitor's IP (HMAC with ADMIN_SECRET). Lets the same
+  /// person count once even with a new browser or cleared cookies; it can't
+  /// be turned back into the IP without the secret.
+  ipHash     String?
   path       String
   referrer   String?
   /// Tracking-link tag, from ?ref= or ?utm_source= (e.g. "acme-recruiter").
@@ -39,6 +43,7 @@ model Visit {
 
   @@index([createdAt])
   @@index([visitorId])
+  @@index([ipHash])
 }
 
 /// Who has the site open right now: one row per visitor, refreshed by the
@@ -57,4 +62,26 @@ model Rating {
   stars     Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+/// A note a visitor left on the footer's notes wall. Shown publicly only
+/// once approved in /admin.
+model Note {
+  id        String   @id @default(cuid())
+  /// Optional display name; empty shows as "Anonymous".
+  name      String?
+  message   String
+  /// Sticky-note colour key (see NOTE_COLORS).
+  color     String   @default("lime")
+  /// "pending" (waiting for approval), "approved" (on the wall) or "hidden".
+  status    String   @default("pending")
+  /// Why a note was held back automatically, e.g. "contains a link".
+  flag      String?
+  visitorId String
+  ipHash    String?
+  createdAt DateTime @default(now())
+
+  @@index([status, createdAt])
+  @@index([ipHash])
+  @@index([visitorId])
 }

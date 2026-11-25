@@ -3,9 +3,14 @@ import type { ReactNode } from 'react';
 import { Building2, Star, Tag } from 'lucide-react';
 import { adminConfigured, isAdmin } from '@/lib/server/admin-auth';
 import { dbConfigured, prisma } from '@/lib/server/db';
-import { onlineSince, ratingSummary } from '@/lib/server/stats';
-import { logout } from './actions';
-import { LinkBuilder, SignOutButton, Toolbar } from './DashboardControls';
+import {
+    countUniqueVisitors,
+    onlineSince,
+    ratingSummary,
+} from '@/lib/server/stats';
+import { approveNote, deleteNote, hideNote, logout } from './actions';
+import { isNoteColor, NOTE_COLORS } from '@/lib/notes';
+import { LinkBuilder, ModerateButton, SignOutButton, Toolbar } from './DashboardControls';
 import LoginForm from './LoginForm';
 import { RANGES, type RangeValue } from './ranges';
 
@@ -234,7 +239,7 @@ const Dashboard = async (range: RangeValue) => {
         online,
         rangeVisits,
         totalVisits,
-        uniqueRows,
+        uniqueVisitors,
         todayVisits,
         avgDuration,
         recent,
@@ -247,6 +252,8 @@ const Dashboard = async (range: RangeValue) => {
         ratingGroups,
         companies,
         orgTypes,
+        pendingNotes,
+        recentNotes,
     ] = await Promise.all([
         prisma.presence.findMany({
             where: { lastSeen: { gte: onlineSince() } },
@@ -255,9 +262,7 @@ const Dashboard = async (range: RangeValue) => {
         }),
         prisma.visit.count({ where: inRange }),
         prisma.visit.count(),
-        prisma.$queryRaw<{ count: bigint }[]>`
-            SELECT COUNT(DISTINCT "visitorId") AS count FROM "Visit"
-            WHERE "createdAt" >= ${since}`,
+        countUniqueVisitors(since),
         prisma.visit.count({ where: { createdAt: { gte: startOfToday() } } }),
         prisma.visit.aggregate({
             _avg: { durationMs: true },
@@ -320,6 +325,16 @@ const Dashboard = async (range: RangeValue) => {
             _count: { _all: true },
             where: { ...inRange, orgType: { not: null } },
         }),
+        prisma.note.findMany({
+            where: { status: 'pending' },
+            orderBy: { createdAt: 'desc' },
+            take: 50,
+        }),
+        prisma.note.findMany({
+            where: { status: { in: ['approved', 'hidden'] } },
+            orderBy: { createdAt: 'desc' },
+            take: 12,
+        }),
     ]);
 
     const orgCount = (type: string) =>
@@ -333,7 +348,6 @@ const Dashboard = async (range: RangeValue) => {
         companyPages.set(visit.org, pages);
     }
 
-    const uniqueVisitors = Number(uniqueRows[0]?.count ?? 0);
     // Where each live visitor is, from their latest visit.
     const latestByVisitor = new Map<string, (typeof recent)[number]>();
     for (const visit of recent) {
@@ -362,7 +376,7 @@ const Dashboard = async (range: RangeValue) => {
                 <Card label="Online now" value={online.length} live />
                 <Card label="Today" value={todayVisits} hint="page views" />
                 <Card label={rangeLabel} value={rangeVisits} hint={`page views · ${totalVisits} all time`} />
-                <Card label="Visitors" value={uniqueVisitors} hint={`unique · ${rangeLabel.toLowerCase()}`} />
+                <Card label="Visitors" value={uniqueVisitors} hint={`unique people · ${rangeLabel.toLowerCase()}`} />
                 <Card
                     className="col-span-2 lg:col-span-1"
                     label="Rating"
@@ -381,6 +395,61 @@ const Dashboard = async (range: RangeValue) => {
             </div>
 
             <div className="mt-3 grid gap-3 sm:mt-4 sm:gap-4 lg:grid-cols-3">
+                <Panel
+                    title={`Notes · ${pendingNotes.length} waiting for approval`}
+                    className="lg:col-span-3"
+                >
+                    {pendingNotes.length === 0 && recentNotes.length === 0 ? (
+                        <p className="text-sm text-muted-foreground">
+                            No notes yet. Notes visitors pin in the footer show up here first.
+                        </p>
+                    ) : (
+                        <ul className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+                            {[...pendingNotes, ...recentNotes].map((note) => (
+                                <li
+                                    key={note.id}
+                                    className={`flex flex-col gap-3 rounded-xl border p-4 text-sm ${note.status === 'pending' ? 'border-primary/40 bg-primary/[0.04]' : 'border-border/60 bg-foreground/[0.02]'}`}
+                                >
+                                    <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                                        <span
+                                            aria-hidden
+                                            className="size-3 rounded-full border border-black/10"
+                                            style={{ backgroundColor: isNoteColor(note.color) ? NOTE_COLORS[note.color].paper : undefined }}
+                                        />
+                                        <span className="font-medium text-foreground">{note.name || 'Anonymous'}</span>
+                                        <span>· {ago(note.createdAt)}</span>
+                                        <span className={`ml-auto rounded-full px-2 py-0.5 text-[10px] uppercase tracking-[0.12em] ${note.status === 'approved' ? 'bg-primary/10 text-primary' : note.status === 'hidden' ? 'bg-foreground/[0.06]' : 'bg-amber-500/15 text-amber-600'}`}>
+                                            {note.status === 'pending' ? 'waiting' : note.status}
+                                        </span>
+                                    </div>
+                                    {note.flag && (
+                                        <p className="text-xs font-medium text-amber-600">⚠ Held back: {note.flag}</p>
+                                    )}
+                                    <p className="whitespace-pre-line break-words text-foreground">{note.message}</p>
+                                    <div className="mt-auto flex flex-wrap gap-2">
+                                        {note.status !== 'approved' && (
+                                            <form action={approveNote}>
+                                                <input type="hidden" name="id" value={note.id} />
+                                                <ModerateButton label="Approve" tone="primary" />
+                                            </form>
+                                        )}
+                                        {note.status !== 'hidden' && (
+                                            <form action={hideNote}>
+                                                <input type="hidden" name="id" value={note.id} />
+                                                <ModerateButton label="Hide" />
+                                            </form>
+                                        )}
+                                        <form action={deleteNote}>
+                                            <input type="hidden" name="id" value={note.id} />
+                                            <ModerateButton label="Delete" tone="danger" />
+                                        </form>
+                                    </div>
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                </Panel>
+
                 <Panel title="On the site right now">
                     {online.length ? (
                         <ul className="space-y-3 text-sm">

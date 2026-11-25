@@ -439,3 +439,47 @@ html[data-theme='light'] #avatar-assistant-panel {
         display: none !important;
     }
 }
+
+/* ---------------------------------------------------------------------------
+   Notes wall (footer guestbook)
+   ------------------------------------------------------------------------- */
+@keyframes notes-marquee {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        /* The row holds its notes twice; half its width is one full loop. */
+        transform: translateX(-50%);
+    }
+}
+
+/* A freshly pinned note drops onto the wall and settles at its tilt. */
+@keyframes note-pin {
+    0% {
+        opacity: 0;
+        transform: translateY(-28px) scale(1.12) rotate(-10deg);
+    }
+    60% {
+        opacity: 1;
+        transform: translateY(3px) scale(0.98) rotate(calc(var(--tilt, 0deg) + 2deg));
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1) rotate(var(--tilt, 0deg));
+    }
+}
+
+@layer utilities {
+    .animate-notes-marquee {
+        animation: notes-marquee 40s linear infinite;
+    }
+    .animate-note-pin {
+        animation: note-pin 650ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .animate-note-pin {
+        animation: none;
+    }
+}

@@ -8,7 +8,7 @@ const REFRESH_MS = 20_000;
 const formatter = new Intl.NumberFormat('en');
 
 /**
- * "● 3 online now · 1,204 visits": refreshed every 20s while the tab is
+ * "● 3 online now · 1,204 visitors": refreshed every 20s while the tab is
  * visible. Hidden until the first answer arrives (and while analytics is not
  * set up), so it never shows a zero or a placeholder.
  */
@@ -58,7 +58,7 @@ export default function LiveCounter({ className }: { className?: string }) {
             </span>
             <span aria-hidden>·</span>
             <span className="tabular-nums">
-                {formatter.format(live.visits)} visits
+                {formatter.format(live.visits)} visitors
             </span>
         </p>
     );

@@ -44,3 +44,34 @@ export async function logout() {
     (await cookies()).delete(ADMIN_COOKIE);
     redirect('/admin');
 }
+
+/** Note moderation. Server actions are public endpoints: each re-checks the session. */
+const moderate = async (formData: FormData, status: 'approved' | 'hidden' | 'delete') => {
+    const { isAdmin } = await import('@/lib/server/admin-auth');
+    if (!(await isAdmin())) return;
+
+    const id = String(formData.get('id') ?? '');
+    if (!id) return;
+
+    const { prisma } = await import('@/lib/server/db');
+    if (status === 'delete') {
+        await prisma.note.deleteMany({ where: { id } });
+    } else {
+        await prisma.note.updateMany({ where: { id }, data: { status } });
+    }
+
+    const { revalidatePath } = await import('next/cache');
+    revalidatePath('/admin');
+};
+
+export async function approveNote(formData: FormData) {
+    await moderate(formData, 'approved');
+}
+
+export async function hideNote(formData: FormData) {
+    await moderate(formData, 'hidden');
+}
+
+export async function deleteNote(formData: FormData) {
+    await moderate(formData, 'delete');
+}
